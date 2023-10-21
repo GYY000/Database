@@ -1,6 +1,6 @@
 import VueRouter from 'vue-router';
-import user_login from "@/views/loginInterface/login";
-import user_register from "@/views/loginInterface/register";
+import user_login from "@/views/loginInterface/login.vue";
+import user_register from "@/views/loginInterface/register.vue";
 
 const routes = [
     {
@@ -14,3 +14,9 @@ const routes = [
         component: user_register,
     }
 ]
+
+const router = createRouter({
+  routes
+})
+
+export default router
