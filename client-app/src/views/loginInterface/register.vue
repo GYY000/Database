@@ -4,13 +4,12 @@
 
 <script>
 export default {
-  name: "userlogin",
+  name: "user_register",
 
   data() {
     return {
       username: '',
       password: '',
-      match: false,
     }
   },
 

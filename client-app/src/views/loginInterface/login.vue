@@ -1,11 +1,24 @@
-<script setup>
-
-</script>
-
 <template>
 
 </template>
 
-<style scoped>
+<script>
+export default {
+  name: "user_login",
 
+  data() {
+    return {
+      username: '',
+      password: '',
+      match: false,
+    }
+  },
+
+  methods: {
+
+  }
+}
+</script>
+
+<style scoped>
 </style>
