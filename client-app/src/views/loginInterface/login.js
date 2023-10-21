@@ -1,3 +1,4 @@
+import {ElMessage} from "element-plus";
 import axios from "axios"
 
 export function user_login(login_data) {
@@ -11,7 +12,7 @@ export function user_login(login_data) {
     ).catch(
         msg => {
             ElMessage({
-                message: 'username and password do not match',
+                message: '您输入的账号或密码不正确，请重新输入。',
                 showClose: true,
                 type: 'error',
             })
