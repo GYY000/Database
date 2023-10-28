@@ -14,6 +14,7 @@ export default createStore({
     mutations: {
         setUserName(state, username) {
             state.user_info.username = username
+            localStorage.setItem("username", username)
         },
         setUserRegDate(state, date) {
             state.user_info.register_date = date
@@ -22,7 +23,8 @@ export default createStore({
             state.user_info.profile_photo = profile_photo
         },
         setAuthentic(state,authentic) {
-          state.isAuthentic = authentic
+          state.isAuthentic = authentic;
+          localStorage.setItem("isAuthentic", authentic? "true":"false");
         }
     },
     actions: {
