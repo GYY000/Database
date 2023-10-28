@@ -76,9 +76,13 @@ WSGI_APPLICATION = "WGZForce.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'db21373122',
+        'USER': '21373122',
+        'PASSWORD': 'Aa108174',
+        'HOST': '120.46.80.149',
+        'PORT': '',
     }
 }
 
