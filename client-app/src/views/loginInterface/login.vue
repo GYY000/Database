@@ -9,7 +9,7 @@
     <input v-model="password" placeholder="请输入您的密码">
   </div>
   <button @click="submit">登录</button>
-  <button @click="register">注册</button>
+  <button @click="toRegister">注册</button>
 </template>
 
 <script>
@@ -33,7 +33,7 @@ export default {
   },
 
   methods: {
-    register() {
+    toRegister() {
       this.$router.push('/register')
     },
     submit() {
