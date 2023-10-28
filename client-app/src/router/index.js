@@ -1,4 +1,4 @@
-import VueRouter from 'vue-router';
+import {createRouter, createWebHistory } from 'vue-router';
 import user_login from "@/views/loginInterface/login.vue";
 import user_register from "@/views/loginInterface/register.vue";
 
@@ -9,14 +9,15 @@ const routes = [
         component: user_login,
     },
     {
-        path: '/user-register',
+        path: '/register',
         name: "register-view",
         component: user_register,
     }
 ]
 
 const router = createRouter({
-  routes
+    history: createWebHistory('/'),
+    routes
 })
 
 export default router
