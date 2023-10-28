@@ -9,6 +9,7 @@
     <input v-model="password" placeholder="请输入您的密码">
   </div>
   <button @click="submit">登录</button>
+  <button @click="register">注册</button>
 </template>
 
 <script>
@@ -17,6 +18,11 @@ import {ElMessage} from "element-plus";
 
 export default {
   name: "user_login",
+  computed: {
+    register() {
+      return register
+    }
+  },
 
   data() {
     return {
@@ -27,6 +33,9 @@ export default {
   },
 
   methods: {
+    register() {
+      this.$router.push('/register')
+    },
     submit() {
       const login_data = {
         "userName": this.userName,

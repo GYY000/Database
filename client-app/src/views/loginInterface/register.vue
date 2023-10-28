@@ -10,14 +10,6 @@
       >
     </div>
     <div>
-      <label>邮箱：</label>
-      <input
-        type="text"
-        id="email_addr"
-        v-model="email"
-      >
-    </div>
-    <div>
       <label>密码：</label>
       <input
         type="text"
@@ -57,7 +49,6 @@ export default {
       username: "",
       password: "",
       confirmPassword: "",
-      email: "",
       can_reg: false
     };
   },
