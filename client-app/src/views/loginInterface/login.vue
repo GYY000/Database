@@ -1,4 +1,8 @@
 <template>
+  <head>
+    <title>登录</title>
+  </head>
+  <body>
   <div>login</div>
   <div>
     <label>账号</label>
@@ -10,7 +14,12 @@
   </div>
   <button @click="submit">登录</button>
   <button @click="toRegister">注册</button>
+  </body>
 </template>
+
+<style scoped>
+
+</style>
 
 <script>
 import {fetch_user_info, user_login} from "@/views/loginInterface/loginAPI";
