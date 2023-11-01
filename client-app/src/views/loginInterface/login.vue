@@ -47,12 +47,12 @@ export default {
     },
     submit() {
       const login_data = {
-        "userName": this.userName,
+        "username": this.username,
         "password": this.password,
       }
       user_login(login_data).then(
           res => {
-            this.match = res.match === "true"
+            this.match = Boolean(res.match === 'true')
           }
       ).then(
           () => {

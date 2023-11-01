@@ -6,7 +6,7 @@ export function user_login(login_data) {
         url: '/loginInterface/login',
         method: "post",
         data: JSON.stringify({
-            userName: login_data.username,
+            username: login_data.username,
             password: login_data.password
         })
     }).then(
@@ -30,15 +30,15 @@ export function fetch_user_info(login_user) {
             url: '/loginInterface/fetch_info',
             method: "post",
             data: JSON.stringify({
-                userName: login_user
+                username: login_user
             })
         }).then(
         (response) => {
-            return JSON.stringify({
+            return {
                 username: login_user,
                 register_date: response.data.register_date,
                 profile_photo: response.data.profile_photo
-            })
+            }
         }
     ).catch(
         error => {
