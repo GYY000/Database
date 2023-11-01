@@ -73,6 +73,7 @@ export default {
               showClose: true,
               type: "success"
             });
+            this.$store.dispatch("reg_success_info", {accountInfo: JSON.stringify(this.username)});
             this.$router.push("/");
           }
         });

@@ -3,13 +3,16 @@ import {createStore} from "vuex";
 export default createStore({
     state: {
         user_info: {
-            username: undefined,
-            profile_photo: undefined,
-            register_date: undefined
+            username: "admin",
+            profile_photo: "default",
+            register_date: "default"
         },
         isAuthentic: false
     },
     getters: {
+        getUserName: state => state.user_info.username,
+        getProfilePhoto: state => state.user_info.profile_photo,
+        getRegisterDate: state => state.user_info.register_date
     },
     mutations: {
         setUserName(state, username) {
@@ -33,6 +36,13 @@ export default createStore({
             commit("setUserRegDate", accountInfo.register_date)
             commit("setUserProfilePhoto", accountInfo.profile_photo)
             commit("setAuthentic", true)
+        },
+        async reg_success_info({commit}, {accountInfo}) {
+            commit("setUserName", accountInfo.username)
+            commit("setAuthentic", true)
+        },
+        async logout({commit}, {accountInfo}) {
+            commit("setAuthentic", false)
         }
     }
 })
