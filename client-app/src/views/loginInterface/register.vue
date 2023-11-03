@@ -4,32 +4,32 @@
     <div>
       <label>用户名：</label>
       <input
-        type="text"
-        id="user_name"
-        v-model="user_name"
+          type="text"
+          id="user_name"
+          v-model="user_name"
       >
     </div>
     <div>
       <label>密码：</label>
       <input
-        type="text"
-        id="password"
-        v-model="password"
+          type="text"
+          id="password"
+          v-model="password"
       >
     </div>
     <div>
       <label>请确认密码：</label>
       <input
-        type="text"
-        id="confirm_password"
-        v-model="confirmPassword"
+          type="text"
+          id="confirm_password"
+          v-model="confirmPassword"
       >
     </div>
     <div>
       <button
-        class="button"
-        type="submit"
-        @click="register"
+          class="button"
+          type="submit"
+          @click="register"
       >
         注册
       </button>
@@ -38,8 +38,8 @@
 </template>
 
 <script>
-import { ElMessage } from "element-plus";
-import { user_register } from "@/views/loginInterface/loginAPI";
+import {ElMessage} from "element-plus";
+import {fetch_user_info, user_register} from "@/views/loginInterface/loginAPI";
 
 export default {
   name: "user_register",
@@ -62,7 +62,7 @@ export default {
       };
       if (this.password === this.confirmPassword) {
         user_register(register_data).then(res => {
-          this.can_reg = Boolean(res.is_successful === "false");
+          this.can_reg = Boolean(res.is_successful === "true");
           if (res.duplicated === "true") {
             ElMessage.error("用户名已经被注册，请更换用户名");
           } else if (this.can_reg === false) {
@@ -73,7 +73,13 @@ export default {
               showClose: true,
               type: "success"
             });
-            this.$store.dispatch("reg_success_info", {accountInfo: JSON.stringify(this.user_name)});
+            this.$store.dispatch("reg_success_info", {accountInfo: {user_name: this.user_name}});
+            fetch_user_info(this.user_name).then(
+                res => {
+                  this.$store.dispatch("login_store_info", {accountInfo: res})
+                  this.$router.push({path: '/'})
+                }
+            )
             this.$router.push("/");
           }
         });

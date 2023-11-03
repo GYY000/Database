@@ -9,11 +9,16 @@ def login(request):
     request_dict = json.loads(request.body.decode('utf-8'))
     req_user_name = request_dict["user_name"]
     req_password = request_dict["password"]
-    user = User.objects.filter(user_name=req_user_name)
-    if len(user) != 0 and user.get(0).password == req_password:
-        return JsonResponse({"match": "true"})
-    else:
+    try:
+        user = User.objects.get(user_name=req_user_name)
+        password = user.password
+        if password == req_password:
+            return JsonResponse({"match": "true"})
+        else:
+            return JsonResponse({"match": "false"})
+    except User.DoesNotExist:
         return JsonResponse({"match": "false"})
+
 
 
 def fetch_info(request):
@@ -32,5 +37,4 @@ def register(request):
     else:
         user = User(user_name=req_user_name, password=req_password)
         user.save()
-        print(req_user_name)
         return JsonResponse({"is_successful": "true", "duplicate": "false"})

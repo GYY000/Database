@@ -1,7 +1,4 @@
 <template>
-  <head>
-    <title>登录</title>
-  </head>
   <body>
   <div>login</div>
   <div>
