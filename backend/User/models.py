@@ -24,14 +24,6 @@ class ReUserTeam(models.Model):
     class Meta:
         unique_together = ('uid', 'tid')
 
-class MonitorRelation(models.Model):
-    id = models.AutoField(primary_key=True)
-    uid = models.ForeignKey(User, on_delete=models.CASCADE)
-    tid = models.ForeignKey(Team, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('uid', 'tid')
-
 class Question(models.Model):
     qid = models.AutoField(primary_key=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -56,6 +48,7 @@ class Exam(models.Model):
     eid = models.AutoField(primary_key=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     qsid = models.ForeignKey(QuestionSet, on_delete=models.CASCADE)
+    exam_name = models.CharField(max_length=30, unique=True)
     start_time = models.DateTimeField()
     duration = models.DurationField()
 
