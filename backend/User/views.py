@@ -1,6 +1,6 @@
 import json
 from django.http import JsonResponse
-from models import User
+from User.models import User
 
 
 # Create your views here.
@@ -22,10 +22,15 @@ def fetch_info(request):
 
 
 def register(request):
-    # TODO just for test 需要连入数据库
     assert request.method == "POST"
     request_dict = json.loads(request.body.decode('utf-8'))
     req_user_name = request_dict["user_name"]
     req_password = request_dict["password"]
-
-    return JsonResponse({"is_successful": "true", "duplicate": "false"})
+    user = User.objects.filter(user_name=req_user_name)
+    if len(user) != 0:
+        return JsonResponse({"is_successful": "false", "duplicate": "true"})
+    else:
+        user = User(user_name=req_user_name, password=req_password)
+        user.save()
+        print(req_user_name)
+        return JsonResponse({"is_successful": "true", "duplicate": "false"})
