@@ -1,14 +1,12 @@
 import json
 from django.http import JsonResponse
 
-
 # Create your views here.
 def login(request):
     assert request.method == "POST"
     request_dict = json.loads(request.body.decode('utf-8'))
-    user_name = request_dict["username"]
+    user_name = request_dict["user_name"]
     password = request_dict["password"]
-    #TODO just for test 需要连入数据库
     print(user_name)
     if user_name == "gyy" and password == "123456":
         return JsonResponse({"match": "true"})

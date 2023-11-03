@@ -6,7 +6,7 @@
   <div>login</div>
   <div>
     <label>账号</label>
-    <input v-model="username" placeholder="请输入您的账号">
+    <input v-model="user_name" placeholder="请输入您的账号">
   </div>
   <div>
     <label>密码</label>
@@ -35,7 +35,7 @@ export default {
 
   data() {
     return {
-      username: '',
+      user_name: '',
       password: '',
       match: false,
     }
@@ -47,7 +47,7 @@ export default {
     },
     submit() {
       const login_data = {
-        "username": this.username,
+        "user_name": this.user_name,
         "password": this.password,
       }
       user_login(login_data).then(
@@ -57,7 +57,7 @@ export default {
       ).then(
           () => {
             if (this.match) {
-              fetch_user_info(this.username).then(
+              fetch_user_info(this.user_name).then(
                   res => {
                     this.$store.dispatch("login_store_info", {accountInfo: res})
                     this.$router.push({path: '/'})

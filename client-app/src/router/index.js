@@ -19,9 +19,9 @@ const routes = [
         name: "login",
         component:user_login,
         meta: {
-            bar_show:true,
-            header_show:true,
-            footer_show:true
+            bar_show:false,
+            header_show:false,
+            footer_show:false
         }
     },
     {
@@ -29,9 +29,9 @@ const routes = [
         name: "register",
         component: user_register,
         meta: {
-            bar_show:true,
-            header_show:true,
-            footer_show:true
+            bar_show:false,
+            header_show:false,
+            footer_show:false
         }
     }
 ]

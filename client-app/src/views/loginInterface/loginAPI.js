@@ -6,7 +6,7 @@ export function user_login(login_data) {
         url: '/loginInterface/login',
         method: "post",
         data: JSON.stringify({
-            username: login_data.username,
+            user_name: login_data.user_name,
             password: login_data.password
         })
     }).then(
@@ -30,12 +30,12 @@ export function fetch_user_info(login_user) {
             url: '/loginInterface/fetch_info',
             method: "post",
             data: JSON.stringify({
-                username: login_user
+                user_name: login_user
             })
         }).then(
         (response) => {
             return {
-                username: login_user,
+                user_name: login_user,
                 register_date: response.data.register_date,
                 profile_photo: response.data.profile_photo
             }
@@ -57,7 +57,7 @@ export function user_register(register_data) {
             url: '/loginInterface/register',
             method: "post",
             data: JSON.stringify({
-                username: register_data.username,
+                user_name: register_data.user_name,
                 password: register_data.password,
             })
         }).then(

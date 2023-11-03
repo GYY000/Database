@@ -5,8 +5,8 @@
       <label>用户名：</label>
       <input
         type="text"
-        id="username"
-        v-model="username"
+        id="user_name"
+        v-model="user_name"
       >
     </div>
     <div>
@@ -46,7 +46,7 @@ export default {
 
   data() {
     return {
-      username: "",
+      user_name: "",
       password: "",
       confirmPassword: "",
       can_reg: false
@@ -56,7 +56,7 @@ export default {
   methods: {
     register() {
       const register_data = {
-        username: this.username,
+        user_name: this.user_name,
         password: this.password,
         email: this.email
       };
@@ -73,7 +73,7 @@ export default {
               showClose: true,
               type: "success"
             });
-            this.$store.dispatch("reg_success_info", {accountInfo: JSON.stringify(this.username)});
+            this.$store.dispatch("reg_success_info", {accountInfo: JSON.stringify(this.user_name)});
             this.$router.push("/");
           }
         });
