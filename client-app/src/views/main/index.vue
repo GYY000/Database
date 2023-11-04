@@ -1,34 +1,99 @@
 <template>
-  <div>This is main page</div>
-  <div>{{getUserName}}</div>
-  <div>{{getProfilePhoto}}</div>
-  <div>{{getRegDate}}</div>
-  <button @click="logout">logout</button>
+  <div>
+    <el-tabs @tab-change="change_tab" class="tabs">
+      <!--- TODO -->
+      <el-tab-pane label="主页" name="/main_page">
+        <router-view v-slot="{ Component }">
+          <keep-alive>
+            <component :is="Component"/>
+          </keep-alive>
+        </router-view>
+      </el-tab-pane>
+      <el-tab-pane label="题目广场" name="/question_hub"> <!-- Changed the name attribute to "/question_hub" -->
+        <router-view v-slot="{ Component }">
+          <keep-alive>
+            <component :is="Component"/>
+          </keep-alive>
+        </router-view>
+      </el-tab-pane>
+    </el-tabs>
+  </div>
+  <div class="r-container">
+    <el-button v-if="is_login" @click="logout" type="primary" :icon="SortDown" class="button">
+      Logout
+    </el-button>
+    <el-button v-else @click="login" type="primary" :icon="SortUp" class="button">
+      Login
+    </el-button>
+    <el-button @click="change_tab('/user_center')" type="primary" :icon="User" class="button"></el-button>
+  </div>
 </template>
 
 <style scoped>
+.tabs {
+  position: fixed;
+  top: 5%;
+  left: 5%;
+  right: 5%;
+  bottom: 5%;
+  width: 87%;
+}
 
+.button {
+
+}
+
+.r-container {
+  position: fixed;
+  top: 5%;
+  right: 5%;
+}
 </style>
 
 <script>
+import {SortDown, SortUp, User} from '@element-plus/icons-vue'
+import {ref} from "vue";
+import router from "@/router";
+import store from "@/store";
+
 export default {
   name: "index",
-  computed: {
-    getUserName() {
-      return this.$store.getters.getUserName
-    },
-    getProfilePhoto() {
-      return this.$store.getters.getProfilePhoto
-    },
-    getRegDate() {
-      return this.$store.getters.getRegisterDate
-    }
+  setup() { // Changed from data() to setup() for Composition API syntax
+    const is_login = ref(store.getters.getIsAuthentic);
+    const tab_path = ref("user_page"); // Changed to ref() for reactivity
+
+    const change_tab = (name) => {
+      tab_path.value = name; // Changed to use ref value
+      router.push(tab_path.value); // Changed to use ref value
+    };
+
+    const logout = () => {
+      store.dispatch("logout", {});
+      router.push({path: '/login'});
+    };
+
+    const login = () => {
+      router.push({path: '/login'});
+    };
+
+    return {
+      is_login,
+      tab_path,
+      change_tab,
+      logout,
+      login
+    };
   },
-  methods: {
-    logout() {
-      this.$store.dispatch("logout", {});
-      this.$router.push({path: '/login'})
-    }
-  }
+  computed: {
+    User() {
+      return User;
+    },
+    SortUp() {
+      return SortUp;
+    },
+    SortDown() {
+      return SortDown;
+    },
+  },
 }
 </script>

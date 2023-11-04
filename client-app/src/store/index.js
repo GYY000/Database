@@ -12,7 +12,8 @@ export default createStore({
     getters: {
         getUserName: state => state.user_info.user_name,
         getProfilePhoto: state => state.user_info.profile_photo,
-        getRegisterDate: state => state.user_info.register_date
+        getRegisterDate: state => state.user_info.register_date,
+        getIsAuthentic: state => state.isAuthentic
     },
     mutations: {
         setUserName(state, user_name) {

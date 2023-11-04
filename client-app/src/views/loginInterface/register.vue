@@ -3,34 +3,18 @@
     <h1>用户注册</h1>
     <div>
       <label>用户名：</label>
-      <input
-          type="text"
-          id="user_name"
-          v-model="user_name"
-      >
+      <input type="text" id="user_name" v-model="user_name" />
     </div>
     <div>
       <label>密码：</label>
-      <input
-          type="text"
-          id="password"
-          v-model="password"
-      >
+      <input type="text" id="password" v-model="password" />
     </div>
     <div>
       <label>请确认密码：</label>
-      <input
-          type="text"
-          id="confirm_password"
-          v-model="confirmPassword"
-      >
+      <input type="text" id="confirm_password" v-model="confirmPassword" />
     </div>
     <div>
-      <button
-          class="button"
-          type="submit"
-          @click="register"
-      >
+      <button class="button" type="submit" @click="register">
         注册
       </button>
     </div>
@@ -38,56 +22,60 @@
 </template>
 
 <script>
-import {ElMessage} from "element-plus";
-import {fetch_user_info, user_register} from "@/views/loginInterface/loginAPI";
+import { ref } from "vue";
+import { ElMessage } from "element-plus";
+import { fetch_user_info, user_register } from "@/views/loginInterface/loginAPI";
+import store from "@/store";
+import router from "@/router";
 
 export default {
   name: "user_register",
 
-  data() {
-    return {
-      user_name: "",
-      password: "",
-      confirmPassword: "",
-      can_reg: false
-    };
-  },
+  setup() {
+    const user_name = ref("");
+    const password = ref("");
+    const confirmPassword = ref("");
+    const can_reg = ref(false);
 
-  methods: {
-    register() {
+    const register = () => {
       const register_data = {
-        user_name: this.user_name,
-        password: this.password,
-        email: this.email
+        user_name: user_name.value,
+        password: password.value,
       };
-      if (this.password === this.confirmPassword) {
-        user_register(register_data).then(res => {
-          this.can_reg = Boolean(res.is_successful === "true");
+
+      if (password.value === confirmPassword.value) {
+        user_register(register_data).then((res) => {
+          can_reg.value = Boolean(res.is_successful === "true");
           if (res.duplicated === "true") {
             ElMessage.error("用户名已经被注册，请更换用户名");
-          } else if (this.can_reg === false) {
+          } else if (!can_reg.value) {
             ElMessage.error("注册失败，请稍后再试");
           } else {
             ElMessage({
               message: "register successfully.",
               showClose: true,
-              type: "success"
+              type: "success",
             });
-            this.$store.dispatch("reg_success_info", {accountInfo: {user_name: this.user_name}});
-            fetch_user_info(this.user_name).then(
-                res => {
-                  this.$store.dispatch("login_store_info", {accountInfo: res})
-                  this.$router.push({path: '/'})
-                }
-            )
-            this.$router.push("/");
+            store.dispatch("reg_success_info", { accountInfo: { user_name: user_name.value } });
+            fetch_user_info(user_name.value).then((res) => {
+              store.dispatch("login_store_info", { accountInfo: res });
+              router.push({ path: "/" });
+            });
           }
         });
       } else {
         ElMessage.error("请确认密码一致");
       }
-    }
-  }
+    };
+
+    return {
+      user_name,
+      password,
+      confirmPassword,
+      can_reg,
+      register,
+    };
+  },
 };
 </script>
 

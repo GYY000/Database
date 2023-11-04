@@ -22,8 +22,22 @@ def login(request):
 
 
 def fetch_info(request):
-    # TODO just for test 需要连入数据库
-    return JsonResponse({"profile_photo": "1", "register_date": "2023.10.31"})
+    assert request.method == "POST"
+    request_dict = json.loads(request.body.decode('utf-8'))
+    req_user_name = request_dict["user_name"]
+    try:
+        user = User.objects.get(user_name=req_user_name)
+        profile_photo = user.profile_photo
+        register_date = user.register_date
+        if profile_photo is None:
+            return JsonResponse({"profile_photo": "None",
+                                 "register_date": register_date.strftime("%Y-%m-%d")})
+        else:
+            return JsonResponse({"profile_photo": profile_photo,
+                                 "register_date": register_date.strftime("%Y-%m-%d")})
+    except User.DoesNotExist:
+        return JsonResponse({"match": "false"})
+
 
 
 def register(request):
@@ -31,10 +45,10 @@ def register(request):
     request_dict = json.loads(request.body.decode('utf-8'))
     req_user_name = request_dict["user_name"]
     req_password = request_dict["password"]
-    user = User.objects.filter(user_name=req_user_name)
-    if len(user) != 0:
+    try:
         return JsonResponse({"is_successful": "false", "duplicate": "true"})
-    else:
+    except User.DoesNotExist:
         user = User(user_name=req_user_name, password=req_password)
         user.save()
         return JsonResponse({"is_successful": "true", "duplicate": "false"})
+

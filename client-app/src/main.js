@@ -1,11 +1,12 @@
 import {createApp} from 'vue'
 import App from './App.vue'
 import router from './router'
+import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import axios from "axios";
 import store from "@/store";
 import locale from 'element-plus/es/locale/lang/zh-cn'
-import {ElementPlus} from "@element-plus/icons-vue";
+import ElementPlus from 'element-plus'
 
 axios.defaults.timeout = 2000;
 
