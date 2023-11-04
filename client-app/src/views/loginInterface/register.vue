@@ -1,23 +1,22 @@
 <template>
-  <div class="container">
-    <h1>用户注册</h1>
-    <div>
-      <label>用户名：</label>
-      <input type="text" id="user_name" v-model="user_name" />
-    </div>
-    <div>
-      <label>密码：</label>
-      <input type="text" id="password" v-model="password" />
-    </div>
-    <div>
-      <label>请确认密码：</label>
-      <input type="text" id="confirm_password" v-model="confirmPassword" />
-    </div>
-    <div>
-      <button class="button" type="submit" @click="register">
-        注册
-      </button>
-    </div>
+  <el-form
+      label-position="left"
+      label-width="75px"
+      style="max-width: 300px;margin:auto">
+    <el-form-item label="用户名">
+      <el-input v-model="user_name"/>
+    </el-form-item>
+    <el-form-item label="密码">
+      <el-input v-model="password"/>
+    </el-form-item>
+    <el-form-item label="确认密码">
+      <el-input v-model="confirmPassword"/>
+    </el-form-item>
+  </el-form>
+  <div class="centered-button">
+    <el-button @click="register" class="button">
+      <div style="color:#409EFF">注 册</div>
+    </el-button>
   </div>
 </template>
 
@@ -80,11 +79,16 @@ export default {
 </script>
 
 <style scoped>
-.container {
-  /* TODO: 添加样式 */
-}
-
+.centered-button {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 .button {
-  /* TODO: 添加样式 */
+  border-radius: 8px;
+  height: 40px;
+  width: 100px;
+  border: 1px solid #409EFF;
 }
 </style>

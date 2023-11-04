@@ -1,70 +1,83 @@
 <template>
-  <div>
-    <div>login</div>
-    <div>
-      <label>账号</label>
-      <input v-model="user_name" placeholder="请输入您的账号" />
-    </div>
-    <div>
-      <label>密码</label>
-      <input v-model="password" placeholder="请输入您的密码" />
-    </div>
-    <button @click="submit">登录</button>
-    <button @click="toRegister">注册</button>
+  <el-form
+      label-position="left"
+      label-width="100px"
+      style="max-width: 300px;margin:auto">
+    <el-form-item label="用户名">
+      <el-input v-model="user_name"/>
+    </el-form-item>
+    <el-form-item label="密码">
+      <el-input v-model="password"/>
+    </el-form-item>
+  </el-form>
+  <div class="centered">
+    <el-button class="button" @click="submit">
+      <div style="color:#409EFF">登 录</div>
+    </el-button>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.centered {
+  position: absolute;
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.button {
+  border-radius: 8px;
+  height: 40px;
+  width: 100px;
+  border: 1px solid #409EFF;
+}
+</style>
 
 <script>
-import { ref } from "vue";
-import { fetch_user_info, user_login } from "@/views/loginInterface/loginAPI";
-import { ElMessage } from "element-plus";
+import {ref} from "vue";
+import {fetch_user_info, user_login} from "@/views/loginInterface/loginAPI";
+import {ElMessage} from "element-plus";
 import store from "@/store";
 import router from "@/router";
 
 export default {
   name: "user_login",
-
   setup() {
     const user_name = ref("");
     const password = ref("");
     const match = ref(false);
-
-    const toRegister = () => {
-      router.push("/register");
-    };
 
     const submit = () => {
       const login_data = {
         user_name: user_name.value,
         password: password.value,
       };
-
+      const user = ref({
+        user_name: '',
+        password: '',
+      });
       user_login(login_data)
-        .then((res) => {
-          match.value = Boolean(res.match === "true");
-        })
-        .then(() => {
-          if (match.value) {
-            fetch_user_info(user_name.value).then((res) => {
-              store.dispatch("login_store_info", { accountInfo: res });
-              router.push({ path: "/" });
-            });
-          } else {
-            ElMessage({
-              message: "login failed",
-              type: "error",
-            });
-          }
-        });
+          .then((res) => {
+            match.value = Boolean(res.match === "true");
+          })
+          .then(() => {
+            if (match.value) {
+              fetch_user_info(user_name.value).then((res) => {
+                store.dispatch("login_store_info", {accountInfo: res});
+                router.push({path: "/"});
+              });
+            } else {
+              ElMessage({
+                message: "login failed",
+                type: "error",
+              });
+            }
+          });
     };
-
     return {
       user_name,
       password,
       match,
-      toRegister,
       submit,
     };
   },

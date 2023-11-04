@@ -9,7 +9,7 @@
           </keep-alive>
         </router-view>
       </el-tab-pane>
-      <el-tab-pane label="题目广场" name="/question_hub"> <!-- Changed the name attribute to "/question_hub" -->
+      <el-tab-pane label="题目广场" name="/question_hub">
         <router-view v-slot="{ Component }">
           <keep-alive>
             <component :is="Component"/>
@@ -58,13 +58,13 @@ import store from "@/store";
 
 export default {
   name: "index",
-  setup() { // Changed from data() to setup() for Composition API syntax
+  setup() {
     const is_login = ref(store.getters.getIsAuthentic);
-    const tab_path = ref("user_page"); // Changed to ref() for reactivity
+    const tab_path = ref("user_page");
 
     const change_tab = (name) => {
-      tab_path.value = name; // Changed to use ref value
-      router.push(tab_path.value); // Changed to use ref value
+      tab_path.value = name;
+      router.push(tab_path.value);
     };
 
     const logout = () => {

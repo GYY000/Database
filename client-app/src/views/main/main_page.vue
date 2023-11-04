@@ -7,7 +7,8 @@
 <script>
 export default {
   name: "main_page",
-  methods: {
+  setup() {
+
   }
 }
 </script>
