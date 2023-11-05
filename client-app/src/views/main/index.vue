@@ -25,7 +25,9 @@
     <el-button v-else @click="login" type="primary" :icon="SortUp" class="button">
       Login
     </el-button>
-    <el-button @click="change_tab('/user_center')" type="primary" :icon="User" class="button"></el-button>
+    <el-button @click="change_tab('/user_center')" type="primary" :icon="User" class="button">
+      用户中心
+    </el-button>
   </div>
 </template>
 

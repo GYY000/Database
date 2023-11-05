@@ -4,7 +4,7 @@ export default createStore({
     state: {
         user_info: {
             user_name: "admin",
-            profile_photo: "default",
+            profile_photo: "src/assets/image/default-avatar.png",
             register_date: "default"
         },
         isAuthentic: false
@@ -24,7 +24,13 @@ export default createStore({
             state.user_info.register_date = date
         },
         setUserProfilePhoto(state, profile_photo) {
-            state.user_info.profile_photo = profile_photo
+            if(profile_photo.substring(0,3) === "/9j") {
+                state.user_info.profile_photo = 'data:image/jpg;base64,' + profile_photo
+            } else if(profile_photo.substring(0,3) === "iVB") {
+                state.user_info.profile_photo = 'data:image/png;base64,' + profile_photo
+            } else {
+                state.user_info.profile_photo = "src/assets/image/default-avatar.png"
+            }
         },
         setAuthentic(state,authentic) {
           state.isAuthentic = authentic;

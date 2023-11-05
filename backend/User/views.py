@@ -1,6 +1,7 @@
 import json
 from django.http import JsonResponse
 from User.models import User
+import base64
 
 
 # Create your views here.
@@ -20,7 +21,6 @@ def login(request):
         return JsonResponse({"match": "false"})
 
 
-
 def fetch_info(request):
     assert request.method == "POST"
     request_dict = json.loads(request.body.decode('utf-8'))
@@ -33,11 +33,10 @@ def fetch_info(request):
             return JsonResponse({"profile_photo": "None",
                                  "register_date": register_date.strftime("%Y-%m-%d")})
         else:
-            return JsonResponse({"profile_photo": profile_photo,
+            return JsonResponse({"profile_photo": bytes.decode(profile_photo),
                                  "register_date": register_date.strftime("%Y-%m-%d")})
     except User.DoesNotExist:
         return JsonResponse({"match": "false"})
-
 
 
 def register(request):
@@ -52,3 +51,18 @@ def register(request):
         user.save()
         return JsonResponse({"is_successful": "true", "duplicate": "false"})
 
+
+def upload_img(request):
+    user_name = request.GET.get('user_name')
+    img = request.FILES.get('file').read()
+    code = base64.b64encode(img)
+    print(user_name)
+    print(type(img))
+    try:
+        user = User.objects.get(user_name=user_name)
+        user.profile_photo = code
+        user.save()
+        return JsonResponse({"is_successful": "true"})
+    except User.DoesNotExist:
+        # 处理找不到用户的情况
+        return JsonResponse({"is_successful": "false"})
