@@ -13,7 +13,6 @@
       <img v-if="src1" :src="src1" class="avatar">
       <div>点击即可更换头像</div>
     </el-upload>
-
   </div>
 </template>
 
