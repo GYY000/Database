@@ -1,30 +1,25 @@
 <template>
-  <div>
-    here is user_center
+  <div class="container">
+    <img :src="src1" class="avatar">
+    <el-upload
+        class="avatar-uploader"
+        :action=action_url
+        :before-upload="handleBeforeUpload"
+        :auto-upload="true"
+        :show-file-list="false"
+        accept=".jpg,.png"
+        :on-success="handleAvatarSuccess"
+    >
+      <img v-if="src1" :src="src1" class="avatar">
+      <div>点击即可更换头像</div>
+    </el-upload>
+
   </div>
-  <el-upload
-      class="avatar-uploader"
-      :action=action_url
-      :before-upload="handleBeforeUpload"
-      :auto-upload="true"
-      :show-file-list="false"
-      accept=".jpg,.png"
-      :on-success="handleAvatarSuccess"
-  >
-    <el-icon class="el-icon--upload">
-      <upload-filled/>
-    </el-icon>
-    <img v-if="src1" :src="src1" class="avatar">
-    <div class="el-upload__text">
-      Drop file here or <em>click to upload</em>
-    </div>
-  </el-upload>
-  <img :src="src1" class="avatar">
 </template>
 
 <script>
 import {ref} from "vue";
-import store from "@/store";
+import userStateStore from "@/store/index";
 import {ElMessage} from "element-plus";
 import {fetch_user_info} from "@/views/loginInterface/loginAPI";
 import {UploadFilled} from '@element-plus/icons-vue'
@@ -34,8 +29,10 @@ export default {
   name: "user_center",
   components: {UploadFilled},
   setup() {
-    const src1 = ref(store.getters.getProfilePhoto)
-    const action_url = ref("http://127.0.0.1:8000/upload_img?user_name=" + store.getters.getUserName)
+    const store = userStateStore()
+    const src1 = ref(store.getProfilePhoto)
+    //TODO: on server change here
+    const action_url = ref("http://127.0.0.1:8000/upload_avatar?user_name=" + store.getUserName)
     const handleBeforeUpload = (rawFile) => {
       if (rawFile.type !== 'image/jpeg' && rawFile.type !== "image/png") {
         ElMessage.error('Avatar picture must be JPG/PNG format!')
@@ -47,12 +44,12 @@ export default {
       return true
     }
     const handleAvatarSuccess = (response, uploadFile) => {
-          fetch_user_info(store.getters.getUserName).then((res) => {
-            store.dispatch("login_store_info", {accountInfo: res});
-            router.push({path: "/user_center"});
-          });
-          src1.value = store.getters.getProfilePhoto
-        }
+      fetch_user_info(store.getUserName).then((res) => {
+        store.login_store_info(res);
+        router.push({path: "/user_center"});
+      });
+      src1.value = store.getProfilePhoto
+    }
     return {
       handleBeforeUpload,
       src1,
@@ -79,6 +76,15 @@ export default {
 .avatar {
   width: 178px;
   height: 178px;
-  display: block;
+}
+
+.container {
+  overflow: hidden;
+  width: 100%;
+  height: 100vh;
+  max-width: 100%;
+  backdrop-filter: blur(2px);
+  background: #f2f2f2;
+  opacity: 95%;
 }
 </style>

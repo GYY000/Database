@@ -45,6 +45,7 @@ def register(request):
     req_user_name = request_dict["user_name"]
     req_password = request_dict["password"]
     try:
+        User.objects.get(user_name=req_user_name)
         return JsonResponse({"is_successful": "false", "duplicate": "true"})
     except User.DoesNotExist:
         user = User(user_name=req_user_name, password=req_password)
@@ -52,12 +53,10 @@ def register(request):
         return JsonResponse({"is_successful": "true", "duplicate": "false"})
 
 
-def upload_img(request):
+def upload_avatar(request):
     user_name = request.GET.get('user_name')
     img = request.FILES.get('file').read()
     code = base64.b64encode(img)
-    print(user_name)
-    print(type(img))
     try:
         user = User.objects.get(user_name=user_name)
         user.profile_photo = code

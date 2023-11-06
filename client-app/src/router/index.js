@@ -2,7 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router';
 import index from "@/views/main/index.vue";
 import main_page from "@/views/main/main_page.vue";
 import user_center from "@/views/main/user_center.vue";
-import store from "@/store";
+import userStateStore from "@/store";
 import log_reg from "@/views/loginInterface/log_reg.vue";
 
 const routes = [
@@ -57,11 +57,12 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    const isLogin = store.getters.getIsAuthentic === true
+    const store = userStateStore()
+    const isLogin = store.getIsAuthentic
     if (to.path === "/log_reg") {
          //若用户已登录且前往登录页，则跳转到首页
-        isLogin ? next("/") : next()
-    } else if (!(to.path === "/log_reg" || to.path === "/main_page") && !isLogin) { // 拦截
+        isLogin ? next("/main_page") : next()
+    } else if (to.path !== "/main_page" && !isLogin) { // 拦截
         next("/log_reg")
     } else {
         next()

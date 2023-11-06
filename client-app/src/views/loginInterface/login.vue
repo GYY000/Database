@@ -37,7 +37,7 @@
 import {ref} from "vue";
 import {fetch_user_info, user_login} from "@/views/loginInterface/loginAPI";
 import {ElMessage} from "element-plus";
-import store from "@/store";
+import userStateStore from "@/store/index";
 import router from "@/router";
 
 export default {
@@ -63,8 +63,9 @@ export default {
           .then(() => {
             if (match.value) {
               fetch_user_info(user_name.value).then((res) => {
-                store.dispatch("login_store_info", {accountInfo: res});
-                router.push({path: "/"});
+                const stateStore = userStateStore();
+                stateStore.login_store_info(res);
+                router.push({path: "/main_page"});
               });
             } else {
               ElMessage({

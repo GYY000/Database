@@ -24,7 +24,7 @@
 import { ref } from "vue";
 import { ElMessage } from "element-plus";
 import { fetch_user_info, user_register } from "@/views/loginInterface/loginAPI";
-import store from "@/store";
+import userStateStore from "@/store";
 import router from "@/router";
 
 export default {
@@ -55,9 +55,11 @@ export default {
               showClose: true,
               type: "success",
             });
-            store.dispatch("reg_success_info", { accountInfo: { user_name: user_name.value } });
+            const store = userStateStore();
+            store.reg_success_info({ user_name: user_name.value })
             fetch_user_info(user_name.value).then((res) => {
-              store.dispatch("login_store_info", { accountInfo: res });
+              const store = userStateStore()
+              store.login_store_info(res)
               router.push({ path: "/" });
             });
           }
