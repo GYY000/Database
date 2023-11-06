@@ -46,7 +46,7 @@ export default {
     const handleAvatarSuccess = (response, uploadFile) => {
       fetch_user_info(store.getUserName).then((res) => {
         store.login_store_info(res);
-        router.push({path: "/user_center"});
+        router.go(0)
       });
       src1.value = store.getProfilePhoto
     }
