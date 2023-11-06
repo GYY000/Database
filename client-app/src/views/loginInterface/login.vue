@@ -7,7 +7,7 @@
       <el-input v-model="user_name"/>
     </el-form-item>
     <el-form-item label="密码">
-      <el-input v-model="password"/>
+      <el-input v-model="password" show-password="true"/>
     </el-form-item>
   </el-form>
   <div class="centered">

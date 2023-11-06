@@ -9,11 +9,13 @@ export const userStateStore = defineStore("user", {
             isAuthentic: false
         }
     },
+
     persist: {
         enabled: true,
         key: "demo",
         storage: sessionStorage,
     },
+
     getters: {
         getUserName: (state) => {
             return state.user_name

@@ -104,7 +104,6 @@ export default {
 
 .tabs-container {
   width: 100%;
-
 }
 
 el-tabs {
