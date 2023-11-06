@@ -231,6 +231,5 @@ export default {
   position: relative;
   background: linear-gradient(to bottom right, rgba(70, 64, 255, 0.56) 0%, rgba(254, 214, 227, 0.87) 100%);
   margin: 10px 0;
-  box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.2);
 }
 </style>

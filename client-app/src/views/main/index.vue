@@ -112,7 +112,7 @@ export default {
   setup() {
     const store = userStateStore()
     const is_login = ref(store.getUserName);
-    const tab_path = ref("user_page");
+    const tab_path = ref("/main_page");
     const avatar = ref(store.getProfilePhoto)
     const user_name = ref(store.getUserName)
     const activeTab = ref(sessionStorage.getItem('activeTab') || '/main_page')
