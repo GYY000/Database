@@ -46,6 +46,16 @@ const routes = [
                     header_show: false,
                     footer_show: false
                 }
+            },
+            {
+                path: '/post_hub',
+                name: "post_hub",
+                component: question_hub,
+                meta: {
+                    bar_show: false,
+                    header_show: false,
+                    footer_show: false
+                }
             }
         ]
     },

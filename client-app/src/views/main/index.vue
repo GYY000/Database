@@ -19,6 +19,13 @@
             </keep-alive>
           </router-view>
         </el-tab-pane>
+        <el-tab-pane label="帖子广场" name="/post_hub">
+          <router-view v-slot="{ Component }">
+            <keep-alive>
+              <component :is="Component"/>
+            </keep-alive>
+          </router-view>
+        </el-tab-pane>
       </el-tabs>
     </div>
     <div class="r-container">
