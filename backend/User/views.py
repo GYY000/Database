@@ -141,7 +141,6 @@ user_id	    name_list
     dict["avator_list"] = avatar_list
     dict["creator_list"] = creator_list
     dict["date_list"] = date_list
-    print(name_list)
     return JsonResponse(dict)
 
 
