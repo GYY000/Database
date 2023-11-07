@@ -37,6 +37,7 @@ class QuestionSet(models.Model):
     set_name = models.CharField(max_length=30, unique=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     create_time = models.DateTimeField(auto_now_add=True)
+    is_public = models.BooleanField(null=False)
     profile_photo = models.BinaryField(null=True, blank=True)
 
 class QuestionSetPerm(models.Model):
@@ -74,6 +75,7 @@ class Message(models.Model):
     receiver = models.ForeignKey(User, related_name='received_messages', on_delete=models.CASCADE)
     time = models.DateTimeField(auto_now_add=True)
     content = models.CharField(max_length=300)
+    read = models.BooleanField(default=False)
 
 class Post(models.Model):
     pid = models.AutoField(primary_key=True)
