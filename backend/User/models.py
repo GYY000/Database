@@ -82,6 +82,8 @@ class Post(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now_add=True)
+    title = models.CharField(max_length=40)
 
 class Comment(models.Model):
     id = models.AutoField(primary_key=True)
