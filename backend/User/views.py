@@ -158,10 +158,11 @@ user_id	    name_list
     create_qsid_list = QuestionSet.objects.filter(creator=user_id)
     create_qs_list = [QuestionSet.objects.get(qsid=qsid) for qsid in create_qsid_list]
     name_list = [_.set_name for _ in create_qs_list]
-    avatar_list = [_.profile_photo for _ in create_qs_list]
+    avatar_list = [bytes.decode(_.profile_photo) for _ in create_qs_list]
+    date_list = [_.create_time.strftime("%Y-%m-%d") for _ in create_qs_list]
     creator_list = [User.objects.get(uid=_.creator).user_name for _ in create_qs_list]
     return JsonResponse({"name_list": name_list, "avatar_list": avatar_list,
-                         "creator_list": creator_list})
+                         "creator_list": creator_list, "date_list": date_list})
 
 
 # 相似度超过50即认为匹配
@@ -190,7 +191,7 @@ search_content	avatar_list
     teamIds = list(ReUserTeam.objects.filter(uid=user_id))
     search_content = request_dict["search_content"]
     ques_sets = list(QuestionSet.objects.filter(is_public=True))
-    for quesPerm in QuestionSetPerm.objects:
+    for quesPerm in QuestionSetPerm.objects.all():
         if teamIds.__contains__(quesPerm.tid):
             quesSet = QuestionSet.objects.get(qsid=quesPerm.qsid)
             if not ques_sets.__contains__(quesSet):
@@ -198,21 +199,25 @@ search_content	avatar_list
     dict = {}
     name_list = []
     avatar_list = []
+    date_list = []
     creator_list = [User.objects.get(uid=qs.creator).user_name for qs in ques_sets]
     for qs in ques_sets:
         name_list.append(qs.set_name)
-        avatar_list.append(qs.profile_photo)
+        avatar_list.append(bytes.decode(qs.profile_photo))
+        date_list.append(qs.create_time.strftime("%Y-%m-%d"))
     i = 0
     while i < len(name_list):
         if not fuzzy_match(name_list[i], search_content):
             name_list.pop(i)
             avatar_list.pop(i)
             creator_list.pop(i)
+            date_list.pop(i)
             i -= 1
         i += 1
     dict["name_list"] = name_list
     dict["avator_list"] = avatar_list
     dict["creator_list"] = creator_list
+    dict["date_list"] = date_list
     return JsonResponse(dict)
 
 
