@@ -23,5 +23,6 @@ urlpatterns = [
     re_path("loginInterface/login", views.login),
     re_path("loginInterface/fetch_info", views.fetch_info),
     re_path("loginInterface/register", views.register),
-    re_path("upload_avatar", views.upload_avatar)
+    re_path("upload_avatar", views.upload_avatar),
+    re_path("upload_ques_set", views.upload_ques_set)
 ]

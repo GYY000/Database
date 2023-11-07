@@ -36,7 +36,7 @@ export default {
     }
     const add_ques_set = () => {
       let form = new FormData
-      form.append("user_name", store.getUserName)
+      form.append("user_id", store.getUserId)
       if (is_public === 'group') {
         form.append("group_name", group_name.value)
       } else {
