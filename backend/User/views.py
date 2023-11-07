@@ -71,17 +71,21 @@ def upload_avatar(request):
 
 def upload_ques_set(request):
     assert request.method == "POST"
-    file = request.FILES.get('file')
+    file = request.FILES.get('file').read()
     code = base64.b64encode(file)
     user_id = request.POST.get('user_id')
     group_name = request.POST.get('group_name')
     set_name = request.POST.get('set_name')
     is_public = "group_name" == "none"
-    ques_set = QuestionSet(set_name=set_name, creator=user_id, is_public=is_public,
-                           profile_photo=code)
-    ques_set.save()
-    if not is_public:
-        ques_id = QuestionSet.objects.get(set_name=set_name).qsid
-        ques_perm = QuestionSetPerm(qsid=ques_id,tid=Team.objects.get(team_name=group_name).tid)
-        ques_perm.save()
-    return JsonResponse({"is_successful": "true"})
+    try:
+        QuestionSet.objects.get(set_name=set_name)
+        return JsonResponse({"is_successful": "false"})
+    except QuestionSet.DoesNotExist:
+        ques_set = QuestionSet(set_name=set_name, creator=User.objects.get(uid=user_id), is_public=is_public,
+                               profile_photo=code)
+        ques_set.save()
+        if not is_public:
+            ques_id = QuestionSet.objects.get(set_name=set_name).qsid
+            ques_perm = QuestionSetPerm(qsid=ques_id, tid=Team.objects.get(team_name=group_name).tid)
+            ques_perm.save()
+        return JsonResponse({"is_successful": "true"})

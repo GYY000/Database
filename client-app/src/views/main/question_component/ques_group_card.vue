@@ -7,7 +7,7 @@
 <script setup>
 export default {
   name:"ques_group_card",
-  props: ['item'],
+  props: ['ques_set_info'],
   setup() {
     return {
 
