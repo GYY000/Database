@@ -1,6 +1,6 @@
 import json
 from django.http import JsonResponse
-from models import *  # fixme: 王士举修改路径
+from User.models import *  # fixme: 王士举修改路径
 import base64
 from Levenshtein import distance
 
@@ -123,7 +123,7 @@ user_id	    name_list
     user_id = request_dict["user_id"]
     teamIds = list(ReUserTeam.objects.filter(uid=user_id))
     ques_sets = list(QuestionSet.objects.filter(is_public=True))
-    for quesPerm in QuestionSetPerm.objects:
+    for quesPerm in QuestionSetPerm.objects.all():
         if teamIds.__contains__(quesPerm.tid):
             quesSet = QuestionSet.objects.get(qsid=quesPerm.qsid)
             if not ques_sets.__contains__(quesSet):
@@ -132,15 +132,16 @@ user_id	    name_list
     name_list = []
     avatar_list = []
     date_list = []
-    creator_list = [User.objects.get(uid=qs.creator).user_name for qs in ques_sets]
+    creator_list = [User.objects.get(uid=qs.creator.uid).user_name for qs in ques_sets]
     for qs in ques_sets:
         name_list.append(qs.set_name)
-        avatar_list.append(qs.profile_photo)
+        avatar_list.append(bytes.decode(qs.profile_photo))
         date_list.append(qs.create_time.strftime("%Y-%m-%d"))
     dict["name_list"] = name_list
     dict["avator_list"] = avatar_list
     dict["creator_list"] = creator_list
     dict["date_list"] = date_list
+    print(name_list)
     return JsonResponse(dict)
 
 

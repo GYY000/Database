@@ -17,7 +17,7 @@
   </el-card>
 </template>
 
-<script setup>
+<script>
 import {ref} from "vue";
 
 export default {
