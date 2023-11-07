@@ -37,7 +37,8 @@ export function fetch_user_info(login_user) {
             return {
                 user_name: login_user,
                 register_date: response.data.register_date,
-                profile_photo: response.data.profile_photo
+                profile_photo: response.data.profile_photo,
+                user_id: response.data.user_id
             }
         }
     ).catch(

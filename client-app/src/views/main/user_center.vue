@@ -84,7 +84,7 @@ export default {
     const src1 = ref(store.getProfilePhoto)
     //const is_editing_user_name = ref(false)
     //TODO: on server change here
-    const action_url = ref("http://127.0.0.1:8000/upload_avatar?user_name=" + store.getUserName)
+    const action_url = ref("http://127.0.0.1:8000/upload_avatar?user_id=" + store.getUserId)
     const handleBeforeUpload = (rawFile) => {
       if (rawFile.type !== 'image/jpeg' && rawFile.type !== "image/png") {
         ElMessage.error('Avatar picture must be JPG/PNG format!')

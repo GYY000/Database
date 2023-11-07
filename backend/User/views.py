@@ -31,10 +31,12 @@ def fetch_info(request):
         register_date = user.register_date
         if profile_photo is None:
             return JsonResponse({"profile_photo": "None",
-                                 "register_date": register_date.strftime("%Y-%m-%d")})
+                                 "register_date": register_date.strftime("%Y-%m-%d"),
+                                 "user_id": user.uid})
         else:
             return JsonResponse({"profile_photo": bytes.decode(profile_photo),
-                                 "register_date": register_date.strftime("%Y-%m-%d")})
+                                 "register_date": register_date.strftime("%Y-%m-%d"),
+                                 "user_id": user.uid})
     except User.DoesNotExist:
         return JsonResponse({"match": "false"})
 
@@ -54,11 +56,11 @@ def register(request):
 
 
 def upload_avatar(request):
-    user_name = request.GET.get('user_name')
+    user_id = request.GET.get('user_id')
     img = request.FILES.get('file').read()
     code = base64.b64encode(img)
     try:
-        user = User.objects.get(user_name=user_name)
+        user = User.objects.get(uid=user_id)
         user.profile_photo = code
         user.save()
         return JsonResponse({"is_successful": "true"})
