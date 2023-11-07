@@ -28,8 +28,7 @@ class Question(models.Model):
     qid = models.AutoField(primary_key=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     qsid = models.ForeignKey('QuestionSet', on_delete=models.CASCADE)
-    content = models.CharField(max_length=400)
-    answer = models.CharField(max_length=400)
+    content = models.JSONField()
     score = models.FloatField()
     serial_num = models.IntegerField()
 
@@ -38,6 +37,7 @@ class QuestionSet(models.Model):
     set_name = models.CharField(max_length=30, unique=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     create_time = models.DateTimeField(auto_now_add=True)
+    profile_photo = models.BinaryField(null=True, blank=True)
 
 class QuestionSetPerm(models.Model):
     id = models.AutoField(primary_key=True)
