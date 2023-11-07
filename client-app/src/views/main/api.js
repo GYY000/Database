@@ -34,26 +34,14 @@ export function upload_ques_set(ques_set_data) {
         })
 }
 
-export function user_register(register_data) {
-    return axios.request(
-        {
-            url: '/loginInterface/register',
-            method: "post",
-            data: JSON.stringify({
-                user_name: register_data.user_name,
-                password: register_data.password,
-            })
-        }).then(
-        (response) => {
-            return response.data;
-        }
-    ).catch(
-        error => {
-            ElMessage({
-                message: '注册失败，请稍后再试',
-                showClose: true,
-                type: 'error',
-            })
-        }
-    )
+export function fetch_all_visible_ques_set(user_id) {
+    return axios.request({
+        url: '/fetch_visible_ques_set',
+        method: "post",
+        data: JSON.stringify({
+            user_id: user_id,
+        })
+    }).then(response => {
+        return response.data
+    })
 }
