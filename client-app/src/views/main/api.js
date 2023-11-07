@@ -25,12 +25,12 @@ export function check_inside_group(data) {
 }
 
 export function upload_ques_set(ques_set_data) {
-    return axios.post('/upload_ques_set', formData,
+    return axios.post('/upload_ques_set', ques_set_data,
         {
             headers: {'Content-Type': 'multipart/form-data'}
         })
         .then(response => {
-            console.log(response.data);
+            return response.data
         })
 }
 

@@ -1,7 +1,7 @@
 <template>
   <el-form>
-    <input type="file" accept="image/jpeg,image/png" ref="upload_image"/>
-    <el-input v-model="set_name" placeholder="请输入用户组的名字"></el-input>
+    <input type="file" accept="image/jpeg,image/png" ref="upload_img"/>
+    <el-input v-model="set_name" placeholder="请输入问题组的名字"></el-input>
     <div>
       <el-radio-group v-model="is_public" class="ml-4">
         <el-radio label="public" size="large">公有</el-radio>
@@ -30,6 +30,7 @@ export default {
     const is_public = ref('public')
     const group_name = ref('none')
     const set_name = ref('')
+    const upload_img = ref(null)
 
     const closure = () => {
       context.emit('change_visible', false);
@@ -43,7 +44,7 @@ export default {
         form.append("group_name", 'none')
       }
       form.append('set_name', set_name.value)
-      form.append('file', this.$refs.upload_image.files[0])
+      form.append('file', upload_img.value.files[0])
       //TODO: 后续可加入tag
       upload_ques_set(form).then(
           (res) => {
@@ -100,7 +101,8 @@ export default {
       group_name,
       transmit,
       set_name,
-      add_ques_set
+      add_ques_set,
+      upload_img
     }
   }
 }
