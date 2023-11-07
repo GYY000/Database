@@ -5,6 +5,7 @@ import user_center from "@/views/main/user_center.vue";
 import userStateStore from "@/store";
 import log_reg from "@/views/loginInterface/log_reg.vue";
 import question_hub from "@/views/main/question_hub.vue";
+import post_hub from "@/views/main/post_hub.vue"
 
 const routes = [
     {
@@ -50,7 +51,7 @@ const routes = [
             {
                 path: '/post_hub',
                 name: "post_hub",
-                component: question_hub,
+                component: post_hub,
                 meta: {
                     bar_show: false,
                     header_show: false,

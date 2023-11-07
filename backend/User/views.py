@@ -3,7 +3,6 @@ from django.http import JsonResponse
 from User.models import User, QuestionSet, QuestionSetPerm, Team
 import base64
 
-
 # Create your views here.
 def login(request):
     assert request.method == "POST"
