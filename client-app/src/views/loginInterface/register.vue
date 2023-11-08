@@ -7,10 +7,10 @@
       <el-input v-model="user_name"/>
     </el-form-item>
     <el-form-item label="密码">
-      <el-input v-model="password" show-password="true"/>
+      <el-input v-model="password" :show-password="true"/>
     </el-form-item>
     <el-form-item label="确认密码">
-      <el-input v-model="confirmPassword" show-password="true"/>
+      <el-input v-model="confirmPassword" :show-password="true"/>
     </el-form-item>
   </el-form>
   <div class="centered-button">
