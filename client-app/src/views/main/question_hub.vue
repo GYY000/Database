@@ -1,17 +1,26 @@
 <template>
   <div class="background_wrap"></div>
   <div class="top_panel">
-    <el-button text @click="dialog_visible = true">
+    <span>
+      <el-button type="success" @click="dialog_visible = true">
       创建问题组
     </el-button>
-    <el-input
-        v-model="search_content"
-        style="width: 20%"
-        size="small"
-        placeholder="search for question_set"
-        :prefix-icon="Search"
-        @keyup.enter.native="search"
-    />
+    </span>
+    <span>
+      <el-input
+          v-model="search_content"
+          style="width: 100%"
+          placeholder="search for question_set"
+          :prefix-icon="Search"
+          @keyup.enter.native="search"
+      />
+    </span>
+    <span>
+      <el-button type="info" @click="get_my_sets">
+        我的问题组
+      </el-button>
+    </span>
+
   </div>
 
   <el-dialog
@@ -45,7 +54,7 @@ import {ref} from "vue";
 import Create_ques_group_form from "@/views/main/question_component/create_ques_group_form.vue";
 import {ElMessageBox} from "element-plus";
 import ques_group_card from "@/views/main/question_component/ques_group_card.vue";
-import {fetch_all_visible_ques_set, fetch_search_res} from "@/views/main/api";
+import {fetch_all_visible_ques_set, fetch_my_ques_sets, fetch_search_res} from "@/views/main/api";
 import userStateStore from "@/store";
 import {Search} from "@element-plus/icons-vue";
 
@@ -61,13 +70,17 @@ export default {
     return {
       start_ques_sets: {},
       store: userStateStore(),
+      flag: true,
     }
   },
-  mounted() {
-    fetch_all_visible_ques_set(this.store.getUserId).then(
-        (data) => {
-          this.start_ques_sets = data;
-        })
+  created() {
+    if (this.flag) {
+      fetch_all_visible_ques_set(this.store.getUserId).then(
+          (data) => {
+            this.start_ques_sets = data;
+            this.flag = false;
+          })
+    }
   },
 
   setup() {
@@ -83,6 +96,15 @@ export default {
 
     const search = (event) => {
       fetch_search_res(store.getUserId, search_content.value).then(
+          (res) => {
+            new_ques_sets.value = res;
+            begin_flag.value = false;
+          }
+      )
+    }
+
+    const get_my_sets = () => {
+      fetch_my_ques_sets(store.getUserId).then(
           (res) => {
             new_ques_sets.value = res;
             begin_flag.value = false;
@@ -107,7 +129,8 @@ export default {
       search_content,
       search,
       new_ques_sets,
-      begin_flag
+      begin_flag,
+      get_my_sets
     }
   }
 }
@@ -132,5 +155,9 @@ export default {
   display: flex;
   flex-direction: row-reverse;
   width: auto;
+}
+
+.top_panel span{
+  padding-left: 5px;
 }
 </style>

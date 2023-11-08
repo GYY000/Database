@@ -58,3 +58,29 @@ export function fetch_search_res(user_id, search_content) {
         return response.data
     })
 }
+
+export function fetch_my_ques_sets(user_id) {
+    return axios.request({
+        url: '/fetch_create_ques_set',
+        method: "post",
+        data: JSON.stringify({
+            user_id: user_id,
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
+export function upload_team(user_id) {
+    return axios.request({
+        url: '/upload_team',
+        method: "post",
+        data: JSON.stringify({
+            user_id: user_id,
+        })
+    }).then(
+        response => {
+            return response.data
+        }
+    )
+}

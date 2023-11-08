@@ -38,4 +38,7 @@ urlpatterns = [
     re_path(r'^post_hub/(?P<pid>\d+)/$', views.post_hub_param),
     re_path("post_hub",views.post_hub),
     re_path("create_post",views.create_post),
+    re_path("upload_team",views.upload_team),
+    re_path("fetch_all_teams",views.fetch_all_teams),
+    re_path("search_team",views.search_for_team),
 ]
