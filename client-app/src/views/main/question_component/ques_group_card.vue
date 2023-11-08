@@ -1,5 +1,5 @@
 <template>
-  <el-card shadow="hover" style="width:30%; border-radius: 3%">
+  <el-card shadow="hover" style="width:30%; border-radius: 3%;margin-top: 10px">
     <div class="card_layout">
       <div class="l_column">
         <div class="image-container">
