@@ -1,4 +1,6 @@
 import json
+from datetime import timezone
+
 from django.http import JsonResponse
 from User.models import *  # fixme: 王士举修改路径
 import base64
@@ -231,7 +233,7 @@ ques_set_name           除了creator、ques_set_name别的都数组返回吧
     qs_name = request_dict['ques_set_name']
     qs_id = QuestionSet.objects.get(set_name=qs_name).qsid
     questions = Question.objects.filter(qsid=qs_id)
-    creator = User.objects.get(uid=questions[0].creator).user_name
+    creator=QuestionSet.objects.get(qsid=qs_id).creator.user_name
     contents = []
     scores = []
     serial_nums = []
@@ -258,7 +260,7 @@ receiver_name
         receiver = User.objects.get(user_name=receiver_name)
     except:
         return JsonResponse({"is_successful": "false"})
-    message = Message(sender=sender.uid, receiver=receiver.uid, content=content)
+    message = Message(sender=sender, receiver=receiver, content=content)
     message.save()
     return JsonResponse({"is_successful": "true"})
 
@@ -306,9 +308,9 @@ user_id	    content_list
 
     request_dict = json.loads(request.body.decode('utf-8'))
     user_id = request_dict["user_id"]
-    messages = Message.objects.filter(recevier=user_id)
+    messages = Message.objects.filter(receiver=user_id)
     content_list = [_.content for _ in messages]
-    sender_name_list = [User.objects.get(uid=_.sender).user_name for _ in messages]
+    sender_name_list = [_.sender.user_name for _ in messages]
     have_read_list = [_.read for _ in messages]
     time_list = [_.time for _ in messages]
     return JsonResponse({"content_list": content_list, "sender_name_list": sender_name_list,
@@ -320,14 +322,14 @@ def post_hub(request):
     request_dict = json.loads(request.body.decode('utf-8'))
     page_no = request_dict["page_no"]
     page_size = request_dict["page_size"]
-    posts = list(Post.objects.order_by('-update_time'))
+    posts = Post.objects.order_by('-update_time')
     start = page_no * page_size
     end = (page_no + 1) * page_size
     if page_no * page_size >= len(posts):
         return JsonResponse([], safe=False)
     if end >= len(posts):
         end = len(posts)
-    name_photos = [(User.objects.get(uid=_.creator).user_name, User.objects.get(uid=_.creator).profile_photo) for _ in
+    name_photos = [ (_.creator.user_name, _.creator.profile_photo) for _ in
                    posts]
     arr = [{"pid": posts[i].pid, "title": posts[i].title, "creator_name": name_photos[i][0],
             "update_time": posts[i].update_time, "content": posts[i].content,
@@ -338,13 +340,13 @@ def post_hub(request):
 def post_hub_param(request, pid):
     if request.method == "GET":
         post = Post.objects.get(pid=pid)
-        dict1 = {"pid": post.pid, "title": post.title, "creator_name": User.objects.get(uid=post.creator).user_name,
+        dict1 = {"pid": post.pid, "title": post.title, "creator_name": post.creator.user_name,
                  "update_time": post.update_time, "content": post.content,
-                 "profile_photo": User.objects.get(uid=post.creator).profile_photo}
+                 "profile_photo": post.creator.profile_photo}
         comments = Comment.objects.filter(pid=pid).order_by("create_time")
         # fixme comment的时间我先按创建时间来了
-        comments = [{"cid": _.id, "user_name": User.objects.get(uid=_.creator).user_name,
-                     "content": _.content, "profile_photo": User.objects.find(uid=_.creator).profile_photo,
+        comments = [{"cid": _.id, "user_name": _.creator.user_name,
+                     "content": _.content, "profile_photo": _.creator.profile_photo,
                      "create_time": _.create_time
                      } for _ in comments]
         return JsonResponse({"post": dict1, "comment": comments})
@@ -352,8 +354,8 @@ def post_hub_param(request, pid):
     elif request.method == "POST":
         request_dict = json.loads(request.body.decode('utf-8'))
         uid = request_dict["uid"]
-        content = request_dict["pid"]
-        comment = Comment(creator=uid, content=content, pid=pid)
+        content = request_dict["content"]
+        comment = Comment(creator=User.objects.get(uid=uid), content=content, pid=Post.objects.get(pid=pid))
         comment.save()
         return JsonResponse({"description": "成功"})
 
@@ -361,7 +363,7 @@ def post_hub_param(request, pid):
 def create_post(request):
     assert request.method == "POST"
     request_dict = json.loads(request.body.decode('utf-8'))
-    post = Post(creator=request_dict['uid'],
+    post = Post(creator=User.objects.get(uid=request_dict["uid"]),
                 content=request_dict['content'],
                 title=request_dict['title'])
     post.save()

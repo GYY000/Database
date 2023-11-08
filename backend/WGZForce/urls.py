@@ -35,7 +35,7 @@ urlpatterns = [
     re_path("delete_message",views.delete_message),
     re_path("have_read_message",views.have_read_message),
     re_path("fetch_all_receive_message",views.fetch_all_receive_message),
+    re_path(r'^post_hub/(?P<pid>\d+)/$', views.post_hub_param),
     re_path("post_hub",views.post_hub),
-    re_path(r'^post_hub/(?P<pid>\d+)/$',views.post_hub_param),
     re_path("create_post",views.create_post),
 ]
