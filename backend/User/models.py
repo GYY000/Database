@@ -12,6 +12,7 @@ class Team(models.Model):
     team_name = models.CharField(max_length=30, unique=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     create_date = models.DateField(auto_now_add=True)
+    introduction = models.CharField(null=False, max_length=200)
     profile_photo = models.BinaryField()
     introduction = models.CharField(null=False, max_length=200)
 
@@ -39,6 +40,7 @@ class QuestionSet(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     create_time = models.DateTimeField(auto_now_add=True)
     is_public = models.BooleanField(null=False)
+    introduction = models.CharField(null=False, max_length=200)
     profile_photo = models.BinaryField(null=True, blank=True)
     introduction = models.CharField(null=False, max_length=200)
 
@@ -94,3 +96,10 @@ class Comment(models.Model):
     content = models.TextField()
     create_time = models.DateTimeField(auto_now_add=True)
     pid = models.ForeignKey(Post, on_delete=models.CASCADE)
+
+class JoinRequest(models.Model):
+    id = models.AutoField(primary_key=True)
+    uid = models.ForeignKey(User, on_delete=models.CASCADE)
+    tid = models.ForeignKey(Team, on_delete=models.CASCADE)
+    create_time = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=30)
