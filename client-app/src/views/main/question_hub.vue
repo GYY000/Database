@@ -1,10 +1,11 @@
 <template>
-  <div>
-    here is question_hub
+  <div class="background_wrap"></div>
+  <div class="top_panel">
+    <el-button text @click="dialog_visible = true">
+      创建问题组
+    </el-button>
   </div>
-  <el-button text @click="dialog_visible = true">
-    创建问题组
-  </el-button>
+
   <el-dialog
       v-model="dialog_visible"
       title="创建问题组"
@@ -28,6 +29,7 @@ import {ElMessageBox} from "element-plus";
 import ques_group_card from "@/views/main/question_component/ques_group_card.vue";
 import {fetch_all_visible_ques_set} from "@/views/main/api";
 import userStateStore from "@/store";
+
 export default {
   name: "question_hub",
   components: {Create_ques_group_form, ques_group_card},
@@ -41,8 +43,6 @@ export default {
     fetch_all_visible_ques_set(this.store.getUserId).then(
         (data) => {
           this.ques_sets = data;
-          console.log(data)
-          console.log(this.ques_sets)
         })
   },
 
@@ -50,7 +50,6 @@ export default {
     const dialog_visible = ref(false)
 
     const change_dialog_visible = (flag) => {
-      console.log(this.ques_sets)
       dialog_visible.value = flag
     }
 
@@ -79,5 +78,16 @@ export default {
   flex-wrap: wrap;
   width: 90%;
   left: 5%;
+}
+
+.background_wrap {
+  background: #f2f2f2;
+  opacity: 80%;
+}
+
+.top_panel {
+  display: flex;
+  flex-direction: row-reverse;
+  width: auto;
 }
 </style>
