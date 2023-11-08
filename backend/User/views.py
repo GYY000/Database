@@ -331,7 +331,7 @@ user_id	    content_list
 def post_hub(request):
     assert request.method == "POST"
     request_dict = json.loads(request.body.decode('utf-8'))
-    page_no = request_dict["page_no"]
+    page_no = request_dict["page_no"] - 1
     page_size = request_dict["page_size"]
     posts = Post.objects.order_by('-update_time')
     start = page_no * page_size
