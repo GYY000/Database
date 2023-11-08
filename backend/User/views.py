@@ -138,7 +138,7 @@ user_id	    name_list
         avatar_list.append(bytes.decode(qs.profile_photo))
         date_list.append(qs.create_time.strftime("%Y-%m-%d"))
     dict["name_list"] = name_list
-    dict["avator_list"] = avatar_list
+    dict["avatar_list"] = avatar_list
     dict["creator_list"] = creator_list
     dict["date_list"] = date_list
     return JsonResponse(dict)

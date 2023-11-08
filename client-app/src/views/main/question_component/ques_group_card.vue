@@ -3,7 +3,7 @@
     <div class="card_layout">
       <div class="l_column">
         <div class="image-container">
-          <img src="img_url" alt="can't find the jpg">
+          <img :src="img_url" alt="can't find the jpg">
         </div>
       </div>
       <div class="r_column">
@@ -22,12 +22,7 @@ import {ref} from "vue";
 
 export default {
   name: "ques_group_card",
-  props: {
-    creator_name: String,
-    set_name: String,
-    avatar: String,
-    date: String
-  },
+  props: ['creator_name', 'set_name','avatar','date'],
   setup(props) {
     const img_url = ref(props.avatar.startsWith('/9j')
         ? 'data:image/jpg;base64,' + props.avatar : 'data:image/png;base64,' + props.avatar);

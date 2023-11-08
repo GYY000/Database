@@ -5,6 +5,9 @@
   <el-button text @click="dialog_visible = true">
     创建问题组
   </el-button>
+  <el-button @click="change_dialog_visible(true)">
+    1
+  </el-button>
   <el-dialog
       v-model="dialog_visible"
       title="创建问题组"
@@ -28,15 +31,29 @@ import {ElMessageBox} from "element-plus";
 import ques_group_card from "@/views/main/question_component/ques_group_card.vue";
 import {fetch_all_visible_ques_set} from "@/views/main/api";
 import userStateStore from "@/store";
-
 export default {
   name: "question_hub",
   components: {Create_ques_group_form, ques_group_card},
+  data() {
+    return {
+      ques_sets: {},
+      store: userStateStore(),
+    }
+  },
+  mounted() {
+    fetch_all_visible_ques_set(this.store.getUserId).then(
+        (data) => {
+          this.ques_sets = data;
+          console.log(data)
+          console.log(this.ques_sets)
+        })
+  },
+
   setup() {
     const dialog_visible = ref(false)
-    const store = userStateStore()
-    const ques_sets = ref(fetch_all_visible_ques_set(store.getUserId))
+
     const change_dialog_visible = (flag) => {
+      console.log(this.ques_sets)
       dialog_visible.value = flag
     }
 
@@ -49,21 +66,21 @@ export default {
             // catch error
           });
     };
+
     return {
       dialog_visible,
       handle_close,
-      change_dialog_visible,
-      ques_sets
+      change_dialog_visible
     }
   }
 }
 </script>
 
 <style scoped>
-.groups-container{
+.groups-container {
   display: flex;
   flex-wrap: wrap;
   width: 90%;
-  left:5%;
+  left: 5%;
 }
 </style>
