@@ -12,7 +12,7 @@
           <div class="seperator"></div>
         </div>
         <div class="set_content">
-          这里是待做的简介
+          {{ introduction }}
         </div>
         <div class="set_create">
           <div style="padding: 2px">{{ creator_name }} created at</div>
@@ -28,7 +28,7 @@ import {ref} from "vue";
 
 export default {
   name: "ques_group_card",
-  props: ['creator_name', 'set_name', 'avatar', 'date'],
+  props: ['creator_name', 'set_name', 'avatar', 'date', 'introduction'],
   setup(props) {
     const img_url = ref(props.avatar.startsWith('/9j')
         ? 'data:image/jpg;base64,' + props.avatar : 'data:image/png;base64,' + props.avatar);

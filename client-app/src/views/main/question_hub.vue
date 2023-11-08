@@ -18,7 +18,8 @@
   <el-row class="groups-container">
     <ques_group_card v-for="(item,index) in ques_sets.creator_list" :creator_name="item"
                      :set_name="ques_sets.name_list[index]"
-                     :avatar="ques_sets.avatar_list[index]" :date="ques_sets.date_list[index]">
+                     :avatar="ques_sets.avatar_list[index]" :date="ques_sets.date_list[index]"
+                     :introduction="ques_sets.introduction_list[index]">
     </ques_group_card>
   </el-row>
 

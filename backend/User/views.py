@@ -76,6 +76,7 @@ def upload_ques_set(request):
     code = base64.b64encode(file)
     user_id = request.POST.get('user_id')
     group_name = request.POST.get('group_name')
+    introduction = request.POST.get('introduction')
     set_name = request.POST.get('set_name')
     is_public = group_name == "none"
     print(group_name)
@@ -84,7 +85,7 @@ def upload_ques_set(request):
         return JsonResponse({"is_successful": "false"})
     except QuestionSet.DoesNotExist:
         ques_set = QuestionSet(set_name=set_name, creator=User.objects.get(uid=user_id), is_public=is_public,
-                               profile_photo=code)
+                               profile_photo=code, introduction=introduction)
         ques_set.save()
         if not is_public:
             ques_id = QuestionSet.objects.get(set_name=set_name).qsid
@@ -133,15 +134,18 @@ user_id	    name_list
     name_list = []
     avatar_list = []
     date_list = []
+    introduction_list = []
     creator_list = [User.objects.get(uid=qs.creator.uid).user_name for qs in ques_sets]
     for qs in ques_sets:
         name_list.append(qs.set_name)
         avatar_list.append(bytes.decode(qs.profile_photo))
         date_list.append(qs.create_time.strftime("%Y-%m-%d"))
+        introduction_list.append(qs.introduction)
     dict["name_list"] = name_list
     dict["avatar_list"] = avatar_list
     dict["creator_list"] = creator_list
     dict["date_list"] = date_list
+    dict["introduction_list"] = introduction_list
     return JsonResponse(dict)
 
 
@@ -162,8 +166,10 @@ user_id	    name_list
     avatar_list = [bytes.decode(_.profile_photo) for _ in create_qs_list]
     date_list = [_.create_time.strftime("%Y-%m-%d") for _ in create_qs_list]
     creator_list = [User.objects.get(uid=_.creator).user_name for _ in create_qs_list]
+    introduction_list = [_.introduction for _ in create_qs_list]
     return JsonResponse({"name_list": name_list, "avatar_list": avatar_list,
-                         "creator_list": creator_list, "date_list": date_list})
+                         "creator_list": creator_list, "date_list": date_list,
+                         "introduction_list": introduction_list})
 
 
 # 相似度超过50即认为匹配
@@ -202,10 +208,12 @@ search_content	avatar_list
     avatar_list = []
     date_list = []
     creator_list = [User.objects.get(uid=qs.creator).user_name for qs in ques_sets]
+    introduction_list = []
     for qs in ques_sets:
         name_list.append(qs.set_name)
         avatar_list.append(bytes.decode(qs.profile_photo))
         date_list.append(qs.create_time.strftime("%Y-%m-%d"))
+        introduction_list.append(qs.introduction)
     i = 0
     while i < len(name_list):
         if not fuzzy_match(name_list[i], search_content):
@@ -213,12 +221,14 @@ search_content	avatar_list
             avatar_list.pop(i)
             creator_list.pop(i)
             date_list.pop(i)
+            introduction_list.pop(i)
             i -= 1
         i += 1
     dict["name_list"] = name_list
     dict["avator_list"] = avatar_list
     dict["creator_list"] = creator_list
     dict["date_list"] = date_list
+    dict["introduction_list"] = introduction_list
     return JsonResponse(dict)
 
 

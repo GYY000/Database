@@ -6,7 +6,12 @@
     <input id="file" type="file"
            accept="image/jpeg,image/png" ref="upload_img"
            @change="show_pic" style="padding-bottom: 15px"/>
-    <el-input v-model="set_name" placeholder="请输入问题组的名字" clearable></el-input>
+    <el-input v-model="set_name" placeholder="请输入问题组的名字"
+              clearable style="padding-bottom: 10px" maxlength="15"></el-input>
+    <el-input v-model="introduction" placeholder="请输入问题组的简介"
+              :autosize="{ minRows: 3, maxRows: 5 }"
+              type="textarea"
+              clearable maxlength="30"></el-input>
     <div>
       <el-radio-group v-model="is_public" class="ml-4">
         <el-radio label="public" size="large">公有</el-radio>
@@ -39,14 +44,17 @@ export default {
     const set_name = ref('')
     const upload_img = ref(null)
     const image_src = ref('')
+    const introduction = ref('')
 
     const closure = () => {
       upload_img.value = ''
       set_name.value = ''
       group_name.value = ''
       image_src.value = ''
+      introduction.value = ''
       context.emit('change_visible', false);
     }
+
     const add_ques_set = () => {
       let form = new FormData
       form.append("user_id", store.getUserId)
@@ -55,6 +63,7 @@ export default {
       } else {
         form.append("group_name", 'none')
       }
+      form.append('introduction', introduction.value)
       form.append('set_name', set_name.value)
       form.append('file', upload_img.value.files[0])
       //TODO: 后续可加入tag
@@ -127,7 +136,8 @@ export default {
       add_ques_set,
       upload_img,
       show_pic,
-      image_src
+      image_src,
+      introduction
     }
   }
 }
