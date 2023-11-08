@@ -15,11 +15,14 @@
       center>
     <create_ques_group_form @change_visible="change_dialog_visible"></create_ques_group_form>
   </el-dialog>
-  <div class="groups-container" v-for="(item,index) in ques_sets.creator_list">
-    <ques_group_card :creator_name="item" :set_name="ques_sets.name_list[index]"
-                     :avatar="ques_sets.avatar_list[index]" :date="ques_sets.date_list[index]">
-    </ques_group_card>
-  </div>
+  <el-row class="groups-container">
+    <el-col v-for="(item,index) in ques_sets.creator_list">
+      <ques_group_card :creator_name="item" :set_name="ques_sets.name_list[index]"
+                       :avatar="ques_sets.avatar_list[index]" :date="ques_sets.date_list[index]">
+      </ques_group_card>
+    </el-col>
+  </el-row>
+
 </template>
 
 <script>
@@ -76,8 +79,9 @@ export default {
 .groups-container {
   display: flex;
   flex-wrap: wrap;
-  width: 90%;
-  left: 5%;
+  justify-content: space-around;
+  width: 95%;
+  left:2.5%;
 }
 
 .background_wrap {
