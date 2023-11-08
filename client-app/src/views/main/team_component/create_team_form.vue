@@ -45,7 +45,7 @@ export default {
       context.emit('change_visible', false);
     }
 
-    const add_ques_set = () => {
+    const add_team = () => {
       let form = new FormData
       form.append("user_id", store.getUserId)
       form.append("group_name", group_name.value)
@@ -83,7 +83,7 @@ export default {
     }
 
     const transmit = () => {
-      add_ques_set()
+      add_team()
       closure()
     }
 
@@ -91,7 +91,7 @@ export default {
       closure,
       group_name,
       transmit,
-      add_ques_set,
+      add_team,
       upload_img,
       show_pic,
       image_src,

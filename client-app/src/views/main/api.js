@@ -46,12 +46,35 @@ export function fetch_all_visible_ques_set(user_id) {
     })
 }
 
+export function fetch_all_teams() {
+    return axios.request({
+        url: '/fetch_all_teams',
+        method: "post",
+        data: JSON.stringify({
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
 export function fetch_search_res(user_id, search_content) {
     return axios.request({
         url: '/search_visible_ques_set',
         method: "post",
         data: JSON.stringify({
             user_id: user_id,
+            search_content: search_content.trim()
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
+export function fetch_search_team_res(user_id, search_content) {
+    return axios.request({
+        url: '/search_team',
+        method: "post",
+        data: JSON.stringify({
             search_content: search_content.trim()
         })
     }).then(response => {
@@ -71,14 +94,23 @@ export function fetch_my_ques_sets(user_id) {
     })
 }
 
-export function upload_team(user_id) {
+export function fetch_my_group(user_id) {
     return axios.request({
-        url: '/upload_team',
+        url: '/fetch_create_ques_set',
         method: "post",
         data: JSON.stringify({
             user_id: user_id,
         })
-    }).then(
+    }).then(response => {
+        return response.data
+    })
+}
+
+export function upload_team(team_data) {
+    return axios.post('/upload_team', team_data,
+        {
+            headers: {'Content-Type': 'multipart/form-data'}
+        }).then(
         response => {
             return response.data
         }

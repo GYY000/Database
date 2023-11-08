@@ -81,7 +81,6 @@ def upload_ques_set(request):
     introduction = request.POST.get('introduction')
     set_name = request.POST.get('set_name')
     is_public = group_name == "none"
-    print(group_name)
     try:
         QuestionSet.objects.get(set_name=set_name)
         return JsonResponse({"is_successful": "false"})
@@ -382,6 +381,7 @@ def create_post(request):
     post.save()
     return JsonResponse({"description": "成功"})
 
+
 def upload_team(request):
     '''
     前->后	后->前
@@ -391,52 +391,59 @@ file
 introduction
 url:/upload_team
     '''
-    assert request.method=="POST"
-    request_dict=json.loads(request.body.decode('utf-8'))
-    creator=User.objects.get(uid=request_dict["user_id"])
-    if request.FILES.get('file')==None:
-        code=None
+    assert request.method == "POST"
+    user_id = request.POST.get('user_id')
+    group_name = request.POST.get('group_name')
+    introduction = request.POST.get('introduction')
+    if request.FILES.get('file') == None:
+        code = None
     else:
-        img=request.FILES.get('file').read()
-        code=base64.b64encode(img)
+        img = request.FILES.get('file').read()
+        code = base64.b64encode(img)
     try:
-        team=Team(team_name=request_dict['group_name'],creator=creator,profile_photo=code,introduction=request_dict["introduction"])
+        team = Team(team_name=group_name, creator=User.objects.get(uid=user_id), profile_photo=code,
+                    introduction=introduction)
         team.save()
-        return JsonResponse({"is_successful":"true"})
+        return JsonResponse({"is_successful": "true"})
     except Exception as e:
-        return JsonResponse({"is_successful":"false"})
+        return JsonResponse({"is_successful": "false"})
 
 
 def fetch_all_teams(request):
-    group_name_list=[]
-    profile_list=[]
-    introduction_list=[]
-    creator_list=[]
+    group_name_list = []
+    profile_list = []
+    introduction_list = []
+    creator_list = []
+    date_list = []
     for _ in Team.objects.all():
         group_name_list.append(_.team_name)
-        profile_list.append(_.profile_photo)
+        profile_list.append(bytes.decode(_.profile_photo))
         introduction_list.append(_.introduction)
         creator_list.append(_.creator.user_name)
-    return JsonResponse({"group_name_list":group_name_list,
-                         "profile_list":profile_list,
-                         "introduction_list":introduction_list,
-                         "creator_list":creator_list})
-
+        date_list.append(_.create_date.strftime("%Y-%m-%d"))
+    return JsonResponse({"group_name_list": group_name_list,
+                         "profile_list": profile_list,
+                         "introduction_list": introduction_list,
+                         "creator_list": creator_list,
+                         "date_list": date_list})
 
 
 def search_for_team(request):
-    search_cont=json.loads(request.body.decode("utf-8"))["search_content"]
-    group_name_list=[]
-    profile_list=[]
-    introduction_list=[]
-    creator_list=[]
+    search_cont = json.loads(request.body.decode("utf-8"))["search_content"]
+    group_name_list = []
+    profile_list = []
+    introduction_list = []
+    creator_list = []
+    date_list = []
     for _ in Team.objects.all():
-        if fuzzy_match(_.team_name,search_cont):
+        if fuzzy_match(_.team_name, search_cont):
             group_name_list.append(_.team_name)
-            profile_list.append(_.profile_photo)
+            profile_list.append(bytes.decode(_.profile_photo))
             introduction_list.append(_.introduction)
             creator_list.append(_.creator.user_name)
-    return JsonResponse({"group_name_list":group_name_list,
-                         "profile_list":profile_list,
-                         "introduction_list":introduction_list,
-                         "creator_list":creator_list})
+            date_list.append(_.create_date.strftime("%Y-%m-%d"))
+    return JsonResponse({"group_name_list": group_name_list,
+                         "profile_list": profile_list,
+                         "introduction_list": introduction_list,
+                         "creator_list": creator_list,
+                         "date_list": date_list})
