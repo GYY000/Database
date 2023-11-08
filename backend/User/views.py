@@ -163,11 +163,11 @@ user_id	    name_list
     request_dict = json.loads(request.body.decode('utf-8'))
     user_id = request_dict["user_id"]
     create_qsid_list = QuestionSet.objects.filter(creator=user_id)
-    create_qs_list = [QuestionSet.objects.get(qsid=qsid) for qsid in create_qsid_list]
+    create_qs_list = [QuestionSet.objects.get(qsid=creator.qsid) for creator in create_qsid_list]
     name_list = [_.set_name for _ in create_qs_list]
     avatar_list = [bytes.decode(_.profile_photo) for _ in create_qs_list]
     date_list = [_.create_time.strftime("%Y-%m-%d") for _ in create_qs_list]
-    creator_list = [User.objects.get(uid=_.creator).user_name for _ in create_qs_list]
+    creator_list = [User.objects.get(uid=_.creator.uid).user_name for _ in create_qs_list]
     introduction_list = [_.introduction for _ in create_qs_list]
     return JsonResponse({"name_list": name_list, "avatar_list": avatar_list,
                          "creator_list": creator_list, "date_list": date_list,
@@ -227,10 +227,12 @@ search_content	avatar_list
             i -= 1
         i += 1
     dict["name_list"] = name_list
-    dict["avator_list"] = avatar_list
+    dict["avatar_list"] = avatar_list
     dict["creator_list"] = creator_list
     dict["date_list"] = date_list
     dict["introduction_list"] = introduction_list
+    print(search_content)
+    print(name_list)
     return JsonResponse(dict)
 
 
@@ -244,7 +246,7 @@ ques_set_name           除了creator、ques_set_name别的都数组返回吧
     qs_name = request_dict['ques_set_name']
     qs_id = QuestionSet.objects.get(set_name=qs_name).qsid
     questions = Question.objects.filter(qsid=qs_id)
-    creator=QuestionSet.objects.get(qsid=qs_id).creator.user_name
+    creator = QuestionSet.objects.get(qsid=qs_id).creator.user_name
     contents = []
     scores = []
     serial_nums = []
@@ -340,7 +342,7 @@ def post_hub(request):
         return JsonResponse([], safe=False)
     if end >= len(posts):
         end = len(posts)
-    name_photos = [ (_.creator.user_name, _.creator.profile_photo) for _ in
+    name_photos = [(_.creator.user_name, _.creator.profile_photo) for _ in
                    posts]
     arr = [{"pid": posts[i].pid, "title": posts[i].title, "creator_name": name_photos[i][0],
             "update_time": posts[i].update_time, "content": posts[i].content,
