@@ -1,10 +1,11 @@
 <template>
-  <div>
-    here is question_hub
+  <div class="background_wrap"></div>
+  <div class="top_panel">
+    <el-button text @click="dialog_visible = true">
+      创建问题组
+    </el-button>
   </div>
-  <el-button text @click="dialog_visible = true">
-    创建问题组
-  </el-button>
+
   <el-dialog
       v-model="dialog_visible"
       title="创建问题组"
@@ -14,11 +15,14 @@
       center>
     <create_ques_group_form @change_visible="change_dialog_visible"></create_ques_group_form>
   </el-dialog>
-  <div class="groups-container" v-for="(item,index) in ques_sets.creator_list">
-    <ques_group_card :creator_name="item" :set_name="ques_sets.name_list[index]"
-                     :avatar="ques_sets.avatar_list[index]" :date="ques_sets.date_list[index]">
+  <el-row class="groups-container">
+    <ques_group_card v-for="(item,index) in ques_sets.creator_list" :creator_name="item"
+                     :set_name="ques_sets.name_list[index]"
+                     :avatar="ques_sets.avatar_list[index]" :date="ques_sets.date_list[index]"
+                     :introduction="ques_sets.introduction_list[index]">
     </ques_group_card>
-  </div>
+  </el-row>
+
 </template>
 
 <script>
@@ -32,10 +36,22 @@ import userStateStore from "@/store";
 export default {
   name: "question_hub",
   components: {Create_ques_group_form, ques_group_card},
+  data() {
+    return {
+      ques_sets: {},
+      store: userStateStore(),
+    }
+  },
+  mounted() {
+    fetch_all_visible_ques_set(this.store.getUserId).then(
+        (data) => {
+          this.ques_sets = data;
+        })
+  },
+
   setup() {
     const dialog_visible = ref(false)
-    const store = userStateStore()
-    const ques_sets = ref(fetch_all_visible_ques_set(store.getUserId))
+
     const change_dialog_visible = (flag) => {
       dialog_visible.value = flag
     }
@@ -49,21 +65,34 @@ export default {
             // catch error
           });
     };
+
     return {
       dialog_visible,
       handle_close,
-      change_dialog_visible,
-      ques_sets
+      change_dialog_visible
     }
   }
 }
 </script>
 
 <style scoped>
-.groups-container{
+.groups-container {
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
-  width: 90%;
-  left:5%;
+  justify-content: space-around;
+  width: 95%;
+  left: 2.5%;
+}
+
+.background_wrap {
+  background: #f2f2f2;
+  opacity: 80%;
+}
+
+.top_panel {
+  display: flex;
+  flex-direction: row-reverse;
+  width: auto;
 }
 </style>

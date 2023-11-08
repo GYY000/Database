@@ -13,6 +13,7 @@ class Team(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     create_date = models.DateField(auto_now_add=True)
     profile_photo = models.BinaryField()
+    introduction = models.CharField(null=False, max_length=200)
 
 class ReUserTeam(models.Model):
     id = models.AutoField(primary_key=True)
@@ -39,6 +40,7 @@ class QuestionSet(models.Model):
     create_time = models.DateTimeField(auto_now_add=True)
     is_public = models.BooleanField(null=False)
     profile_photo = models.BinaryField(null=True, blank=True)
+    introduction = models.CharField(null=False, max_length=200)
 
 class QuestionSetPerm(models.Model):
     id = models.AutoField(primary_key=True)
