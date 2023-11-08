@@ -45,3 +45,16 @@ export function fetch_all_visible_ques_set(user_id) {
         return response.data
     })
 }
+
+export function fetch_search_res(user_id, search_content) {
+    return axios.request({
+        url: '/search_visible_ques_set',
+        method: "post",
+        data: JSON.stringify({
+            user_id: user_id,
+            search_content: search_content.trim()
+        })
+    }).then(response => {
+        return response.data
+    })
+}

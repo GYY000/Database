@@ -209,7 +209,7 @@ search_content	avatar_list
     name_list = []
     avatar_list = []
     date_list = []
-    creator_list = [User.objects.get(uid=qs.creator).user_name for qs in ques_sets]
+    creator_list = [User.objects.get(uid=qs.creator.uid).user_name for qs in ques_sets]
     introduction_list = []
     for qs in ques_sets:
         name_list.append(qs.set_name)

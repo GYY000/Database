@@ -4,6 +4,14 @@
     <el-button text @click="dialog_visible = true">
       创建问题组
     </el-button>
+    <el-input
+        v-model="search_content"
+        style="width: 20%"
+        size="small"
+        placeholder="search for question_set"
+        :prefix-icon="Search"
+        @keyup.enter.native="search"
+    />
   </div>
 
   <el-dialog
@@ -15,11 +23,18 @@
       center>
     <create_ques_group_form @change_visible="change_dialog_visible"></create_ques_group_form>
   </el-dialog>
-  <el-row class="groups-container">
-    <ques_group_card v-for="(item,index) in ques_sets.creator_list" :creator_name="item"
-                     :set_name="ques_sets.name_list[index]"
-                     :avatar="ques_sets.avatar_list[index]" :date="ques_sets.date_list[index]"
-                     :introduction="ques_sets.introduction_list[index]">
+  <el-row class="groups-container" v-if="begin_flag">
+    <ques_group_card v-for="(item,index) in start_ques_sets.creator_list" :creator_name="item"
+                     :set_name="start_ques_sets.name_list[index]"
+                     :avatar="start_ques_sets.avatar_list[index]" :date="start_ques_sets.date_list[index]"
+                     :introduction="start_ques_sets.introduction_list[index]">
+    </ques_group_card>
+  </el-row>
+  <el-row class="groups-container" v-else>
+    <ques_group_card v-for="(item,index) in new_ques_sets.creator_list" :creator_name="item"
+                     :set_name="new_ques_sets.name_list[index]"
+                     :avatar="new_ques_sets.avatar_list[index]" :date="new_ques_sets.date_list[index]"
+                     :introduction="new_ques_sets.introduction_list[index]">
     </ques_group_card>
   </el-row>
 
@@ -30,30 +45,49 @@ import {ref} from "vue";
 import Create_ques_group_form from "@/views/main/question_component/create_ques_group_form.vue";
 import {ElMessageBox} from "element-plus";
 import ques_group_card from "@/views/main/question_component/ques_group_card.vue";
-import {fetch_all_visible_ques_set} from "@/views/main/api";
+import {fetch_all_visible_ques_set, fetch_search_res} from "@/views/main/api";
 import userStateStore from "@/store";
+import {Search} from "@element-plus/icons-vue";
 
 export default {
   name: "question_hub",
+  computed: {
+    Search() {
+      return Search
+    }
+  },
   components: {Create_ques_group_form, ques_group_card},
   data() {
     return {
-      ques_sets: {},
+      start_ques_sets: {},
       store: userStateStore(),
     }
   },
   mounted() {
     fetch_all_visible_ques_set(this.store.getUserId).then(
         (data) => {
-          this.ques_sets = data;
+          this.start_ques_sets = data;
         })
   },
 
   setup() {
     const dialog_visible = ref(false)
+    const search_content = ref("")
+    const store = userStateStore()
+    const new_ques_sets = ref(null)
+    const begin_flag = ref(true)
 
     const change_dialog_visible = (flag) => {
       dialog_visible.value = flag
+    }
+
+    const search = (event) => {
+      fetch_search_res(store.getUserId, search_content.value).then(
+          (res) => {
+            new_ques_sets.value = res;
+            begin_flag.value = false;
+          }
+      )
     }
 
     const handle_close = (done) => {
@@ -69,7 +103,11 @@ export default {
     return {
       dialog_visible,
       handle_close,
-      change_dialog_visible
+      change_dialog_visible,
+      search_content,
+      search,
+      new_ques_sets,
+      begin_flag
     }
   }
 }
