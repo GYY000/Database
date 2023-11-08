@@ -145,15 +145,15 @@ export default {
 
 <style scoped>
 .image-container {
-  width: 300px; /* 指定容器的宽度 */
-  height: 200px; /* 指定容器的高度 */
-  overflow: hidden; /* 裁剪超出容器的部分 */
+  width: 300px;
+  height: 200px;
+  overflow: hidden;
   padding-bottom: 10px;
 }
 
 .image-container img {
   width: auto;
   height: 100%;
-  object-fit: cover; /* 缩放图片以填充容器，并裁剪超出的部分 */
+  object-fit: cover;
 }
 </style>

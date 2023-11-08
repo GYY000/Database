@@ -1,5 +1,5 @@
 <template>
-  <el-card shadow="hover" style="width:30%; border-radius: 3%;margin-top: 10px">
+  <el-card shadow="hover" style="width:32%; border-radius: 3%;margin-top: 10px">
     <div class="card_layout">
       <div class="l_column">
         <div class="image-container">
@@ -15,8 +15,11 @@
           {{ introduction }}
         </div>
         <div class="set_create">
-          <div style="padding: 2px">{{ creator_name }} created at</div>
-          <div>{{ date }}</div>
+          <div style="padding: 2px">{{ creator_name }} {{ date }}</div>
+        </div>
+        <div class="footer">
+          <el-button type="primary" :icon="TopRight" class="button"/>
+          <el-button type="primary" :icon="MagicStick" class="button"/>
         </div>
       </div>
     </div>
@@ -25,9 +28,21 @@
 
 <script>
 import {ref} from "vue";
+import {Edit, MagicStick, TopRight} from "@element-plus/icons-vue";
 
 export default {
   name: "ques_group_card",
+  computed: {
+    TopRight() {
+      return TopRight
+    },
+    MagicStick() {
+      return MagicStick
+    },
+    Edit() {
+      return Edit
+    }
+  },
   props: ['creator_name', 'set_name', 'avatar', 'date', 'introduction'],
   setup(props) {
     const img_url = ref(props.avatar.startsWith('/9j')
@@ -74,14 +89,26 @@ export default {
 }
 
 .set_content {
-  height: 50%;
+  height: 30%;
   font-size: 10px;
 }
 
 .set_create {
   font-size: 10px;
   color: rgb(86, 94, 108);
-  height: 20%;
+  height: 15%;
+}
+
+.footer {
+  height: 25%;
+  display: flex;
+}
+
+.button{
+  margin-top: 8px;
+  height: 70%;
+  width: 30%;
+  padding-right: 5px;
 }
 
 .seperator {
