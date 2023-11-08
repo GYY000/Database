@@ -77,7 +77,8 @@ def upload_ques_set(request):
     user_id = request.POST.get('user_id')
     group_name = request.POST.get('group_name')
     set_name = request.POST.get('set_name')
-    is_public = "group_name" == "none"
+    is_public = group_name == "none"
+    print(group_name)
     try:
         QuestionSet.objects.get(set_name=set_name)
         return JsonResponse({"is_successful": "false"})
