@@ -26,6 +26,13 @@
             </keep-alive>
           </router-view>
         </el-tab-pane>
+        <el-tab-pane label="用户群组" name="/team_hub">
+          <router-view v-slot="{ Component }">
+            <keep-alive>
+              <component :is="Component"/>
+            </keep-alive>
+          </router-view>
+        </el-tab-pane>
       </el-tabs>
     </div>
     <div class="r-container">

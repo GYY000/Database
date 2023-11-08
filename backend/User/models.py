@@ -14,6 +14,7 @@ class Team(models.Model):
     create_date = models.DateField(auto_now_add=True)
     introduction = models.CharField(null=False, max_length=200)
     profile_photo = models.BinaryField()
+    introduction = models.CharField(null=False, max_length=200)
 
 class ReUserTeam(models.Model):
     id = models.AutoField(primary_key=True)
@@ -41,6 +42,7 @@ class QuestionSet(models.Model):
     is_public = models.BooleanField(null=False)
     introduction = models.CharField(null=False, max_length=200)
     profile_photo = models.BinaryField(null=True, blank=True)
+    introduction = models.CharField(null=False, max_length=200)
 
 class QuestionSetPerm(models.Model):
     id = models.AutoField(primary_key=True)
@@ -84,7 +86,8 @@ class Post(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     create_time = models.DateTimeField(auto_now_add=True)
-    update_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
+    #fixme auto_now_add -> auto_now
     title = models.CharField(max_length=40)
 
 class Comment(models.Model):

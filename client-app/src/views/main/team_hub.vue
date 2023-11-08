@@ -1,17 +1,15 @@
 <template>
-
+  <div>here is team hub</div>
 </template>
 
 <script>
-  export default {
-    name:"team_hub",
-    setup() {
+export default {
+  name: "team_hub",
+  setup() {
 
-      return {
-
-      }
-    }
+    return {}
   }
+}
 </script>
 
 <style scoped>
