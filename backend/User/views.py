@@ -137,7 +137,7 @@ user_id	    name_list
     avatar_list = []
     date_list = []
     introduction_list = []
-    creator_list = [User.objects.get(uid=qs.creator.uid).user_name for qs in ques_sets]
+    creator_list = [qs.creator.user_name for qs in ques_sets]
     for qs in ques_sets:
         name_list.append(qs.set_name)
         avatar_list.append(bytes.decode(qs.profile_photo))
@@ -167,14 +167,14 @@ user_id	    name_list
     name_list = [_.set_name for _ in create_qs_list]
     avatar_list = [bytes.decode(_.profile_photo) for _ in create_qs_list]
     date_list = [_.create_time.strftime("%Y-%m-%d") for _ in create_qs_list]
-    creator_list = [User.objects.get(uid=_.creator.uid).user_name for _ in create_qs_list]
+    creator_list = [_.creator.user_name for _ in create_qs_list]
     introduction_list = [_.introduction for _ in create_qs_list]
     return JsonResponse({"name_list": name_list, "avatar_list": avatar_list,
                          "creator_list": creator_list, "date_list": date_list,
                          "introduction_list": introduction_list})
 
 
-# 相似度超过50即认为匹配
+# 相似度超过30即认为匹配
 def fuzzy_match(str1, str2):
     len1, len2 = len(str1), len(str2)
     max_len = max(len1, len2)
@@ -184,7 +184,7 @@ def fuzzy_match(str1, str2):
 
     similarity = 1 - distance(str1, str2) / max_len
 
-    return similarity > 0.5
+    return similarity > 0.3
 
 
 def search_visible_ques_set(request):
@@ -209,7 +209,7 @@ search_content	avatar_list
     name_list = []
     avatar_list = []
     date_list = []
-    creator_list = [User.objects.get(uid=qs.creator.uid).user_name for qs in ques_sets]
+    creator_list = [qs.creator.user_name for qs in ques_sets]
     introduction_list = []
     for qs in ques_sets:
         name_list.append(qs.set_name)
@@ -381,3 +381,62 @@ def create_post(request):
                 title=request_dict['title'])
     post.save()
     return JsonResponse({"description": "成功"})
+
+def upload_team(request):
+    '''
+    前->后	后->前
+user_id	                is_successful(true false)
+group_name
+file
+introduction
+url:/upload_team
+    '''
+    assert request.method=="POST"
+    request_dict=json.loads(request.body.decode('utf-8'))
+    creator=User.objects.get(uid=request_dict["user_id"])
+    if request.FILES.get('file')==None:
+        code=None
+    else:
+        img=request.FILES.get('file').read()
+        code=base64.b64encode(img)
+    try:
+        team=Team(team_name=request_dict['group_name'],creator=creator,profile_photo=code,introduction=request_dict["introduction"])
+        team.save()
+        return JsonResponse({"is_successful":"true"})
+    except Exception as e:
+        return JsonResponse({"is_successful":"false"})
+
+
+def fetch_all_teams(request):
+    group_name_list=[]
+    profile_list=[]
+    introduction_list=[]
+    creator_list=[]
+    for _ in Team.objects.all():
+        group_name_list.append(_.team_name)
+        profile_list.append(_.profile_photo)
+        introduction_list.append(_.introduction)
+        creator_list.append(_.creator.user_name)
+    return JsonResponse({"group_name_list":group_name_list,
+                         "profile_list":profile_list,
+                         "introduction_list":introduction_list,
+                         "creator_list":creator_list})
+
+
+
+def search_for_team(request):
+    search_cont=json.loads(request.body.decode("utf-8"))["search_content"]
+    group_name_list=[]
+    profile_list=[]
+    introduction_list=[]
+    creator_list=[]
+    for _ in Team.objects.all():
+        if fuzzy_match(_.team_name,search_cont):
+            group_name_list.append(_.team_name)
+            profile_list.append(_.profile_photo)
+            introduction_list.append(_.introduction)
+            creator_list.append(_.creator.user_name)
+    return JsonResponse({"group_name_list":group_name_list,
+                         "profile_list":profile_list,
+                         "introduction_list":introduction_list,
+                         "creator_list":creator_list})
