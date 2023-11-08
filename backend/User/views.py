@@ -1,6 +1,6 @@
 import json
 from django.http import JsonResponse
-from models import * #fixme: 王士举修改路径
+from User.models import * #fixme: 王士举修改路径
 import base64
 from Levenshtein import distance
 
@@ -313,6 +313,7 @@ user_id	    content_list
 
 def post_hub(request):
     assert request.method=="POST"
+    #print(request.body)
     request_dict=json.loads(request.body.decode('utf-8'))
     page_no=request_dict["page_no"]
     page_size=request_dict["page_size"]
