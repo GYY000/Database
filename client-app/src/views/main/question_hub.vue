@@ -5,9 +5,6 @@
   <el-button text @click="dialog_visible = true">
     创建问题组
   </el-button>
-  <el-button @click="change_dialog_visible(true)">
-    1
-  </el-button>
   <el-dialog
       v-model="dialog_visible"
       title="创建问题组"
