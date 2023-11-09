@@ -20,16 +20,6 @@ const routes = [
         },
         children: [
             {
-                path: '/main_page',
-                name: "main_page",
-                component: main_page,
-                meta: {
-                    bar_show: false,
-                    header_show: false,
-                    footer_show: false
-                }
-            },
-            {
                 path: '/user_center',
                 name: "user_center",
                 component: user_center,
@@ -38,38 +28,8 @@ const routes = [
                     header_show: false,
                     footer_show: false
                 }
-            },
-            {
-                path: '/question_hub',
-                name: "question_hub",
-                component: question_hub,
-                meta: {
-                    bar_show: false,
-                    header_show: false,
-                    footer_show: false
-                }
-            },
-            {
-                path: '/post_hub',
-                name: "post_hub",
-                component: post_hub,
-                meta: {
-                    bar_show: false,
-                    header_show: false,
-                    footer_show: false
-                }
-            },
-            {
-                path: '/team_hub',
-                name: "team_hub",
-                component: team_hub,
-                meta: {
-                    bar_show: false,
-                    header_show: false,
-                    footer_show: false
-                }
             }
-        ]
+            ]
     },
     {
         path: "/log_reg",
@@ -94,8 +54,8 @@ router.beforeEach((to, from, next) => {
     const isLogin = store.getIsAuthentic
     if (to.path === "/log_reg") {
          //若用户已登录且前往登录页，则跳转到首页
-        isLogin ? next("/main_page") : next()
-    } else if (to.path !== "/main_page" && !isLogin) { // 拦截
+        isLogin ? next("/") : next()
+    } else if (to.path !== "/" && !isLogin) { // 拦截
         next("/log_reg")
     } else {
         next()

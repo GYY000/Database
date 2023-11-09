@@ -6,32 +6,24 @@
       <el-tabs v-model="activeTab" @tab-change="change_tab" class="tabs">
         <!--- TODO -->
         <el-tab-pane label="主页" name="/main_page">
-          <router-view v-slot="{ Component }">
-            <keep-alive>
-              <component :is="Component"/>
-            </keep-alive>
-          </router-view>
+          <keep-alive>
+            <div>here is main page</div>
+          </keep-alive>
         </el-tab-pane>
         <el-tab-pane label="题目广场" name="/question_hub">
-          <router-view v-slot="{ Component }">
-            <keep-alive>
-              <component :is="Component"/>
-            </keep-alive>
-          </router-view>
+          <keep-alive>
+            <question_hub v-if="activeTab === '/question_hub'"></question_hub>
+          </keep-alive>
         </el-tab-pane>
         <el-tab-pane label="帖子广场" name="/post_hub">
-          <router-view v-slot="{ Component }">
-            <keep-alive>
-              <component :is="Component"/>
-            </keep-alive>
-          </router-view>
+          <keep-alive>
+            <post_hub v-if="activeTab === '/post_hub'"></post_hub>
+          </keep-alive>
         </el-tab-pane>
         <el-tab-pane label="用户群组" name="/team_hub">
-          <router-view v-slot="{ Component }">
-            <keep-alive>
-              <component :is="Component"/>
-            </keep-alive>
-          </router-view>
+          <keep-alive>
+            <team_hub v-if="activeTab === '/team_hub'"></team_hub>
+          </keep-alive>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -120,9 +112,13 @@ import {SortDown, SortUp, User} from '@element-plus/icons-vue'
 import {ref, watch} from "vue";
 import router from "@/router";
 import {userStateStore} from "@/store";
+import Question_hub from "@/views/main/question_hub.vue";
+import Post_hub from "@/views/main/post_hub.vue";
+import Team_hub from "@/views/main/team_hub.vue";
 
 export default {
   name: "index",
+  components: {Team_hub, Post_hub, Question_hub},
   setup() {
     const store = userStateStore()
     const is_login = ref(store.getUserName);
@@ -138,7 +134,6 @@ export default {
 
     const change_tab = (name) => {
       tab_path.value = name;
-      router.push(tab_path.value);
     };
 
     const logout = () => {

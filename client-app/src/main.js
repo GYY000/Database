@@ -19,4 +19,4 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 }
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate);
-app.use(pinia).use(router).use(ElementPlus).use(ElementPlus, {locale}).mount('#app')
+app.use(pinia).use(router).use(ElementPlus, {locale}).mount('#app')

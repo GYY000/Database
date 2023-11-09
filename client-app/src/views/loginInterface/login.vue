@@ -65,7 +65,7 @@ export default {
               fetch_user_info(user_name.value).then((res) => {
                 const stateStore = userStateStore();
                 stateStore.login_store_info(res);
-                router.push({path: "/main_page"});
+                router.push({path: "/"});
               });
             } else {
               ElMessage({

@@ -434,11 +434,9 @@ def search_for_team(request):
 
 
 def get_profile_photo(request):
-    request_dict=json.loads(request.body.decode('utf-8'))
-    uid=request_dict["uid"]
-    return  JsonResponse({"profile_photo": bytes.decode(User.objects.get(uid=uid).profile_photo)})
-
-
+    request_dict = json.loads(request.body.decode('utf-8'))
+    uid = request_dict["uid"]
+    return JsonResponse({"profile_photo": bytes.decode(User.objects.get(uid=uid).profile_photo)})
 
 
 def fetch_team_avatar(request):
@@ -453,11 +451,7 @@ def fetch_team_avatar(request):
 def fetch_set_avatar(request):
     set_name = json.loads(request.body.decode("utf-8"))["set_name"]
     try:
-        print(set_name)
         set = QuestionSet.objects.get(set_name=set_name)
-        print(bytes.decode(set.profile_photo))
         return JsonResponse({"avatar": bytes.decode(set.profile_photo)})
     except Exception:
-        print("in exception")
         return JsonResponse({"avatar": 'none'})
-
