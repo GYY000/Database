@@ -314,7 +314,7 @@ user_id	    content_list
     content_list = [_.content for _ in messages]
     sender_name_list = [_.sender.user_name for _ in messages]
     have_read_list = [_.read for _ in messages]
-    time_list = [_.time for _ in messages]
+    time_list = [_.time.str for _ in messages]
     return JsonResponse({"content_list": content_list, "sender_name_list": sender_name_list,
                          "time_list": time_list, "have_read_list": have_read_list})
 
@@ -455,3 +455,168 @@ def fetch_set_avatar(request):
         return JsonResponse({"avatar": bytes.decode(set.profile_photo)})
     except Exception:
         return JsonResponse({"avatar": 'none'})
+
+def del_team(request):
+    '''
+    前->后	后->前
+team_name	    is_successful(true,false)
+url:/del_team
+    '''
+    request_dict=json.loads(request.body.decode('utf-8'))
+    team_name=request_dict['team_name']
+    try:
+        team=Team.objects.get(team_name=team_name)
+        team.delete()
+        return JsonResponse({"is_successful":"true"})
+    except:
+        return JsonResponse({"is_successful":"false"})
+
+
+
+def apply_for_team(request):
+    '''
+    前->后	后->前
+creator_name（用户组创建者的名字）	is_successful(true,false)
+team_name
+applier_id
+url:/apply_for_team
+    '''
+    #TODO creator_name无用？
+    request_dict=json.loads(request.body.decode('utf-8'))
+    creator_name=request_dict["creator_name"]
+    team_name=request_dict["team_name"]
+    applier_id=request_dict["applier_id"]
+    joinReq=JoinRequest(uid=User.objects.get(uid=applier_id),
+                        tid=Team.objects.get(team_name=team_name),
+                        status="未审理,请耐心等待！")
+    joinReq.save()
+    return JsonResponse({"is_successful":"true"})
+
+
+def del_member(request):
+    '''
+    前->后	后->前
+del_user_id	is_successful(true,false)
+team_name
+url:/del_member
+    '''
+    request_dict=json.loads(request.body.decode('utf-8'))
+    del_user_id=request_dict["del_user_id"]
+    team_name=request_dict["team_name"]
+    try:
+        ReUserTeam.objects.get(uid=User.objects.get(uid=del_user_id)
+                           ,tid=Team.objects.get(team_name=team_name)).delete()
+        return JsonResponse({"is_successful":"true"})
+    except:
+        return JsonResponse({"is_successful":"false"})
+
+
+def del_ques_set(request):
+    '''
+前->后	后->前
+ques_set_name	is_successful(true,false)
+url:/del_ques_set
+    '''
+    request_dict=json.loads(request.body.decode('utf-8'))
+    ques_set_name=request_dict["ques_set_name"]
+    try:
+        QuestionSet.objects.get(set_name=ques_set_name).delete()
+        return JsonResponse({"is_successful":"true"})
+    except:
+        return JsonResponse({"is_successful":"false"})
+
+
+def answer_to_req(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    id_list=request_dict['id_list']
+    team_name=request_dict['team_name']
+    applier_id=request_dict['applier_id']
+    aggre=request_dict["aggre"]
+    applier=User.objects.get(uid=applier_id)
+    team=Team.objects.get(team_name=team_name)
+    if aggre:
+        try:
+            ReUserTeam(uid=applier,tid=team,is_admin=False).save()
+        except:
+            return JsonResponse({"is_successful":"false"})
+        return JsonResponse({"is_successful":"true"})
+    JoinRequest.objects.get(id=id_list).delete()
+    return JsonResponse({"is_successful":"true"})
+
+
+
+def fetch_all_application(request):
+    '''
+    前->后	后->前
+user_id	    applier_name_list
+	        team_name_list
+	        time_list
+	        id_list(申请的编号们 方便删除)
+url:/fetch_all_application
+
+
+    '''
+    request_dict=json.loads(request.body.decode("utf-8"))
+    user_id=request_dict["user_id"]
+    applier_name_list=[]
+    team_name_list=[]
+    time_list=[]
+    id_list=[]
+    for _ in JoinRequest.objects.all():
+        if _.tid.creator.uid==user_id:
+            id_list.append(_.id)
+            applier_name_list.append(_.uid.user_name)
+            team_name_list.append(_.tid.team_name)
+            time_list.append(_.create_time.strftime("%Y-%m-%d"))
+    return JsonResponse({"applier_name_list":applier_name_list,
+                         "team_name_list":team_name_list,
+                         "time_list":time_list,
+                         "id_list":id_list})
+
+
+def fetch_all_ques_set_in_team(request):
+    '''
+    前->后	后->前
+team_name	    name_list
+	        creator_list
+	        introduction_list
+	        date_list
+url:/fetch_all_ques_set_in_team
+
+    '''
+
+    request_dict=json.loads(request.body.decode('utf-8'))
+    team_name=request_dict["team_name"]
+    name_list=[]
+    creator_list=[]
+    introduction_list=[]
+    date_list=[]
+    team=Team.objects.get(team_name=team_name)
+    for _ in QuestionSetPerm.objects.all():
+        if _.tid.tid==team.tid:
+            name_list.append(_.qsid.set_name)
+            creator_list.append(_.qsid.c)
+            date_list.append(_.qsid.create_time)
+            introduction_list.append(_.qsid.introduction)
+    return JsonResponse({"name_list":name_list,"creator_list":creator_list,
+                         "introduction_list":introduction_list,
+                         "date_list":date_list})
+
+
+
+def fetch_all_users_in_team(request):
+    '''
+    前->后	后->前
+team_name	name_list
+	        register_date_list
+url:/fetch_all_users_in_team
+    '''
+    team_name=json.loads(request.body.decode('utf-8'))['team_name']
+    name_list=[]
+    register_date_list=[]
+    for _ in ReUserTeam.objects.all():
+        if _.tid.team_name==team_name:
+            name_list.append(_.uid.user_name)
+            register_date_list.append(_.join_date)
+    return JsonResponse({"name_list":name_list,"register_date_list":register_date_list})
+
