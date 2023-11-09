@@ -7,22 +7,22 @@
         <!--- TODO -->
         <el-tab-pane label="主页" name="/main_page">
           <keep-alive>
-            <div>here is main page</div>
+            <router-view name="main_page"></router-view>
           </keep-alive>
         </el-tab-pane>
         <el-tab-pane label="题目广场" name="/question_hub">
           <keep-alive>
-            <question_hub v-if="activeTab === '/question_hub'"></question_hub>
+            <router-view name="question_hub"></router-view>
           </keep-alive>
         </el-tab-pane>
         <el-tab-pane label="帖子广场" name="/post_hub">
           <keep-alive>
-            <post_hub v-if="activeTab === '/post_hub'"></post_hub>
+            <router-view name="post_hub"></router-view>
           </keep-alive>
         </el-tab-pane>
         <el-tab-pane label="用户群组" name="/team_hub">
           <keep-alive>
-            <team_hub v-if="activeTab === '/team_hub'"></team_hub>
+            <router-view name="team_hub"></router-view>
           </keep-alive>
         </el-tab-pane>
       </el-tabs>
@@ -41,7 +41,6 @@
           {{ user_name }},您好
         </el-button>
       </span>
-
     </div>
   </div>
 
@@ -134,6 +133,7 @@ export default {
 
     const change_tab = (name) => {
       tab_path.value = name;
+      router.push(tab_path.value)
     };
 
     const logout = () => {
