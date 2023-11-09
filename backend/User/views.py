@@ -133,17 +133,14 @@ user_id	    name_list
                 ques_sets.append(quesSet)
     dict = {}
     name_list = []
-    avatar_list = []
     date_list = []
     introduction_list = []
     creator_list = [qs.creator.user_name for qs in ques_sets]
     for qs in ques_sets:
         name_list.append(qs.set_name)
-        avatar_list.append(bytes.decode(qs.profile_photo))
         date_list.append(qs.create_time.strftime("%Y-%m-%d"))
         introduction_list.append(qs.introduction)
     dict["name_list"] = name_list
-    dict["avatar_list"] = avatar_list
     dict["creator_list"] = creator_list
     dict["date_list"] = date_list
     dict["introduction_list"] = introduction_list
@@ -164,12 +161,12 @@ user_id	    name_list
     create_qsid_list = QuestionSet.objects.filter(creator=user_id)
     create_qs_list = [QuestionSet.objects.get(qsid=creator.qsid) for creator in create_qsid_list]
     name_list = [_.set_name for _ in create_qs_list]
-    avatar_list = [bytes.decode(_.profile_photo) for _ in create_qs_list]
     date_list = [_.create_time.strftime("%Y-%m-%d") for _ in create_qs_list]
     creator_list = [_.creator.user_name for _ in create_qs_list]
     introduction_list = [_.introduction for _ in create_qs_list]
-    return JsonResponse({"name_list": name_list, "avatar_list": avatar_list,
-                         "creator_list": creator_list, "date_list": date_list,
+    return JsonResponse({"name_list": name_list,
+                         "creator_list": creator_list,
+                         "date_list": date_list,
                          "introduction_list": introduction_list})
 
 
@@ -193,7 +190,6 @@ user_id	        name_list
 search_content	avatar_list
 	            creator_list
     '''
-
     request_dict = json.loads(request.body.decode('utf-8'))
     user_id = request_dict["user_id"]
     teamIds = list(ReUserTeam.objects.filter(uid=user_id))
@@ -206,32 +202,26 @@ search_content	avatar_list
                 ques_sets.append(quesSet)
     dict = {}
     name_list = []
-    avatar_list = []
     date_list = []
     creator_list = [qs.creator.user_name for qs in ques_sets]
     introduction_list = []
     for qs in ques_sets:
         name_list.append(qs.set_name)
-        avatar_list.append(bytes.decode(qs.profile_photo))
         date_list.append(qs.create_time.strftime("%Y-%m-%d"))
         introduction_list.append(qs.introduction)
     i = 0
     while i < len(name_list):
         if not fuzzy_match(name_list[i], search_content):
             name_list.pop(i)
-            avatar_list.pop(i)
             creator_list.pop(i)
             date_list.pop(i)
             introduction_list.pop(i)
             i -= 1
         i += 1
     dict["name_list"] = name_list
-    dict["avatar_list"] = avatar_list
     dict["creator_list"] = creator_list
     dict["date_list"] = date_list
     dict["introduction_list"] = introduction_list
-    print(search_content)
-    print(name_list)
     return JsonResponse(dict)
 
 
@@ -411,18 +401,15 @@ url:/upload_team
 
 def fetch_all_teams(request):
     group_name_list = []
-    profile_list = []
     introduction_list = []
     creator_list = []
     date_list = []
     for _ in Team.objects.all():
         group_name_list.append(_.team_name)
-        profile_list.append(bytes.decode(_.profile_photo))
         introduction_list.append(_.introduction)
         creator_list.append(_.creator.user_name)
         date_list.append(_.create_date.strftime("%Y-%m-%d"))
     return JsonResponse({"group_name_list": group_name_list,
-                         "profile_list": profile_list,
                          "introduction_list": introduction_list,
                          "creator_list": creator_list,
                          "date_list": date_list})
@@ -431,19 +418,38 @@ def fetch_all_teams(request):
 def search_for_team(request):
     search_cont = json.loads(request.body.decode("utf-8"))["search_content"]
     group_name_list = []
-    profile_list = []
     introduction_list = []
     creator_list = []
     date_list = []
     for _ in Team.objects.all():
         if fuzzy_match(_.team_name, search_cont):
             group_name_list.append(_.team_name)
-            profile_list.append(bytes.decode(_.profile_photo))
             introduction_list.append(_.introduction)
             creator_list.append(_.creator.user_name)
             date_list.append(_.create_date.strftime("%Y-%m-%d"))
     return JsonResponse({"group_name_list": group_name_list,
-                         "profile_list": profile_list,
                          "introduction_list": introduction_list,
                          "creator_list": creator_list,
                          "date_list": date_list})
+
+
+def fetch_team_avatar(request):
+    team_name = json.loads(request.body.decode("utf-8"))["team_name"]
+    try:
+        team = Team.objects.get(team_name=team_name)
+        return JsonResponse({"avatar": bytes.decode(team.profile_photo)})
+    except Exception:
+        return JsonResponse({"avatar": 'none'})
+
+
+def fetch_set_avatar(request):
+    set_name = json.loads(request.body.decode("utf-8"))["set_name"]
+    try:
+        print(set_name)
+        set = QuestionSet.objects.get(set_name=set_name)
+        print(bytes.decode(set.profile_photo))
+        return JsonResponse({"avatar": bytes.decode(set.profile_photo)})
+    except Exception:
+        print("in exception")
+        return JsonResponse({"avatar": 'none'})
+

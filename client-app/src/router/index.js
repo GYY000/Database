@@ -52,7 +52,8 @@ const routes = [
             {
                 path: '/post_hub',
                 name: "post_hub",
-                component: post_hub,
+                //TODO: before push fix here
+                component: question_hub,
                 meta: {
                     bar_show: false,
                     header_show: false,

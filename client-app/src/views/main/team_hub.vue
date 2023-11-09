@@ -35,14 +35,14 @@
   <el-row class="groups-container" v-if="begin_flag">
     <team_card v-for="(item,index) in start_team_sets.creator_list" :creator_name="item"
                :group_name="start_team_sets.group_name_list[index]"
-               :avatar="start_team_sets.profile_list[index]" :date="start_team_sets.date_list[index]"
+               :date="start_team_sets.date_list[index]"
                :introduction="start_team_sets.introduction_list[index]">
     </team_card>
   </el-row>
   <el-row class="groups-container" v-else>
     <team_card v-for="(item,index) in new_team_sets.creator_list" :creator_name="item"
                :group_name="new_team_sets.group_name_list[index]"
-               :avatar="new_team_sets.profile_list[index]" :date="new_team_sets.date_list[index]"
+               :date="new_team_sets.date_list[index]"
                :introduction="new_team_sets.introduction_list[index]">
     </team_card>
   </el-row>

@@ -1,8 +1,8 @@
 <template>
   <el-card shadow="hover" style="width:32%; border-radius: 3%;margin-top: 10px">
     <div class="card_layout">
-      <div class="image-container">
-        <img :src="img_url" alt="can't find the jpg">
+      <div class="image-container" v-if="flag === true">
+        <img :src="avatar_url" alt="can't find the jpg">
       </div>
       <div class="set_title">
         {{ group_name }}
@@ -23,11 +23,32 @@
 </template>
 
 <script>
-import {ref} from "vue";
 import {Edit, MagicStick, TopRight} from "@element-plus/icons-vue";
+import {fetch_team_avatar} from "@/views/main/api";
+import {ref} from "vue";
 
 export default {
   name: "team_card",
+  props: ['creator_name', 'group_name', 'date', 'introduction'],
+
+  setup(props){
+    const avatar_url = ref(null)
+    const flag = ref(false)
+    const func = () => {
+      fetch_team_avatar(props.group_name).then(
+          (data) => {
+            avatar_url.value = data.avatar.startsWith('/9j')
+                ? 'data:image/jpg;base64,' + data.avatar : 'data:image/png;base64,' + data.avatar;
+            flag.value = true;
+          })
+    }
+    func()
+    return{
+      avatar_url,
+      flag
+    }
+  },
+
   computed: {
     TopRight() {
       return TopRight
@@ -38,14 +59,6 @@ export default {
     Edit() {
       return Edit
     }
-  },
-  props: ['creator_name', 'group_name', 'avatar', 'date', 'introduction'],
-  setup(props) {
-    const img_url = ref(props.avatar.startsWith('/9j')
-        ? 'data:image/jpg;base64,' + props.avatar : 'data:image/png;base64,' + props.avatar);
-    return {
-      img_url
-    }
   }
 }
 </script>
@@ -53,22 +66,14 @@ export default {
 <style scoped>
 .card_layout {
   display: flex;
+  flex-direction: column;
   max-width: 300px;
-}
-
-.l_column {
-  flex-grow: 2;
-  max-width: 300px;
-}
-
-.r_column {
-  flex-grow: 3;
 }
 
 .image-container {
-  width: 150px; /* 指定容器的宽度 */
-  height: 130px; /* 指定容器的高度 */
-  overflow: hidden; /* 裁剪超出容器的部分 */
+  width: 150px;
+  height: 130px;
+  overflow: hidden;
 }
 
 .image-container img {
@@ -115,6 +120,6 @@ export default {
   background: linear-gradient(to bottom right, rgba(214, 216, 220, 0.96) 0%,
   rgba(70, 64, 255, 0.56) 60%,
   rgba(214, 216, 220, 0.96) 100%);
-  box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2);
 }
 </style>

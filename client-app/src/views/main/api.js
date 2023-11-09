@@ -82,6 +82,30 @@ export function fetch_search_team_res(user_id, search_content) {
     })
 }
 
+export function fetch_team_avatar(team_name) {
+    return axios.request({
+        url: '/fetch_team_avatar',
+        method: "post",
+        data: JSON.stringify({
+            team_name: team_name.trim()
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
+export function fetch_set_avatar(set_name) {
+    return axios.request({
+        url: '/fetch_set_avatar',
+        method: "post",
+        data: JSON.stringify({
+            set_name: set_name.trim()
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
 export function fetch_my_ques_sets(user_id) {
     return axios.request({
         url: '/fetch_create_ques_set',
