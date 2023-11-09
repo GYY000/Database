@@ -16,7 +16,7 @@
       />
     </span>
     <span>
-      <el-button type="info" @click="get_my_sets">
+      <el-button type="info" @click="get_my_teams">
         我的用户组
       </el-button>
     </span>
@@ -54,8 +54,7 @@ import {ref} from "vue";
 import {ElMessageBox} from "element-plus";
 
 import {
-  fetch_all_teams,
-  fetch_my_ques_sets,
+  fetch_all_teams, fetch_my_group,
   fetch_search_team_res
 } from "@/views/main/api";
 
@@ -110,15 +109,6 @@ export default {
       )
     }
 
-    const get_my_sets = () => {
-      fetch_my_ques_sets(store.getUserId).then(
-          (res) => {
-            new_team_sets.value = res;
-            begin_flag.value = false;
-          }
-      )
-    }
-
     const handle_close = (done) => {
       ElMessageBox.confirm('确定取消创建用户组吗')
           .then(() => {
@@ -129,6 +119,14 @@ export default {
           });
     };
 
+    const get_my_teams = () => {
+      fetch_my_group(store.getUserId).then(
+          (res) => {
+            new_team_sets.value = res;
+            begin_flag.value = false;
+          }
+      )
+    }
     return {
       dialog_visible,
       handle_close,
@@ -137,7 +135,7 @@ export default {
       search,
       new_team_sets,
       begin_flag,
-      get_my_sets
+      get_my_teams
     }
   }
 }

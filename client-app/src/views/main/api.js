@@ -70,7 +70,7 @@ export function fetch_search_res(user_id, search_content) {
     })
 }
 
-export function fetch_search_team_res(user_id, search_content) {
+export function fetch_search_team_res(search_content) {
     return axios.request({
         url: '/search_team',
         method: "post",
