@@ -452,6 +452,6 @@ def search_for_team(request):
 def get_profile_photo(request):
     request_dict=json.loads(request.body.decode('utf-8'))
     uid=request_dict["uid"]
-    return bytes.decode(User.objects.get(uid=uid).profile_photo)
+    return  JsonResponse({"profile_photo": bytes.decode(User.objects.get(uid=uid).profile_photo)})
 
 
