@@ -447,3 +447,11 @@ def search_for_team(request):
                          "introduction_list": introduction_list,
                          "creator_list": creator_list,
                          "date_list": date_list})
+
+
+def get_profile_photo(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    uid=request_dict["uid"]
+    return bytes.decode(User.objects.get(uid=uid).profile_photo)
+
+
