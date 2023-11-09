@@ -1,26 +1,22 @@
 <template>
   <el-card shadow="hover" style="width:32%; border-radius: 3%;margin-top: 10px">
     <div class="card_layout">
-      <div class="l_column">
-        <div class="image-container">
-          <img :src="img_url" alt="can't find the jpg">
-        </div>
+      <div class="image-container">
+        <img :src="img_url" alt="can't find the jpg">
       </div>
-      <div class="r_column">
-        <div class="set_title">
-          {{ group_name }}
-          <div class="seperator"></div>
-        </div>
-        <div class="set_content">
-          {{ introduction }}
-        </div>
-        <div class="set_create">
-          <div style="padding: 2px">{{ creator_name }} {{ date }}</div>
-        </div>
-        <div class="footer">
-          <el-button type="primary" :icon="TopRight" class="button"/>
-          <el-button type="primary" :icon="MagicStick" class="button"/>
-        </div>
+      <div class="set_title">
+        {{ group_name }}
+        <div class="seperator"></div>
+      </div>
+      <div class="set_content">
+        {{ introduction }}
+      </div>
+      <div class="set_create">
+        <div style="padding: 2px">{{ creator_name }} {{ date }}</div>
+      </div>
+      <div class="footer">
+        <el-button type="primary" :icon="TopRight" class="button"/>
+        <el-button type="primary" :icon="MagicStick" class="button"/>
       </div>
     </div>
   </el-card>
@@ -57,7 +53,7 @@ export default {
 <style scoped>
 .card_layout {
   display: flex;
-  max-width: 400px;
+  max-width: 300px;
 }
 
 .l_column {
@@ -104,7 +100,7 @@ export default {
   display: flex;
 }
 
-.button{
+.button {
   margin-top: 8px;
   height: 70%;
   width: 30%;
