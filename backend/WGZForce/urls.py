@@ -37,6 +37,12 @@ urlpatterns = [
     re_path("have_read_message", views.have_read_message),
     re_path("fetch_all_receive_message", views.fetch_all_receive_message),
     re_path(r'^post_hub/(?P<pid>\d+)/$', views.post_hub_param),
+    re_path("post_hub",views.post_hub),
+    re_path("create_post",views.create_post),
+    re_path("upload_team",views.upload_team),
+    re_path("fetch_all_teams",views.fetch_all_teams),
+    re_path("search_team",views.search_for_team),
+    re_path("get_profile_photo",views.get_profile_photo)
     re_path("post_hub", views.post_hub),
     re_path("create_post", views.create_post),
     re_path("upload_team", views.upload_team),

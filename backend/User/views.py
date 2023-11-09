@@ -433,6 +433,14 @@ def search_for_team(request):
                          "date_list": date_list})
 
 
+def get_profile_photo(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    uid=request_dict["uid"]
+    return  JsonResponse({"profile_photo": bytes.decode(User.objects.get(uid=uid).profile_photo)})
+
+
+
+
 def fetch_team_avatar(request):
     team_name = json.loads(request.body.decode("utf-8"))["team_name"]
     try:
