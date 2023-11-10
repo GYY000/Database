@@ -30,7 +30,7 @@
       draggable
       :before-close="handle_close"
       center>
-    <create_ques_group_form @change_visible="change_dialog_visible"></create_ques_group_form>
+    <create_ques_group_form @change_visible="change_dialog_visible" @refresh="refresh"></create_ques_group_form>
   </el-dialog>
   <el-row class="groups-container" v-if="begin_flag">
     <ques_group_card v-for="(item,index) in start_ques_sets.creator_list" :creator_name="item"
@@ -122,6 +122,10 @@ export default {
           });
     };
 
+    const refresh = () => {
+      router.go(0);
+    }
+
     return {
       dialog_visible,
       handle_close,
@@ -130,7 +134,8 @@ export default {
       search,
       new_ques_sets,
       begin_flag,
-      get_my_sets
+      get_my_sets,
+      refresh
     }
   }
 }

@@ -1,12 +1,14 @@
 <template>
   <el-card :body-style="{ padding: '0px' }" shadow="hover"
            style="width:23%; border-radius: 3%;margin-top: 10px">
+    <div class="image-container" v-if="flag === true">
+      <img :src="avatar_url" alt="can't find the jpg">
+    </div>
     <div class="card_layout">
-      <div class="image-container" v-if="flag === true">
-        <img :src="avatar_url" alt="can't find the jpg">
-      </div>
       <div class="set_title">
         {{ group_name }}
+      </div>
+      <div style="display: flex;width: 100%;justify-content: center">
         <div class="seperator"></div>
       </div>
       <div class="set_content">
@@ -15,12 +17,9 @@
       <div class="set_create">
         <div style="padding: 2px">{{ creator_name }} {{ date }}</div>
       </div>
-      <div class="footer" v-if="creator_name === store.getUserName">
-        <el-button type="primary" :icon="TopRight" class="button"/>
+      <div class="footer">
+        <el-button type="primary" :icon="Edit" v-if="creator_name === store.getUserName" class="button"/>
         <el-button type="primary" :icon="MagicStick" class="button"/>
-      </div>
-      <div v-else class="footer">
-
       </div>
     </div>
   </el-card>
@@ -36,7 +35,7 @@ export default {
   name: "team_card",
   props: ['creator_name', 'group_name', 'date', 'introduction'],
 
-  setup(props){
+  setup(props) {
     const avatar_url = ref(null)
     const flag = ref(false)
     const store = userStateStore()
@@ -50,7 +49,7 @@ export default {
           })
     }
     func()
-    return{
+    return {
       avatar_url,
       flag,
       store
@@ -75,7 +74,10 @@ export default {
 .card_layout {
   display: flex;
   flex-direction: column;
+  width: 90%;
+  padding-left: 5%;
   max-width: 300px;
+  height: 150px
 }
 
 .image-container {
@@ -91,26 +93,42 @@ export default {
 }
 
 .set_title {
+  padding-top: 5px;
   font-weight: bold;
   font-size: 18px;
   color: #1169ea;
-  height: 30%;
+  height: 20%;
+  display: flex;
+  justify-content: center;
 }
 
 .set_content {
-  height: 30%;
+  padding-top: 10px;
+  padding-left: 5%;
+  padding-right: 5%;
+  height: 50%;
   font-size: 10px;
+  display: flex;
+  justify-content: center;
 }
 
 .set_create {
+  padding-top: 10px;
+  padding-left: 5%;
+  padding-right: 5%;
   font-size: 10px;
   color: rgb(86, 94, 108);
   height: 15%;
+  display: flex;
+  justify-content: center;
 }
 
 .footer {
   height: 25%;
+  padding-left: 5%;
+  padding-right: 5%;
   display: flex;
+  justify-content: center;
 }
 
 .button {
@@ -122,7 +140,7 @@ export default {
 
 .seperator {
   height: 1px;
-  width: 90%;
+  width: 70%;
   position: relative;
   margin-top: 5px;
   background: linear-gradient(to bottom right, rgba(214, 216, 220, 0.96) 0%,
