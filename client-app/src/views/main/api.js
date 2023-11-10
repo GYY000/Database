@@ -140,3 +140,30 @@ export function upload_team(team_data) {
         }
     )
 }
+
+export function check_inside_group(user_id, group_name) {
+    return axios.request({
+        url: '/check_inside_group',
+        method: "post",
+        data: JSON.stringify({
+            user_id: user_id,
+            group_name: group_name,
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
+export function apply_for_team(creator_name, team_name, applier_id) {
+    return axios.request({
+        url: '/apply_for_team',
+        method: "post",
+        data: JSON.stringify({
+            creator_name:creator_name,
+            applier_id: applier_id,
+            team_name: team_name,
+        })
+    }).then(response => {
+        return response.data
+    })
+}

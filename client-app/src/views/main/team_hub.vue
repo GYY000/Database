@@ -30,17 +30,21 @@
     <team_card v-for="(item,index) in start_team_sets.creator_list" :creator_name="item"
                :group_name="start_team_sets.group_name_list[index]"
                :date="start_team_sets.date_list[index]"
-               :introduction="start_team_sets.introduction_list[index]">
+               :introduction="start_team_sets.introduction_list[index]"
+               @try_edit="change_edit_available">
     </team_card>
   </el-row>
   <el-row class="groups-container" v-else>
     <team_card v-for="(item,index) in new_team_sets.creator_list" :creator_name="item"
                :group_name="new_team_sets.group_name_list[index]"
                :date="new_team_sets.date_list[index]"
-               :introduction="new_team_sets.introduction_list[index]">
+               :introduction="new_team_sets.introduction_list[index]"
+               @try_edit="change_edit_available">
     </team_card>
   </el-row>
-
+  <el-dialog v-model="edit_available" title="编辑用户组" draggable align-center>
+    <edit_team :team_name="edit_team_info"></edit_team>
+  </el-dialog>
 </template>
 
 <script>
@@ -48,7 +52,7 @@ import {ref} from "vue";
 import {ElMessageBox} from "element-plus";
 
 import {
-  fetch_all_teams, fetch_my_group,
+  fetch_all_teams,
   fetch_search_team_res
 } from "@/views/main/api";
 
@@ -56,6 +60,8 @@ import userStateStore from "@/store";
 import {Search} from "@element-plus/icons-vue";
 import Create_team_form from "@/views/main/team_component/create_team_form.vue";
 import team_card from "@/views/main/team_component/team_card.vue";
+import Edit_team from "@/views/main/team_component/edit_team.vue";
+import router from "@/router";
 
 export default {
   name: "team_hub",
@@ -64,7 +70,7 @@ export default {
       return Search
     }
   },
-  components: {Create_team_form, team_card},
+  components: {Edit_team, Create_team_form, team_card},
   data() {
     return {
       start_team_sets: {},
@@ -89,9 +95,16 @@ export default {
     const store = userStateStore()
     const new_team_sets = ref(null)
     const begin_flag = ref(true)
+    const edit_available = ref(false)
+    const edit_team_info = ref(null)
 
     const change_dialog_visible = (flag) => {
       dialog_visible.value = flag
+    }
+
+    const change_edit_available = (data) => {
+      edit_available.value = data.flag
+      edit_team_info.value = data.team_name
     }
 
     const search = (event) => {
@@ -125,7 +138,10 @@ export default {
       search,
       new_team_sets,
       begin_flag,
-      refresh
+      refresh,
+      change_edit_available,
+      edit_available,
+      edit_team_info
     }
   }
 }

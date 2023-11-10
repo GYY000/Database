@@ -18,27 +18,41 @@
         <div style="padding: 2px">{{ creator_name }} {{ date }}</div>
       </div>
       <div class="footer">
-        <el-button type="primary" :icon="Edit" v-if="creator_name === store.getUserName" class="button"/>
-        <el-button type="primary" :icon="MagicStick" class="button"/>
+        <el-button type="primary" :icon="Edit" @click="toEdit" v-if="creator_name === store.getUserName" class="button"
+                   round>
+          管理用户组
+        </el-button>
+        <div v-else>
+          <el-button type='danger' v-if="inside" :icon="Remove" class="button" @click="exit" round>
+            退出
+          </el-button>
+          <el-button type="primary" v-else :icon="Plus" class="button" @click="joinReq" round>
+            加入
+          </el-button>
+        </div>
+
       </div>
     </div>
   </el-card>
 </template>
 
 <script>
-import {Edit, MagicStick, TopRight} from "@element-plus/icons-vue";
-import {fetch_team_avatar} from "@/views/main/api";
+import {Edit, MagicStick, Plus, Remove, TopRight} from "@element-plus/icons-vue";
+import {apply_for_team, check_inside_group, fetch_team_avatar} from "@/views/main/api";
 import {ref} from "vue";
 import userStateStore from "@/store";
+import router from "@/router";
+import {ElMessage} from "element-plus";
 
 export default {
   name: "team_card",
   props: ['creator_name', 'group_name', 'date', 'introduction'],
 
-  setup(props) {
+  setup(props, context) {
     const avatar_url = ref(null)
     const flag = ref(false)
     const store = userStateStore()
+    const inside = ref(false)
 
     const func = () => {
       fetch_team_avatar(props.group_name).then(
@@ -46,17 +60,55 @@ export default {
             avatar_url.value = data.avatar.startsWith('/9j')
                 ? 'data:image/jpg;base64,' + data.avatar : 'data:image/png;base64,' + data.avatar;
             flag.value = true;
-          })
+          });
+      check_inside_group(store.getUserId, props.group_name).then(
+          (data) => {
+            inside.value = data.is_inside === 'true'
+          }
+      );
     }
+
+    const toEdit = () => {
+      context.emit('try_edit', {flag: true, team_name: props.group_name})
+    }
+
+    const exit = () => {
+      //TODO:
+    }
+
+    const joinReq = () => {
+      apply_for_team(props.creator_name, props.group_name, store.getUserId).then(
+          (response) => {
+            if(response.is_successful === 'true') {
+              ElMessage({
+                message: '发送成功',
+                showClose: true,
+                type: 'success',
+            })
+            }
+          }
+      )
+    }
+
     func()
     return {
       avatar_url,
       flag,
-      store
+      store,
+      toEdit,
+      inside,
+      exit,
+      joinReq
     }
   },
 
   computed: {
+    Remove() {
+      return Remove
+    },
+    Plus() {
+      return Plus
+    },
     TopRight() {
       return TopRight
     },
@@ -127,6 +179,7 @@ export default {
   height: 25%;
   padding-left: 5%;
   padding-right: 5%;
+  padding-bottom: 3%;
   display: flex;
   justify-content: center;
 }
@@ -134,7 +187,7 @@ export default {
 .button {
   margin-top: 8px;
   height: 70%;
-  width: 30%;
+  width: 58%;
   padding-right: 5px;
 }
 

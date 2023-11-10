@@ -18,7 +18,7 @@ const routes = [
             {
                 path: '/team_hub',
                 name: "team_hub",
-                components: {team_hub: () => import('@/views/main/team_hub.vue')}
+                components: {team_hub: () => import('@/views/main/team_hub.vue')},
             },
             {
                 path: '/post_hub',
