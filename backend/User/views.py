@@ -313,7 +313,7 @@ user_id	    content_list
     content_list = [_.content for _ in messages]
     sender_name_list = [_.sender.user_name for _ in messages]
     have_read_list = [_.read for _ in messages]
-    time_list = [_.time.str for _ in messages]
+    time_list = [_.time.strftime("%Y-%m-%d") for _ in messages]
     return JsonResponse({"content_list": content_list, "sender_name_list": sender_name_list,
                          "time_list": time_list, "have_read_list": have_read_list})
 
@@ -333,7 +333,7 @@ def post_hub(request):
     name_photos = [(_.creator.user_name, _.creator.profile_photo) for _ in
                    posts]
     arr = [{"pid": posts[i].pid, "title": posts[i].title, "creator_name": name_photos[i][0],
-            "update_time": posts[i].update_time, "content": posts[i].content,
+            "update_time": posts[i].update_time.strftime("%Y-%m-%d"), "content": posts[i].content,
             "profile_photo": name_photos[i][1]} for i in range(len(posts))]
     return JsonResponse(arr[start:end], safe=False)
 
@@ -342,13 +342,13 @@ def post_hub_param(request, pid):
     if request.method == "GET":
         post = Post.objects.get(pid=pid)
         dict1 = {"pid": post.pid, "title": post.title, "creator_name": post.creator.user_name,
-                 "update_time": post.update_time, "content": post.content,
+                 "update_time": post.update_time.strftime("%Y-%m-%d"), "content": post.content,
                  "profile_photo": post.creator.profile_photo}
         comments = Comment.objects.filter(pid=pid).order_by("create_time")
         # fixme comment的时间我先按创建时间来了
         comments = [{"cid": _.id, "user_name": _.creator.user_name,
                      "content": _.content, "profile_photo": _.creator.profile_photo,
-                     "create_time": _.create_time
+                     "create_time": _.create_time.strftime("%Y-%m-%d")
                      } for _ in comments]
         return JsonResponse({"post": dict1, "comment": comments})
 
@@ -595,7 +595,7 @@ url:/fetch_all_ques_set_in_team
         if _.tid.tid==team.tid:
             name_list.append(_.qsid.set_name)
             creator_list.append(_.qsid.creator.user_name)
-            date_list.append(_.qsid.create_time)
+            date_list.append(_.qsid.create_.strftime("%Y-%m-%d"))
             introduction_list.append(_.qsid.introduction)
     return JsonResponse({"name_list":name_list,"creator_list":creator_list,
                          "introduction_list":introduction_list,
@@ -618,4 +618,46 @@ url:/fetch_all_users_in_team
             name_list.append(_.uid.user_name)
             register_date_list.append(_.join_date)
     return JsonResponse({"name_list":name_list,"register_date_list":register_date_list})
+
+
+def get_user_post(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    uid=request_dict['uid']
+    page_no=request_dict['page_no']
+    page_size=request_dict['page_size']
+    posts=Post.objects.filter(creator=uid).order_by('-update_time')
+    start = page_no * page_size
+    end = (page_no + 1) * page_size
+    if page_no * page_size >= len(posts):
+        return JsonResponse({"total":0,"posts":[]})
+    if end >= len(posts):
+        end = len(posts)
+    names = [_.creator.user_name for _ in posts[start:end]]
+    arr = [{"pid": posts[i].pid, "title": posts[i].title, "creator_name": names[i-start],
+            "update_time": posts[i].update_time.strftime("%Y-%m-%d"), "content": posts[i].content} for i in range(start,end)]
+    return JsonResponse({"total":(end-start),"posts":arr})
+
+
+def search_post(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    key_word=request_dict['key_word']
+    page_no=request_dict['page_no']
+    page_size=request_dict['page_size']
+    posts=list(Post.objects.order_by('-update_time'))
+    i=0
+    while i<len(posts):
+        if (not fuzzy_match(posts[i].content,key_word)) and (not fuzzy_match(posts[i].title,key_word)):
+            posts.pop(i)
+            i-=1
+        i+=1
+    start = page_no * page_size
+    end = (page_no + 1) * page_size
+    if page_no * page_size >= len(posts):
+        return JsonResponse({"total":0,"posts":[]})
+    if end >= len(posts):
+        end = len(posts)
+    names = [_.creator.user_name for _ in posts[start:end]]
+    arr = [{"pid": posts[i].pid, "title": posts[i].title, "creator_name": names[i-start],
+            "update_time": posts[i].update_time.strftime("%Y-%m-%d"), "content": posts[i].content,} for i in range(start,end)]
+    return JsonResponse({"total":(end-start),"posts":arr})
 
