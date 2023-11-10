@@ -1,30 +1,30 @@
 <template>
   <!-- TODO:也许有时间可以做一个悬浮效果-->
-  <button @click="show_info = true">
+  <div @click="show_info = true">
     <el-skeleton :loading="flag" animated>
       <template #template>
-        <el-skeleton-item variant="image" style="height: 40px;width: 40px;border-radius: 50%"/>
+        <el-skeleton-item variant="image" style="height: 60px;width: 60px;border-radius: 50%"/>
       </template>
       <template #default>
-        <img :src="avatar" style="height: 40px;width: 40px;border-radius: 50%"/>
+        <img :src="avatar" style="height: 60px;width: 60px;border-radius: 50%"/>
       </template>
     </el-skeleton>
-  </button>
+  </div>
 
-  <el-dialog v-model="show_info">
-    <el-card>
-      <div style="display: flex; flex-direction: column">
-        <div style="padding-right: 20px">
-          <el-skeleton :loading="flag" animated>
-            <template #template>
-              <el-skeleton-item variant="image" style="width: 100px; height: 100px; border-radius: 50%"/>
-            </template>
-            <template #default>
-              <img :src="avatar" style="width: 100px; height: 100px;border-radius: 50%">
-            </template>
-          </el-skeleton>
-        </div>
-        <div style="font-size:17px; padding-bottom: 5px;display: flex;justify-content: center">
+  <el-dialog v-model="show_info" style="width:400px" draggable>
+    <div style="display: flex;justify-content: center">
+      <div>
+        <el-skeleton :loading="flag" animated>
+          <template #template>
+            <el-skeleton-item variant="image" style="width: 100px; height: 100px; border-radius: 50%"/>
+          </template>
+          <template #default>
+            <img :src="avatar" style="width: 100px; height: 100px;border-radius: 50%">
+          </template>
+        </el-skeleton>
+      </div>
+      <div style="display: flex; flex-direction: column;padding-left: 20px">
+        <div style="font-size:17px; padding-bottom: 5px;display: flex;justify-content: left">
           <span style="font-weight: bold;color: #409EFF">{{ name }}</span>
         </div>
         <div style="padding-bottom: 15px;display: flex;justify-content: center">
@@ -36,7 +36,7 @@
           </el-button>
         </div>
       </div>
-    </el-card>
+    </div>
   </el-dialog>
 </template>
 

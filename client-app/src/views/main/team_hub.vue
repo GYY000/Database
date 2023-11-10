@@ -30,21 +30,16 @@
     <team_card v-for="(item,index) in start_team_sets.creator_list" :creator_name="item"
                :group_name="start_team_sets.group_name_list[index]"
                :date="start_team_sets.date_list[index]"
-               :introduction="start_team_sets.introduction_list[index]"
-               @try_edit="change_edit_available">
+               :introduction="start_team_sets.introduction_list[index]">
     </team_card>
   </el-row>
   <el-row class="groups-container" v-else>
     <team_card v-for="(item,index) in new_team_sets.creator_list" :creator_name="item"
                :group_name="new_team_sets.group_name_list[index]"
                :date="new_team_sets.date_list[index]"
-               :introduction="new_team_sets.introduction_list[index]"
-               @try_edit="change_edit_available">
+               :introduction="new_team_sets.introduction_list[index]">
     </team_card>
   </el-row>
-  <el-dialog v-model="edit_available" title="编辑用户组" draggable center>
-    <edit_team :team_name="edit_team_name" :date="edit_team_date" :avatar="edit_team_avatar"></edit_team>
-  </el-dialog>
 </template>
 
 <script>
@@ -95,20 +90,9 @@ export default {
     const store = userStateStore()
     const new_team_sets = ref(null)
     const begin_flag = ref(true)
-    const edit_available = ref(false)
-    const edit_team_name = ref(null)
-    const edit_team_date = ref(null)
-    const edit_team_avatar = ref(null)
 
     const change_dialog_visible = (flag) => {
       dialog_visible.value = flag
-    }
-
-    const change_edit_available = (data) => {
-      edit_available.value = data.flag
-      edit_team_name.value = data.team_name
-      edit_team_date.value = data.date
-      //edit_team_avatar.value = data.avatar
     }
 
     const search = (event) => {
@@ -142,12 +126,7 @@ export default {
       search,
       new_team_sets,
       begin_flag,
-      refresh,
-      change_edit_available,
-      edit_available,
-      edit_team_name,
-      edit_team_date,
-      edit_team_avatar
+      refresh
     }
   }
 }
