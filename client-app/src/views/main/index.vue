@@ -4,7 +4,6 @@
   <div class="main-container">
     <div>
       <el-tabs v-model="activeTab" @tab-change="change_tab" class="tabs">
-        <!--- TODO -->
         <el-tab-pane label="主页" name="/main_page">
           <keep-alive>
             <router-view name="main_page"></router-view>
@@ -36,12 +35,15 @@
       </el-button>
       <span v-if="!is_login" style="height:100%;">请先登录</span>
       <span v-else style="height:100%;">
-        <el-button @click="change_tab('/user_center')" type="" text class="button1">
+        <el-button @click="goto('/user_center')" type="" text class="button1">
           <img :src="avatar" class="avatar">
           {{ user_name }},您好
         </el-button>
       </span>
     </div>
+    <el-dialog>
+
+    </el-dialog>
   </div>
 
 </template>
@@ -120,7 +122,7 @@ export default {
   components: {Team_hub, Post_hub, Question_hub},
   setup() {
     const store = userStateStore()
-    const is_login = ref(store.getUserName);
+    const is_login = ref(store.getIsAuthentic);
     const tab_path = ref("/main_page");
     const avatar = ref(store.getProfilePhoto)
     const user_name = ref(store.getUserName)
@@ -133,7 +135,11 @@ export default {
 
     const change_tab = (name) => {
       tab_path.value = name;
-      router.push(tab_path.value)
+      router.push({path: tab_path.value})
+    };
+
+    const goto = (name) => {
+      router.push({path: name})
     };
 
     const logout = () => {
@@ -153,7 +159,8 @@ export default {
       logout,
       login,
       avatar,
-      user_name
+      user_name,
+      goto
     };
   },
   computed: {

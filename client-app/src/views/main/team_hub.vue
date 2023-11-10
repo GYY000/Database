@@ -15,12 +15,6 @@
           @keyup.enter.native="search"
       />
     </span>
-    <span>
-      <el-button type="info" @click="get_my_teams">
-        我的用户组
-      </el-button>
-    </span>
-
   </div>
 
   <el-dialog
@@ -119,14 +113,6 @@ export default {
           });
     };
 
-    const get_my_teams = () => {
-      fetch_my_group(store.getUserId).then(
-          (res) => {
-            new_team_sets.value = res;
-            begin_flag.value = false;
-          }
-      )
-    }
     return {
       dialog_visible,
       handle_close,
@@ -135,7 +121,6 @@ export default {
       search,
       new_team_sets,
       begin_flag,
-      get_my_teams
     }
   }
 }

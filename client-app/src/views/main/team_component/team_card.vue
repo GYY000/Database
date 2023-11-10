@@ -1,5 +1,6 @@
 <template>
-  <el-card shadow="hover" style="width:32%; border-radius: 3%;margin-top: 10px">
+  <el-card :body-style="{ padding: '0px' }" shadow="hover"
+           style="width:23%; border-radius: 3%;margin-top: 10px">
     <div class="card_layout">
       <div class="image-container" v-if="flag === true">
         <img :src="avatar_url" alt="can't find the jpg">
@@ -14,9 +15,12 @@
       <div class="set_create">
         <div style="padding: 2px">{{ creator_name }} {{ date }}</div>
       </div>
-      <div class="footer">
+      <div class="footer" v-if="creator_name === store.getUserName">
         <el-button type="primary" :icon="TopRight" class="button"/>
         <el-button type="primary" :icon="MagicStick" class="button"/>
+      </div>
+      <div v-else class="footer">
+
       </div>
     </div>
   </el-card>
@@ -26,6 +30,7 @@
 import {Edit, MagicStick, TopRight} from "@element-plus/icons-vue";
 import {fetch_team_avatar} from "@/views/main/api";
 import {ref} from "vue";
+import userStateStore from "@/store";
 
 export default {
   name: "team_card",
@@ -34,6 +39,8 @@ export default {
   setup(props){
     const avatar_url = ref(null)
     const flag = ref(false)
+    const store = userStateStore()
+
     const func = () => {
       fetch_team_avatar(props.group_name).then(
           (data) => {
@@ -45,7 +52,8 @@ export default {
     func()
     return{
       avatar_url,
-      flag
+      flag,
+      store
     }
   },
 
@@ -71,14 +79,14 @@ export default {
 }
 
 .image-container {
-  width: 150px;
-  height: 130px;
+  width: 100%;
+  height: 250px;
   overflow: hidden;
 }
 
 .image-container img {
-  width: 130px;
-  height: 130px;
+  width: 100%;
+  height: 250px;
   object-fit: cover;
 }
 
