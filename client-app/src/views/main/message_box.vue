@@ -1,5 +1,9 @@
 <template>
-  <div style="display: flex;flex-direction: column">
+  <div v-if="id_list.length === 0"
+       style="color: #6b778c;font-size: 15px;display: flex;justify-content:center">
+    (づ￣3￣)づ╭❤～ 暂时没有申请哦~
+  </div>
+  <div v-else style="display: flex;flex-direction: column">
     <message v-for="(item,index) in applier_name_list"
              :applier_name="item"
              :team_name="team_name_list[index]"

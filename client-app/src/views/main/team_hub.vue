@@ -42,8 +42,8 @@
                @try_edit="change_edit_available">
     </team_card>
   </el-row>
-  <el-dialog v-model="edit_available" title="编辑用户组" draggable align-center>
-    <edit_team :team_name="edit_team_info"></edit_team>
+  <el-dialog v-model="edit_available" title="编辑用户组" draggable center>
+    <edit_team :team_name="edit_team_name" :date="edit_team_date" :avatar="edit_team_avatar"></edit_team>
   </el-dialog>
 </template>
 
@@ -96,7 +96,9 @@ export default {
     const new_team_sets = ref(null)
     const begin_flag = ref(true)
     const edit_available = ref(false)
-    const edit_team_info = ref(null)
+    const edit_team_name = ref(null)
+    const edit_team_date = ref(null)
+    const edit_team_avatar = ref(null)
 
     const change_dialog_visible = (flag) => {
       dialog_visible.value = flag
@@ -104,7 +106,9 @@ export default {
 
     const change_edit_available = (data) => {
       edit_available.value = data.flag
-      edit_team_info.value = data.team_name
+      edit_team_name.value = data.team_name
+      edit_team_date.value = data.date
+      //edit_team_avatar.value = data.avatar
     }
 
     const search = (event) => {
@@ -141,7 +145,9 @@ export default {
       refresh,
       change_edit_available,
       edit_available,
-      edit_team_info
+      edit_team_name,
+      edit_team_date,
+      edit_team_avatar
     }
   }
 }

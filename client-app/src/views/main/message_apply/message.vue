@@ -7,17 +7,17 @@
             <el-skeleton-item variant="image" style="width: 100px; height: 100px; border-radius: 50%"/>
           </template>
           <template #default>
-              <img :src="avatar" style="width: 100px; height: 100px;border-radius: 50%">
+            <img :src="avatar" style="width: 100px; height: 100px;border-radius: 50%">
           </template>
         </el-skeleton>
       </div>
       <div>
         <div style="font-size:17px; padding-bottom: 5px">
-          <span style="font-weight: bold;color: #409EFF">{{applier_name}}</span> 希望加入
-          <span style="font-weight: bold;color: #409EFF">{{team_name}}</span>
+          <span style="font-weight: bold;color: #409EFF">{{ applier_name }}</span> 希望加入
+          <span style="font-weight: bold;color: #409EFF">{{ team_name }}</span>
         </div>
         <div style="padding-bottom: 15px">
-          {{creat_time}}
+          {{ creat_time }}
         </div>
         <div>
           <el-button type="success" @click="respond_to_apply(true)">
@@ -50,8 +50,7 @@ export default {
           (data) => {
             avatar.value = data.profile_photo.startsWith('/9j')
                 ? 'data:image/jpg;base64,' + data.profile_photo : 'data:image/png;base64,' + data.profile_photo;
-            console.log(avatar.value)
-            flag.value=false
+            flag.value = false
           }
       )
     }
@@ -59,14 +58,14 @@ export default {
     init()
 
     const respond_to_apply = (flag) => {
-      respond(props.id,props.team_name, props.applier_name, flag).then(
+      respond(props.id, props.team_name, props.applier_name, flag).then(
           (res) => {
-            if(res.is_successful === 'true') {
+            if (res.is_successful === 'true') {
               ElMessage({
                 message: '完成申请',
                 showClose: true,
                 type: 'success',
-            })
+              })
             }
           }
       )

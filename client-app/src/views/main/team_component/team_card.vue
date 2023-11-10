@@ -1,9 +1,17 @@
 <template>
   <el-card :body-style="{ padding: '0px' }" shadow="hover"
            style="width:23%; border-radius: 3%;margin-top: 10px">
-    <div class="image-container" v-if="flag === true">
-      <img :src="avatar_url" alt="can't find the jpg">
-    </div>
+    <el-skeleton :loading="flag" animated>
+      <template #template>
+        <el-skeleton-item variant="image" class="image-container"/>
+      </template>
+      <template #default>
+        <div class="image-container">
+          <img :src="avatar_url" alt="can't find the jpg">
+        </div>
+      </template>
+    </el-skeleton>
+
     <div class="card_layout">
       <div class="set_title">
         {{ group_name }}
@@ -28,7 +36,7 @@
           <el-button type='danger' v-if="inside" :icon="Remove" class="button" @click="exit" round>
             退出
           </el-button>
-          <el-button type="primary" v-else :icon="Plus" class="button" @click="joinReq" round >
+          <el-button type="primary" v-else :icon="Plus" class="button" @click="joinReq" round>
             加入
           </el-button>
         </div>
@@ -51,7 +59,7 @@ export default {
 
   setup(props, context) {
     const avatar_url = ref(null)
-    const flag = ref(false)
+    const flag = ref(true)
     const store = userStateStore()
     const inside = ref(false)
 
@@ -60,7 +68,7 @@ export default {
           (data) => {
             avatar_url.value = data.avatar.startsWith('/9j')
                 ? 'data:image/jpg;base64,' + data.avatar : 'data:image/png;base64,' + data.avatar;
-            flag.value = true;
+            flag.value = false;
           });
       check_inside_group(store.getUserId, props.group_name).then(
           (data) => {
@@ -70,7 +78,8 @@ export default {
     }
 
     const toEdit = () => {
-      context.emit('try_edit', {flag: true, team_name: props.group_name})
+      context.emit('try_edit',
+          {flag: true, team_name: props.group_name, date:props.date, avatar:avatar_url.value})
     }
 
     const exit = () => {
@@ -80,12 +89,12 @@ export default {
     const joinReq = () => {
       apply_for_team(props.creator_name, props.group_name, store.getUserId).then(
           (response) => {
-            if(response.is_successful === 'true') {
+            if (response.is_successful === 'true') {
               ElMessage({
                 message: '发送成功',
                 showClose: true,
                 type: 'success',
-            })
+              })
             }
           }
       )

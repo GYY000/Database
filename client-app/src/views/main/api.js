@@ -182,3 +182,28 @@ export function respond(id, team_name, applier_name, agree) {
         return response.data
     })
 }
+
+export function fetch_all_member(team_name) {
+    return axios.request({
+        url: '/fetch_all_users_in_team',
+        method: "post",
+        data: JSON.stringify({
+            team_name:team_name,
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
+export function del_member(name, team_name) {
+    return axios.request({
+        url: '/del_member',
+        method: "post",
+        data: JSON.stringify({
+            del_user_name: name,
+            team_name: team_name
+        })
+    }).then(response => {
+        return response.data
+    })
+}
