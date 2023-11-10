@@ -89,8 +89,7 @@ def upload_ques_set(request):
                                profile_photo=code, introduction=introduction)
         ques_set.save()
         if not is_public:
-            ques_id = QuestionSet.objects.get(set_name=set_name).qsid
-            ques_perm = QuestionSetPerm(qsid=ques_id, tid=Team.objects.get(team_name=group_name).tid)
+            ques_perm = QuestionSetPerm(qsid=ques_set, tid=Team.objects.get(team_name=group_name))
             ques_perm.save()
         return JsonResponse({"is_successful": "true"})
 
@@ -396,6 +395,7 @@ url:/upload_team
         team.save()
         return JsonResponse({"is_successful": "true"})
     except Exception as e:
+        print(e)
         return JsonResponse({"is_successful": "false"})
 
 
@@ -504,8 +504,8 @@ url:/del_member
     del_user_id=request_dict["del_user_id"]
     team_name=request_dict["team_name"]
     try:
-        ReUserTeam.objects.get(uid=User.objects.get(uid=del_user_id)
-                           ,tid=Team.objects.get(team_name=team_name)).delete()
+        ReUserTeam.objects.get(uid=del_user_id
+                           ,tid=Team.objects.get(team_name=team_name).tid).delete()
         return JsonResponse({"is_successful":"true"})
     except:
         return JsonResponse({"is_successful":"false"})
@@ -595,7 +595,7 @@ url:/fetch_all_ques_set_in_team
     for _ in QuestionSetPerm.objects.all():
         if _.tid.tid==team.tid:
             name_list.append(_.qsid.set_name)
-            creator_list.append(_.qsid.c)
+            creator_list.append(_.qsid.creator.user_name)
             date_list.append(_.qsid.create_time)
             introduction_list.append(_.qsid.introduction)
     return JsonResponse({"name_list":name_list,"creator_list":creator_list,
