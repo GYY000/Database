@@ -1,5 +1,5 @@
 <template>
-  <el-form>
+  <el-form style="padding-bottom: 15px">
     <div v-show="image_src !== ''" class="image-container">
       <img :src="image_src" id="show">
     </div>
@@ -43,6 +43,7 @@ export default {
       image_src.value = ''
       introduction.value = ''
       context.emit('change_visible', false);
+      context.emit('refresh');
     }
 
     const add_team = () => {

@@ -53,6 +53,7 @@ export default {
       image_src.value = ''
       introduction.value = ''
       context.emit('change_visible', false);
+      context.emit('refresh')
     }
 
     const add_ques_set = () => {

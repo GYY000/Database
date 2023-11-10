@@ -4,7 +4,6 @@
   <div class="main-container">
     <div>
       <el-tabs v-model="activeTab" @tab-change="change_tab" class="tabs">
-        <!--- TODO -->
         <el-tab-pane label="主页" name="/main_page">
           <keep-alive>
             <router-view name="main_page"></router-view>
@@ -28,6 +27,10 @@
       </el-tabs>
     </div>
     <div class="r-container">
+      <el-badge :value="100" :max="20" class="item" style="margin-right: 30px;">
+        <el-button v-if="is_login"
+                   @click="open_message_box" type="primary" :icon="Message" style="width:100%;"/>
+      </el-badge>
       <el-button v-if="is_login" @click="logout" type="primary" :icon="SortDown" class="button">
         Logout
       </el-button>
@@ -36,12 +39,15 @@
       </el-button>
       <span v-if="!is_login" style="height:100%;">请先登录</span>
       <span v-else style="height:100%;">
-        <el-button @click="change_tab('/user_center')" type="" text class="button1">
+        <el-button @click="goto('/user_center')" type="" text class="button1">
           <img :src="avatar" class="avatar">
           {{ user_name }},您好
         </el-button>
       </span>
     </div>
+    <el-dialog v-model="open_message" title="申请中心" center>
+      <message_box></message_box>
+    </el-dialog>
   </div>
 
 </template>
@@ -68,7 +74,8 @@
 }
 
 .button {
-  margin-right: 10px;
+  padding-right: 30px;
+  width: 25%
 }
 
 .r-container {
@@ -107,7 +114,7 @@
 </style>
 
 <script>
-import {SortDown, SortUp, User} from '@element-plus/icons-vue'
+import {Message, SortDown, SortUp, User} from '@element-plus/icons-vue'
 import {ref, watch} from "vue";
 import router from "@/router";
 import {userStateStore} from "@/store";
@@ -117,14 +124,15 @@ import Team_hub from "@/views/main/team_hub.vue";
 
 export default {
   name: "index",
-  components: {Team_hub, Post_hub, Question_hub},
+  components: {Message, Team_hub, Post_hub, Question_hub},
   setup() {
     const store = userStateStore()
-    const is_login = ref(store.getUserName);
+    const is_login = ref(store.getIsAuthentic);
     const tab_path = ref("/main_page");
     const avatar = ref(store.getProfilePhoto)
     const user_name = ref(store.getUserName)
     const activeTab = ref(sessionStorage.getItem('activeTab') || '/main_page')
+    const open_message = ref(false)
 
 
     watch(activeTab, (newValue) => {
@@ -133,7 +141,11 @@ export default {
 
     const change_tab = (name) => {
       tab_path.value = name;
-      router.push(tab_path.value)
+      router.push({path: tab_path.value})
+    };
+
+    const goto = (name) => {
+      router.push({path: name})
     };
 
     const logout = () => {
@@ -145,6 +157,10 @@ export default {
       router.push({path: '/log_reg'});
     };
 
+    const open_message_box = () => {
+      open_message.value=true
+    }
+
     return {
       activeTab,
       is_login,
@@ -153,10 +169,17 @@ export default {
       logout,
       login,
       avatar,
-      user_name
+      user_name,
+      goto,
+      open_message_box,
+      open_message
     };
   },
+
   computed: {
+    Message() {
+      return Message
+    },
     User() {
       return User;
     },

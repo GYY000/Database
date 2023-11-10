@@ -435,8 +435,8 @@ def search_for_team(request):
 
 def get_profile_photo(request):
     request_dict = json.loads(request.body.decode('utf-8'))
-    uid = request_dict["uid"]
-    return JsonResponse({"profile_photo": bytes.decode(User.objects.get(uid=uid).profile_photo)})
+    user_name = request_dict["user_name"]
+    return JsonResponse({"profile_photo": bytes.decode(User.objects.get(user_name=user_name).profile_photo)})
 
 
 def fetch_team_avatar(request):
@@ -530,9 +530,9 @@ def answer_to_req(request):
     request_dict=json.loads(request.body.decode('utf-8'))
     id_list=request_dict['id_list']
     team_name=request_dict['team_name']
-    applier_id=request_dict['applier_id']
+    applier_name=request_dict['applier_name']
     aggre=request_dict["aggre"]
-    applier=User.objects.get(uid=applier_id)
+    applier=User.objects.get(user_name=applier_name)
     team=Team.objects.get(team_name=team_name)
     if aggre:
         try:
