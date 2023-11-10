@@ -658,7 +658,7 @@ def search_post(request):
     if end >= len(posts):
         end = len(posts)
     names = [_.creator.user_name for _ in posts[start:end]]
-    arr = [{"pid": posts[i].pid, "title": posts[i].title, "creator_name": names[i],
+    arr = [{"pid": posts[i].pid, "title": posts[i].title, "creator_name": names[i-start],
             "update_time": posts[i].update_time.strftime("%Y-%m-%d"), "content": posts[i].content,} for i in range(start,end)]
     return JsonResponse({"total":(end-start),"posts":arr})
 
