@@ -1,28 +1,4 @@
-import {ElMessage} from "element-plus";
 import axios from "axios";
-
-export function check_inside_group(data) {
-    return axios.request({
-        url: '/check_inside_group',
-        method: "post",
-        data: JSON.stringify({
-            user_name: data.user_name,
-            password: data.group_name,
-        })
-    }).then(
-        (response) => {
-            return response.data
-        }
-    ).catch(
-        error => {
-            ElMessage({
-                message: '验证失败，请稍后再试',
-                showClose: true,
-                type: 'error',
-            })
-        }
-    )
-}
 
 export function upload_ques_set(ques_set_data) {
     return axios.post('/upload_ques_set', ques_set_data,
@@ -162,6 +138,45 @@ export function apply_for_team(creator_name, team_name, applier_id) {
             creator_name:creator_name,
             applier_id: applier_id,
             team_name: team_name,
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
+export function fetch_all_application(user_id) {
+    return axios.request({
+        url: '/fetch_all_application',
+        method: "post",
+        data: JSON.stringify({
+            user_id: user_id,
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
+export function fetch_avatar(user_name) {
+    return axios.request({
+        url: '/get_profile_photo',
+        method: "post",
+        data: JSON.stringify({
+            user_name: user_name,
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
+export function respond(id, team_name, applier_name, agree) {
+    return axios.request({
+        url: '/answer_to_req',
+        method: "post",
+        data: JSON.stringify({
+            id:id,
+            team_name:team_name,
+            applier_name:applier_name,
+            agree: agree
         })
     }).then(response => {
         return response.data

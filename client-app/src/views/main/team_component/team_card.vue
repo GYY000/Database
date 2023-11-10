@@ -18,7 +18,9 @@
         <div style="padding: 2px">{{ creator_name }} {{ date }}</div>
       </div>
       <div class="footer">
-        <el-button type="primary" :icon="Edit" @click="toEdit" v-if="creator_name === store.getUserName" class="button"
+        <el-button type="primary" :icon="Edit" @click="toEdit"
+                   v-if="creator_name === store.getUserName" class="button"
+                   style="width: 70%;"
                    round>
           管理用户组
         </el-button>
@@ -26,11 +28,10 @@
           <el-button type='danger' v-if="inside" :icon="Remove" class="button" @click="exit" round>
             退出
           </el-button>
-          <el-button type="primary" v-else :icon="Plus" class="button" @click="joinReq" round>
+          <el-button type="primary" v-else :icon="Plus" class="button" @click="joinReq" round >
             加入
           </el-button>
         </div>
-
       </div>
     </div>
   </el-card>
@@ -187,7 +188,7 @@ export default {
 .button {
   margin-top: 8px;
   height: 70%;
-  width: 58%;
+  width: 100%;
   padding-right: 5px;
 }
 

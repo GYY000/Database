@@ -528,19 +528,18 @@ url:/del_ques_set
 
 def answer_to_req(request):
     request_dict=json.loads(request.body.decode('utf-8'))
-    id_list=request_dict['id_list']
+    id=request_dict['id']
     team_name=request_dict['team_name']
     applier_name=request_dict['applier_name']
-    aggre=request_dict["aggre"]
+    agree=request_dict["agree"]
     applier=User.objects.get(user_name=applier_name)
     team=Team.objects.get(team_name=team_name)
-    if aggre:
+    if agree:
         try:
             ReUserTeam(uid=applier,tid=team,is_admin=False).save()
         except:
             return JsonResponse({"is_successful":"false"})
-        return JsonResponse({"is_successful":"true"})
-    JoinRequest.objects.get(id=id_list).delete()
+    JoinRequest.objects.get(id=id).delete()
     return JsonResponse({"is_successful":"true"})
 
 
