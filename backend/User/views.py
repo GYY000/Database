@@ -333,21 +333,21 @@ def post_hub(request):
     name_photos = [(_.creator.user_name, _.creator.profile_photo) for _ in
                    posts]
     arr = [{"pid": posts[i].pid, "title": posts[i].title, "creator_name": name_photos[i][0],
-            "update_time": posts[i].update_time, "content": posts[i].content,
-            "profile_photo": name_photos[i][1]} for i in range(len(posts))]
-    return JsonResponse(arr[start:end], safe=False)
+            "update_time": posts[i].update_time, "content": posts[i].content, "uid": posts[i].creator.uid} for i in range(len(posts))]
+    return JsonResponse({"posts": arr[start:end], "total": len(posts)}, safe=False)
 
 
 def post_hub_param(request, pid):
     if request.method == "GET":
         post = Post.objects.get(pid=pid)
         dict1 = {"pid": post.pid, "title": post.title, "creator_name": post.creator.user_name,
-                 "update_time": post.update_time, "content": post.content,
-                 "profile_photo": post.creator.profile_photo}
+                 "update_time": post.update_time, "content": post.content
+                 }
         comments = Comment.objects.filter(pid=pid).order_by("create_time")
         # fixme comment的时间我先按创建时间来了
         comments = [{"cid": _.id, "user_name": _.creator.user_name,
-                     "content": _.content, "profile_photo": _.creator.profile_photo,
+                     "uid": _.creator.uid,
+                     "content": _.content, 
                      "create_time": _.create_time
                      } for _ in comments]
         return JsonResponse({"post": dict1, "comment": comments})
@@ -436,7 +436,8 @@ def search_for_team(request):
 def get_profile_photo(request):
     request_dict = json.loads(request.body.decode('utf-8'))
     uid = request_dict["uid"]
-    return JsonResponse({"profile_photo": bytes.decode(User.objects.get(uid=uid).profile_photo)})
+    profile_photo = User.objects.get(uid=uid).profile_photo
+    return JsonResponse({"profile_photo": bytes.decode(profile_photo) if profile_photo is not None else None})
 
 
 def fetch_team_avatar(request):

@@ -3,6 +3,7 @@ import index from "@/views/main/index.vue";
 import userStateStore from "@/store";
 import log_reg from "@/views/loginInterface/log_reg.vue";
 import user_center from "@/views/main/user_center.vue";
+import post_detail from '@/views/main/post_detail.vue'
 
 const routes = [
     {
@@ -29,6 +30,11 @@ const routes = [
                 path: '/main_page',
                 name: "main_page",
                 components: {main_page: () => import('@/views/main/main_page.vue')}
+            },
+            {
+                path: '/post_detail/:pid',
+                name: "post_detail",
+                components: {post_detail: () => import('@/views/main/post_detail.vue')},
             },
         ]
     },

@@ -18,6 +18,7 @@
           <keep-alive>
             <router-view name="post_hub"></router-view>
           </keep-alive>
+          <router-view name="post_detail"></router-view>
         </el-tab-pane>
         <el-tab-pane label="用户群组" name="/team_hub">
           <keep-alive>
