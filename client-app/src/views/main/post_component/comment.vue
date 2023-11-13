@@ -1,16 +1,17 @@
 <template>
-  <div class="comment">
-    <div class="comment-header">
-      <img v-if="this.profile_photo" :src="this.profile_photo" alt="头像" class="profile-photo"/>
+  <el-card class="box-card">
+    <div class="comment-header el-card__header">
+      <img v-if="profile_photo !== ''" :src="profile_photo" alt="头像" class="profile-photo" />
       <div v-else class="placeholder"></div>
       <h2>{{ comment.user_name }}</h2>
     </div>
-    <p>{{ comment.content }}</p>
-  </div>
+    <p class="content">{{ comment.content }}</p>
+    <p class="update-time">{{ comment.create_time }}</p> <!-- 更新时间放在右下角 -->
+  </el-card>
 </template>
     
-  <script>
-  import axios from 'axios';
+<script>
+import axios from 'axios';
 export default {
   props: {
     comment: {
@@ -43,7 +44,7 @@ export default {
 };
 </script>
     
-  <style scoped>
+<style scoped>
 .comment {
   padding: 10px;
   margin-bottom: 20px;
@@ -53,7 +54,16 @@ export default {
 .comment-header {
   display: flex;
   align-items: center;
+  height: 80px;
 }
+
+.placeholder {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #ddd;
+}
+
 .profile-photo {
   width: 50px;
   height: 50px;
@@ -61,5 +71,24 @@ export default {
   margin-right: 10px;
   border-radius: 50%;
 }
+
+.box-card {
+  border-radius: 10px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  height: auto;
+}
+
+.update-time {
+  position: absolute;
+  bottom: 10px;
+  /* 距离底部10px */
+  right: 10px;
+  /* 距离右侧10px */
+  font-size: 12px;
+  /* 字体变小 */
+  color: #999;
+  /* 颜色变淡 */
+}
 </style>
-<style scoped></style>

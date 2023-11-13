@@ -1,17 +1,22 @@
 <template>
   <div>
-    <h1>asdfgh</h1>
-    <p>{{ post.content }}</p>
-    <p>1231231</p>
-    <div>
-      <comment
-        v-for="comment in comments"
-        :key="comment.cid"
-        :comment="comment"
-      />
-      <comment_editor></comment_editor>      
+    <el-card class="box-card">
+      <div class="card-content">
+        <div class="post-header">
+          <img v-if="profile_photo !== ''" :src="profile_photo" alt="头像" class="profile-photo" />
+          <div v-else class="placeholder"></div>
+          <h2>{{ post.creator_name }}</h2>
+        </div>
+        <h3>{{ post.title }}</h3>
+        <p>{{ post.content }}</p>
+        <p class="update-time">{{ post.update_time }}</p> <!-- 更新时间放在右下角 -->
+      </div>
+    </el-card>
+    <div class="line"></div> <!-- 添加分割线 -->
+    <div class="comment-list">
+      <comment v-for="comment in comments" :key="comment.cid" :comment="comment" />
+      <comment_editor></comment_editor>
     </div>
-
   </div>
 </template>
   
@@ -29,28 +34,103 @@ export default {
     return {
       post: {},
       comments: [],
+      profile_photo: '',
     };
   },
   mounted() {
-    // 在组件挂载后通过API请求获取帖子详情数据
-    console.log("挂钩")
     this.fetchPostDetail();
   },
   methods: {
     fetchPostDetail() {
-        // 获取路由参数中的pid
-        const pid = this.$route.params.pid;
-        axios.get(`/post_detail/${pid}`)
-            .then((response) => {
-            this.post = response.data.post;
-            this.comments = response.data.comment;
+      const pid = this.$route.params.pid;
+      axios.get(`/post_detail/${pid}`)
+        .then((response) => {
+          this.post = response.data.post;
+          this.comments = response.data.comment;
+          axios.post('/get_profile_photo', { user_name: this.post.creator_name })
+            .then(response => {
+              if (response.data.profile_photo) {
+                this.profile_photo = response.data.profile_photo;
+                this.profile_photo = this.profile_photo.startsWith('/9j') ? 'data:image/jpg;base64,' + this.profile_photo : 'data:image/png;base64,' + this.profile_photo
+              }
             })
-            .catch((error) => {
-            console.error(error);
+            .catch(error => {
+              console.error(error);
             });
-        }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
   },
 };
 </script>
 <style scoped>
+.line {
+  height: 1px;
+  background-color: #ccc;
+  margin: 20px 0;
+  position: relative;
+}
+
+.line::after {
+  content: '';
+  position: absolute;
+  left: -50%;
+  right: -50%;
+  top: 50%;
+  height: 1px;
+  background-color: #ccc;
+  transform: translateY(-50%);
+}
+
+.comment-list {
+  display: flex; /* 使用flex布局 */
+  flex-direction: column; /* 设置主轴方向为纵向 */
+  gap: 20px; /* 设置卡片之间的间距为20px */
+}
+
+.placeholder {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #ddd;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+}
+
+.profile-photo {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  margin-right: 10px;
+  border-radius: 50%;
+}
+
+.box-card {
+  border-radius: 10px;
+  /* 设置圆角 */
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  /* 添加阴影效果 */
+  transition: transform 0.3s, box-shadow 0.3s;
+  /* 添加鼠标交互效果的过渡动画 */
+  position: relative;
+  /* 设置为相对定位，以便将更新时间放在右下角 */
+  height: auto;
+}
+
+.update-time {
+  position: absolute;
+  bottom: 10px;
+  /* 距离底部10px */
+  right: 10px;
+  /* 距离右侧10px */
+  font-size: 12px;
+  /* 字体变小 */
+  color: #999;
+  /* 颜色变淡 */
+}
 </style>
