@@ -1,5 +1,5 @@
 <template>
-  <img src="src/assets/image/inside_backpage1.jpg" class="background">
+  <img src="@/assets/image/inside_backpage1.jpg" class="background">
   <div class="secbackground"></div>
   <div class="main-container">
     <div>
@@ -18,6 +18,7 @@
           <keep-alive>
             <router-view name="post_hub"></router-view>
           </keep-alive>
+          <router-view name="post_detail"></router-view>
         </el-tab-pane>
         <el-tab-pane label="用户群组" name="/team_hub">
           <keep-alive>
@@ -29,7 +30,7 @@
     <div class="r-container">
       <el-badge :value="messages.id_list.length" v-if="messages !== null" :max="20" class="item" style="margin-right: 30px;">
         <el-button v-if="is_login"
-                   @click="open_message_box" type="primary" :icon="Message" style="width:100%;"/>
+            @click="open_message_box" type="primary" :icon="Message" style="width:100%;"/>
       </el-badge>
       <el-button v-if="is_login" @click="logout" type="primary" :icon="SortDown" class="button">
         Logout
