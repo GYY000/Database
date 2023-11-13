@@ -3,6 +3,8 @@ import index from "@/views/main/index.vue";
 import userStateStore from "@/store";
 import log_reg from "@/views/loginInterface/log_reg.vue";
 import user_center from "@/views/main/user_center.vue";
+import do_problem from "@/views/quesDoing/do_problem.vue";
+import edit_ques_group from "@/views/quesDoing/edit_ques_group.vue";
 
 const routes = [
     {
@@ -42,6 +44,16 @@ const routes = [
         name: "user_center",
         component: user_center
     },
+    {
+        path: '/do_prob',
+        name: "do_prob",
+        component: do_problem
+    },
+    {
+        path: '/edit_ques_group',
+        name: "edit_ques_group",
+        component: edit_ques_group
+    }
 ]
 
 

@@ -7,7 +7,8 @@ export const userStateStore = defineStore("user", {
             user_name: "admin",
             profile_photo: "src/assets/image/default-avatar.png",
             register_date: "default",
-            isAuthentic: false
+            isAuthentic: false,
+            ques_group_name: undefined
         }
     },
 
@@ -33,6 +34,9 @@ export const userStateStore = defineStore("user", {
         getIsAuthentic: (state) => {
             return state.isAuthentic
         },
+        getQuesGroupName: (state) => {
+            return state.ques_group_name
+        }
     },
 
     actions: {
@@ -55,6 +59,9 @@ export const userStateStore = defineStore("user", {
         },
         async logout() {
             this.isAuthentic = false
+        },
+        async intoQuesGroup(group_name) {
+            this.ques_group_name = group_name
         }
     }
 })
