@@ -40,7 +40,6 @@
                :introduction="new_team_sets.introduction_list[index]">
     </team_card>
   </el-row>
-
 </template>
 
 <script>
@@ -48,7 +47,7 @@ import {ref} from "vue";
 import {ElMessageBox} from "element-plus";
 
 import {
-  fetch_all_teams, fetch_my_group,
+  fetch_all_teams,
   fetch_search_team_res
 } from "@/views/main/api";
 
@@ -56,6 +55,8 @@ import userStateStore from "@/store";
 import {Search} from "@element-plus/icons-vue";
 import Create_team_form from "@/views/main/team_component/create_team_form.vue";
 import team_card from "@/views/main/team_component/team_card.vue";
+import Edit_team from "@/views/main/team_component/edit_team.vue";
+import router from "@/router";
 
 export default {
   name: "team_hub",
@@ -64,7 +65,7 @@ export default {
       return Search
     }
   },
-  components: {Create_team_form, team_card},
+  components: {Edit_team, Create_team_form, team_card},
   data() {
     return {
       start_team_sets: {},

@@ -28,6 +28,10 @@
       </el-tabs>
     </div>
     <div class="r-container">
+      <el-badge :value="messages.id_list.length" v-if="messages !== null" :max="20" class="item" style="margin-right: 30px;">
+        <el-button v-if="is_login"
+                   @click="open_message_box" type="primary" :icon="Message" style="width:100%;"/>
+      </el-badge>
       <el-button v-if="is_login" @click="logout" type="primary" :icon="SortDown" class="button">
         Logout
       </el-button>
@@ -42,8 +46,13 @@
         </el-button>
       </span>
     </div>
-    <el-dialog>
-
+    <el-dialog v-model="open_message" title="申请中心" center>
+      <message_box
+          :applier_name_list="messages.applier_name_list"
+          :id_list="messages.id_list"
+          :team_name_list="messages.team_name_list"
+          :time_list="messages.time_list"
+      ></message_box>
     </el-dialog>
   </div>
 
@@ -71,7 +80,8 @@
 }
 
 .button {
-  margin-right: 10px;
+  padding-right: 30px;
+  width: 25%
 }
 
 .r-container {
@@ -110,17 +120,19 @@
 </style>
 
 <script>
-import {SortDown, SortUp, User} from '@element-plus/icons-vue'
+import {Message, SortDown, SortUp, User} from '@element-plus/icons-vue'
 import {ref, watch} from "vue";
 import router from "@/router";
 import {userStateStore} from "@/store";
 import Question_hub from "@/views/main/question_hub.vue";
 import Post_hub from "@/views/main/post_hub.vue";
 import Team_hub from "@/views/main/team_hub.vue";
+import {fetch_all_application} from "@/views/main/api";
+import Message_box from "@/views/main/message_box.vue";
 
 export default {
   name: "index",
-  components: {Team_hub, Post_hub, Question_hub},
+  components: {Message_box, Message, Team_hub, Post_hub, Question_hub},
   setup() {
     const store = userStateStore()
     const is_login = ref(store.getIsAuthentic);
@@ -128,7 +140,8 @@ export default {
     const avatar = ref(store.getProfilePhoto)
     const user_name = ref(store.getUserName)
     const activeTab = ref(sessionStorage.getItem('activeTab') || '/main_page')
-
+    const open_message = ref(false)
+    const messages = ref(null)
 
     watch(activeTab, (newValue) => {
       sessionStorage.setItem('activeTab', newValue);
@@ -152,6 +165,20 @@ export default {
       router.push({path: '/log_reg'});
     };
 
+    const open_message_box = () => {
+      open_message.value=true
+    }
+
+    const init = () => {
+      fetch_all_application(store.user_id).then(
+          (response) => {
+            messages.value = response
+          }
+      )
+    }
+
+    init()
+
     return {
       activeTab,
       is_login,
@@ -161,11 +188,17 @@ export default {
       login,
       avatar,
       user_name,
-      goto
+      goto,
+      open_message_box,
+      open_message,
+      messages
     };
   },
 
   computed: {
+    Message() {
+      return Message
+    },
     User() {
       return User;
     },
