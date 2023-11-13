@@ -3,12 +3,15 @@
     <h1>asdfgh</h1>
     <p>{{ post.content }}</p>
     <p>1231231</p>
-    <comment
-      v-for="comment in comments"
-      :key="comment.cid"
-      :comment="comment"
-    />
-    <comment_editor></comment_editor>
+    <div>
+      <comment
+        v-for="comment in comments"
+        :key="comment.cid"
+        :comment="comment"
+      />
+      <comment_editor></comment_editor>      
+    </div>
+
   </div>
 </template>
   
@@ -49,4 +52,5 @@ export default {
   },
 };
 </script>
-<style scoped></style>
+<style scoped>
+</style>

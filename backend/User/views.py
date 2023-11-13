@@ -5,6 +5,8 @@ from django.http import JsonResponse
 from User.models import *  # fixme: 王士举修改路径
 import base64
 from Levenshtein import distance
+import io
+from PIL import Image
 
 
 # Create your views here.
@@ -436,7 +438,28 @@ def search_for_team(request):
 def get_profile_photo(request):
     request_dict = json.loads(request.body.decode('utf-8'))
     user_name = request_dict["user_name"]
-    return JsonResponse({"profile_photo": bytes.decode(User.objects.get(user_name=user_name).profile_photo)})
+    user = User.objects.get(user_name=user_name)
+
+    # 获取Base64编码的图片数据
+    base64_photo = user.profile_photo
+
+    # 如果图片数据不存在，返回空
+    if base64_photo is None:
+        return JsonResponse({"profile_photo": None})
+
+    # 解码Base64图片数据
+    decoded_photo = base64.b64decode(base64_photo)
+
+    # 打开解码后的图片
+    img = Image.open(io.BytesIO(decoded_photo))
+
+    # 设置压缩尺寸和质量
+    compressed_img = img.resize((300, 300))  # 设置压缩尺寸
+    compressed_img_io = io.BytesIO()  # 创建一个内存文件对象
+    compressed_img.save(compressed_img_io, format='JPEG', quality=70)  # 保存压缩后的图片到内存文件对象
+
+    # 返回压缩后的图片数据
+    return JsonResponse({"profile_photo": base64.b64encode(compressed_img_io.getvalue()).decode('utf-8')})
 
 
 def fetch_team_avatar(request):

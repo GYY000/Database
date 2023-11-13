@@ -1,9 +1,11 @@
 <template>
   <router-link :to="`/post_detail/${post.pid}`" class="no-underline">
     <div class="post">
-      <img v-if="post.profile_photo" :src="post.profile_photo" alt="头像" />
-      <div v-else class="placeholder"></div>
-      <h2>{{ post.title }}</h2>
+      <div class="post-header">
+        <img v-if="profile_photo !== ''" :src="profile_photo" alt="头像" class="profile-photo" />
+        <div v-else class="placeholder"></div>
+        <h2>{{ post.title }}</h2>
+      </div>
       <p>{{ post.content }}</p>
       <p>作者：{{ post.creator_name }}</p>
       <p>更新时间：{{ post.update_time }}</p>
@@ -20,17 +22,27 @@ export default {
       required: true,
     },
   },
-  created() {
-    if (this.post.uid) {
-      // 发起 POST 请求获取用户的头像信息
-      axios.post('/get_profile_photo', { uid: this.post.uid })
+  data() {
+    return {
+      profile_photo: '', // 使用本地变量存储post对象
+    };
+  },
+  mounted() {
+    this.getProfilePhoto();
+  },
+  methods: {
+    getProfilePhoto() {
+      axios.post('/get_profile_photo', { user_name: this.post.creator_name })
         .then(response => {
-          this.post.profile_photo = response.data.profile_photo;
+          if (response.data.profile_photo) {
+            this.profile_photo = response.data.profile_photo;
+            this.profile_photo = this.profile_photo.startsWith('/9j') ? 'data:image/jpg;base64,' + this.profile_photo : 'data:image/png;base64,' + this.profile_photo
+          }
         })
         .catch(error => {
           console.error(error);
         });
-    }
+    },
   },
 };
 </script>
@@ -46,5 +58,18 @@ export default {
   width: 100px;
   height: 100px;
   background-color: #ddd;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+}
+
+.profile-photo {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  margin-right: 10px;
+  border-radius: 50%;
 }
 </style>
