@@ -677,3 +677,68 @@ def search_post(request):
             "update_time": posts[i].update_time.strftime("%Y-%m-%d"), "content": posts[i].content,} for i in range(start,end)]
     return JsonResponse({"total":len(posts),"posts":arr})
 
+def upload_ques(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    try:
+        Question(creator=User.objects.get(uid=request_dict['creator_id']),
+                 qsid=QuestionSet.objects.get(set_name=request_dict['ques_set_name']),
+                 content=request_dict['content'],
+                 serial_num=request_dict['serial_num'],
+                 score=request_dict['score']
+                 ).save()
+        return JsonResponse({"is_successful":"true"})
+    except:
+        return JsonResponse({"is_successful":"false"})
+
+def get_all_relative_person(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    uid=request_dict['uid']
+    messages=list(Message.objects.order_by('-time'))
+    i=0
+    user_names=[]
+    user_ids=[]
+    reads=[]
+    while i< len(messages):
+        if messages[i].sender.uid==uid or messages[i].receiver.uid==uid:
+            if messages[i].sender.uid!=uid:
+                if not user_ids.__contains__(messages[i].sender.uid):
+                    user_ids.append(messages[i].sender.uid)
+                    user_names.append(messages[i].sender.user_name)
+                    reads.append(not messages[i].read)
+            if messages[i].receiver.uid!=uid:
+                if not user_ids.__contains__(messages[i].receiver.uid):
+                    user_ids.append(messages[i].receiver.uid)
+                    user_names.append(messages[i].receiver.user_name)
+                    reads.append(not messages[i].read)
+        i+=1
+    return JsonResponse([ {"user_name":user_names[i],
+                            "user_id":user_ids[i],
+                           "has_unread_message":reads[i]
+                           } for i in range(len(user_names))],safe=False)
+
+
+def get_history_message(request):
+    assert request.method=="POST"
+    request_dict=json.loads(request.body.decode('utf-8'))
+    uid1=request_dict['uid1']
+    uid2=request_dict['uid2']
+    messages=Message.objects.filter(sender=uid1,receiver=uid2).order_by('-time')
+    mes_list=[{"sender_name":_.sender.user_name,"sender_id":_.sender.uid,
+              "receiver_name":_.receiver.user_name,"receiver_id":_.receiver.uid,
+               "content":_.content,"time":_.time.strftime("%Y-%m-%d %H:%M") ,"read": _.read
+               } for _ in messages]
+    return JsonResponse(mes_list,safe=False)
+
+def mark_as_read(request):
+    assert request.method=="POST"
+    request_dict=json.loads(request.body.decode('utf-8'))
+    sender_id=request_dict['sender_id']
+    receiver_id=request_dict['receiver_id']
+    for _ in Message.objects.all():
+        print("HAHAHAHHA")
+        print(_.read)
+        if _.sender.uid==sender_id and _.receiver.uid==receiver_id and _.read==False:
+            _.read=True
+            _.save()
+    return JsonResponse({"description": "成功"})
+
