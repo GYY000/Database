@@ -25,8 +25,10 @@
           <div style="padding: 2px">{{ creator_name }} {{ date }}</div>
         </div>
         <div class="footer">
-          <el-button type="primary" :icon="TopRight" class="button"/>
+          <el-button type="primary" :icon="TopRight" class="button" @click="do_problem"/>
           <el-button type="primary" :icon="MagicStick" class="button"/>
+          <el-button type="danger" :icon="Edit" class="button"
+                     v-if="creator_name === user_name" @click="do_edit"/>
         </div>
       </div>
     </div>
@@ -37,6 +39,8 @@
 import {Edit, MagicStick, TopRight} from "@element-plus/icons-vue";
 import {fetch_set_avatar} from "@/views/main/api";
 import {ref} from "vue";
+import userStateStore from "@/store";
+import router from "@/router";
 
 export default {
   name: "ques_group_card",
@@ -57,6 +61,17 @@ export default {
   setup(props) {
     const avatar_url = ref(null)
     const flag = ref(true)
+    const store = userStateStore()
+    const user_name = ref(store.user_name)
+
+    const do_problem = () => {
+      router.push('/do_prob')
+    }
+
+    const do_edit = () => {
+      router.push('/edit_ques_group')
+    }
+
     const func = () => {
       fetch_set_avatar(props.set_name).then(
           (data) => {
@@ -65,10 +80,16 @@ export default {
             flag.value = false;
           })
     }
+
     func()
+
     return {
       avatar_url,
-      flag
+      flag,
+      store,
+      user_name,
+      do_problem,
+      do_edit
     }
   }
 }
