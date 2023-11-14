@@ -1,8 +1,7 @@
 <template>
   <el-card class="box-card">
     <div class="comment-header el-card__header">
-      <img v-if="profile_photo !== ''" :src="profile_photo" alt="头像" class="profile-photo" />
-      <div v-else class="placeholder"></div>
+      <img :src="profile_photo" alt="头像" class="profile-photo" />
       <h2>{{ comment.user_name }}</h2>
     </div>
     <p class="content">{{ comment.content }}</p>
@@ -21,7 +20,7 @@ export default {
   },
   data() {
     return {
-      profile_photo: '', // 使用本地变量存储post对象
+      profile_photo: '/src/assets/image/default-avatar.png', // 使用本地变量存储post对象
     };
   },
   mounted() {

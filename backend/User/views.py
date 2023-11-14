@@ -444,10 +444,10 @@ def get_profile_photo(request):
     base64_photo = user.profile_photo
 
     if base64_photo is None:
-        img = Image.open('./static/img/default_profile_photo.jpeg')
-    else:
-        decoded_photo = base64.b64decode(base64_photo)
-        img = Image.open(io.BytesIO(decoded_photo))
+        return JsonResponse({"profile_photo": None})
+    
+    decoded_photo = base64.b64decode(base64_photo)
+    img = Image.open(io.BytesIO(decoded_photo))
 
     compressed_img = img.resize((300, 300))
     compressed_img_io = io.BytesIO()

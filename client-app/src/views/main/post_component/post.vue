@@ -2,8 +2,7 @@
   <router-link :to="`/post_detail/${post.pid}`" class="router-link-active">
     <el-card class="box-card">
       <div class="post-header el-card__header">
-        <img v-if="profile_photo !== ''" :src="profile_photo" alt="头像" class="profile-photo" />
-        <div v-else class="placeholder"></div>
+        <img :src="profile_photo" alt="头像" class="profile-photo" />
         <h2>{{ post.creator_name }}</h2>
       </div>
       <h3>{{ post.title }}</h3>
@@ -24,7 +23,7 @@ export default {
   },
   data() {
     return {
-      profile_photo: '', // 使用本地变量存储post对象
+      profile_photo: '/src/assets/image/default-avatar.png',
     };
   },
   mounted() {

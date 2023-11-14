@@ -95,6 +95,7 @@ export default {
     reloadAllPosts() {
       this.pageNo = 1;
       this.loadPosts();
+      this.title = "全部帖子"
     },
     searchPosts() {
       this.pageNo = 1

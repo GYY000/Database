@@ -3,8 +3,7 @@
     <el-card class="box-card">
       <div class="card-content">
         <div class="post-header">
-          <img v-if="profile_photo !== ''" :src="profile_photo" alt="头像" class="profile-photo" />
-          <div v-else class="placeholder"></div>
+          <img :src="profile_photo" alt="头像" class="profile-photo" />
           <h2>{{ post.creator_name }}</h2>
         </div>
         <h3>{{ post.title }}</h3>
@@ -34,7 +33,7 @@ export default {
     return {
       post: {},
       comments: [],
-      profile_photo: '',
+      profile_photo: '/src/assets/image/default-avatar.png',
     };
   },
   mounted() {
