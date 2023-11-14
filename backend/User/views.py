@@ -7,6 +7,7 @@ import base64
 from Levenshtein import distance
 import io
 from PIL import Image
+from django.db.models import Q
 
 
 # Create your views here.
@@ -265,7 +266,19 @@ receiver_name
         return JsonResponse({"is_successful": "false"})
     message = Message(sender=sender, receiver=receiver, content=content)
     message.save()
-    return JsonResponse({"is_successful": "true"})
+    inserted_message = Message.objects.get(id=message.id)
+    # 将消息对象转换为字典形式
+    message_dict = {
+        "sender_name": inserted_message.sender.user_name,
+        "sender_id": inserted_message.sender.uid,
+        "receiver_name": inserted_message.receiver.user_name,
+        "receiver_id": inserted_message.receiver.uid,
+        "content": inserted_message.content,
+        "time": inserted_message.time.strftime("%Y-%m-%d %H:%M"),
+        "read": inserted_message.read,
+        "id": inserted_message.id
+    }
+    return JsonResponse(message_dict)
 
 
 def delete_message(request):
@@ -722,10 +735,10 @@ def get_history_message(request):
     request_dict=json.loads(request.body.decode('utf-8'))
     uid1=request_dict['uid1']
     uid2=request_dict['uid2']
-    messages=Message.objects.filter(sender=uid1,receiver=uid2).order_by('-time')
+    messages=Message.objects.filter(Q(sender=uid1, receiver=uid2) | Q(sender=uid2, receiver=uid1)).order_by('-time').reverse()
     mes_list=[{"sender_name":_.sender.user_name,"sender_id":_.sender.uid,
               "receiver_name":_.receiver.user_name,"receiver_id":_.receiver.uid,
-               "content":_.content,"time":_.time.strftime("%Y-%m-%d %H:%M") ,"read": _.read
+               "content":_.content,"time":_.time.strftime("%Y-%m-%d %H:%M") ,"read": _.read, "id": _.id
                } for _ in messages]
     return JsonResponse(mes_list,safe=False)
 

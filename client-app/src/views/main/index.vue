@@ -59,7 +59,7 @@
       ></message_box>
     </el-dialog>
 
-    <el-dialog v-model="open_private_message" title="私信" center>
+    <el-dialog v-model="open_private_message" title="私信" center style="width: 1000px;" @before-close="(done) => {this.$refs.messageContainer.$destroy();done();}">
       <message_container></message_container>
     </el-dialog>
 
