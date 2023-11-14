@@ -59,5 +59,10 @@ urlpatterns = [
     re_path("fetch_all_ques_set_in_team", views.fetch_all_ques_set_in_team),
     re_path("fetch_all_users_in_team", views.fetch_all_users_in_team),
     re_path("get_user_post",views.get_user_post),
-    re_path("search_post",views.search_post)
+    re_path("search_post",views.search_post),
+    re_path("get_all_relative_person",views.get_all_relative_person),
+    re_path("get_history_message",views.get_history_message),
+    re_path("mark_as_read",views.mark_as_read),
+    re_path("upload_ques",views.upload_ques)
+
 ]
