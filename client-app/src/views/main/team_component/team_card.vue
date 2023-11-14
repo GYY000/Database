@@ -1,9 +1,17 @@
 <template>
   <el-card :body-style="{ padding: '0px' }" shadow="hover"
            style="width:23%; border-radius: 3%;margin-top: 10px">
-    <div class="image-container" v-if="flag === true">
-      <img :src="avatar_url" alt="can't find the jpg">
-    </div>
+    <el-skeleton :loading="flag" animated>
+      <template #template>
+        <el-skeleton-item variant="image" class="image-container"/>
+      </template>
+      <template #default>
+        <div class="image-container">
+          <img :src="avatar_url" alt="can't find the jpg">
+        </div>
+      </template>
+    </el-skeleton>
+
     <div class="card_layout">
       <div class="set_title">
         {{ group_name }}
@@ -18,7 +26,9 @@
         <div style="padding: 2px">{{ creator_name }} {{ date }}</div>
       </div>
       <div class="footer">
-        <el-button type="primary" :icon="Edit" @click="toEdit" v-if="creator_name === store.getUserName" class="button"
+        <el-button type="primary" :icon="Edit" @click="toEdit"
+                   v-if="creator_name === store.getUserName" class="button"
+                   style="width: 70%;"
                    round>
           管理用户组
         </el-button>
@@ -30,9 +40,17 @@
             加入
           </el-button>
         </div>
-
       </div>
     </div>
+
+    <el-dialog v-model="edit_available" :show-close="false" draggable>
+      <template #header="{ close, titleId}">
+        <div class="my-header">
+          <div :id="titleId" class="edit_title">Team</div>
+        </div>
+      </template>
+      <edit_team :team_name="group_name" :date="date" :avatar="avatar_url" :creator="creator_name"></edit_team>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -43,23 +61,26 @@ import {ref} from "vue";
 import userStateStore from "@/store";
 import router from "@/router";
 import {ElMessage} from "element-plus";
+import Edit_team from "@/views/main/team_component/edit_team.vue";
 
 export default {
   name: "team_card",
+  components: {Edit_team},
   props: ['creator_name', 'group_name', 'date', 'introduction'],
 
   setup(props, context) {
     const avatar_url = ref(null)
-    const flag = ref(false)
+    const flag = ref(true)
     const store = userStateStore()
     const inside = ref(false)
+    const edit_available = ref(false)
 
     const func = () => {
       fetch_team_avatar(props.group_name).then(
           (data) => {
             avatar_url.value = data.avatar.startsWith('/9j')
                 ? 'data:image/jpg;base64,' + data.avatar : 'data:image/png;base64,' + data.avatar;
-            flag.value = true;
+            flag.value = false;
           });
       check_inside_group(store.getUserId, props.group_name).then(
           (data) => {
@@ -69,7 +90,7 @@ export default {
     }
 
     const toEdit = () => {
-      context.emit('try_edit', {flag: true, team_name: props.group_name})
+      edit_available.value = true
     }
 
     const exit = () => {
@@ -79,12 +100,12 @@ export default {
     const joinReq = () => {
       apply_for_team(props.creator_name, props.group_name, store.getUserId).then(
           (response) => {
-            if(response.is_successful === 'true') {
+            if (response.is_successful === 'true') {
               ElMessage({
                 message: '发送成功',
                 showClose: true,
                 type: 'success',
-            })
+              })
             }
           }
       )
@@ -98,7 +119,8 @@ export default {
       toEdit,
       inside,
       exit,
-      joinReq
+      joinReq,
+      edit_available
     }
   },
 
@@ -187,7 +209,7 @@ export default {
 .button {
   margin-top: 8px;
   height: 70%;
-  width: 58%;
+  width: 100%;
   padding-right: 5px;
 }
 
@@ -200,5 +222,17 @@ export default {
   rgba(70, 64, 255, 0.56) 60%,
   rgba(214, 216, 220, 0.96) 100%);
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@font-face {
+  font-family: 'Lobster';
+  src: url('/src/assets/fonts/Lobster-1-4-1.otf') format('truetype');
+}
+
+.edit_title {
+  font-size: 50px;
+  font-family: 'Lobster', cursive;
+  display: flex;
+  justify-content: center;
 }
 </style>

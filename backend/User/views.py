@@ -5,6 +5,8 @@ from django.http import JsonResponse
 from User.models import *  # fixme: 王士举修改路径
 import base64
 from Levenshtein import distance
+import io
+from PIL import Image
 
 
 # Create your views here.
@@ -333,22 +335,22 @@ def post_hub(request):
     name_photos = [(_.creator.user_name, _.creator.profile_photo) for _ in
                    posts]
     arr = [{"pid": posts[i].pid, "title": posts[i].title, "creator_name": name_photos[i][0],
-            "update_time": posts[i].update_time.strftime("%Y-%m-%d"), "content": posts[i].content,
-            "profile_photo": name_photos[i][1]} for i in range(len(posts))]
-    return JsonResponse(arr[start:end], safe=False)
+            "update_time": posts[i].update_time.strftime("%Y-%m-%d %H:%M"), "content": posts[i].content, "uid": posts[i].creator.uid} for i in range(len(posts))]
+    return JsonResponse({"posts": arr[start:end], "total": len(posts)}, safe=False)
 
 
 def post_hub_param(request, pid):
     if request.method == "GET":
         post = Post.objects.get(pid=pid)
         dict1 = {"pid": post.pid, "title": post.title, "creator_name": post.creator.user_name,
-                 "update_time": post.update_time.strftime("%Y-%m-%d"), "content": post.content,
-                 "profile_photo": post.creator.profile_photo}
+                 "update_time": post.update_time.strftime("%Y-%m-%d %H:%M"), "content": post.content
+                 }
         comments = Comment.objects.filter(pid=pid).order_by("create_time")
         # fixme comment的时间我先按创建时间来了
         comments = [{"cid": _.id, "user_name": _.creator.user_name,
-                     "content": _.content, "profile_photo": _.creator.profile_photo,
-                     "create_time": _.create_time.strftime("%Y-%m-%d")
+                     "uid": _.creator.uid,
+                     "content": _.content, 
+                     "create_time": _.create_time.strftime("%Y-%m-%d %H:%M")
                      } for _ in comments]
         return JsonResponse({"post": dict1, "comment": comments})
 
@@ -435,8 +437,22 @@ def search_for_team(request):
 
 def get_profile_photo(request):
     request_dict = json.loads(request.body.decode('utf-8'))
+    print(request_dict)
     user_name = request_dict["user_name"]
-    return JsonResponse({"profile_photo": bytes.decode(User.objects.get(user_name=user_name).profile_photo)})
+    user = User.objects.get(user_name=user_name)
+
+    base64_photo = user.profile_photo
+
+    if base64_photo is None:
+        return JsonResponse({"profile_photo": None})
+    
+    decoded_photo = base64.b64decode(base64_photo)
+    img = Image.open(io.BytesIO(decoded_photo))
+
+    compressed_img = img.resize((300, 300))
+    compressed_img_io = io.BytesIO()
+    compressed_img.save(compressed_img_io, format='JPEG', quality=70)
+    return JsonResponse({"profile_photo": base64.b64encode(compressed_img_io.getvalue()).decode('utf-8')})
 
 
 def fetch_team_avatar(request):
@@ -528,19 +544,18 @@ url:/del_ques_set
 
 def answer_to_req(request):
     request_dict=json.loads(request.body.decode('utf-8'))
-    id_list=request_dict['id_list']
+    id=request_dict['id']
     team_name=request_dict['team_name']
     applier_name=request_dict['applier_name']
-    aggre=request_dict["aggre"]
+    agree=request_dict["agree"]
     applier=User.objects.get(user_name=applier_name)
     team=Team.objects.get(team_name=team_name)
-    if aggre:
+    if agree:
         try:
             ReUserTeam(uid=applier,tid=team,is_admin=False).save()
         except:
             return JsonResponse({"is_successful":"false"})
-        return JsonResponse({"is_successful":"true"})
-    JoinRequest.objects.get(id=id_list).delete()
+    JoinRequest.objects.get(id=id).delete()
     return JsonResponse({"is_successful":"true"})
 
 
@@ -624,7 +639,7 @@ url:/fetch_all_users_in_team
 def get_user_post(request):
     request_dict=json.loads(request.body.decode('utf-8'))
     uid=request_dict['uid']
-    page_no=request_dict['page_no']
+    page_no=request_dict['page_no']-1
     page_size=request_dict['page_size']
     posts=Post.objects.filter(creator=uid).order_by('-update_time')
     start = page_no * page_size
@@ -636,13 +651,13 @@ def get_user_post(request):
     names = [_.creator.user_name for _ in posts[start:end]]
     arr = [{"pid": posts[i].pid, "title": posts[i].title, "creator_name": names[i-start],
             "update_time": posts[i].update_time.strftime("%Y-%m-%d"), "content": posts[i].content} for i in range(start,end)]
-    return JsonResponse({"total":(end-start),"posts":arr})
+    return JsonResponse({"total":len(posts),"posts":arr})
 
 
 def search_post(request):
     request_dict=json.loads(request.body.decode('utf-8'))
     key_word=request_dict['key_word']
-    page_no=request_dict['page_no']
+    page_no=request_dict['page_no']-1
     page_size=request_dict['page_size']
     posts=list(Post.objects.order_by('-update_time'))
     i=0
@@ -660,5 +675,5 @@ def search_post(request):
     names = [_.creator.user_name for _ in posts[start:end]]
     arr = [{"pid": posts[i].pid, "title": posts[i].title, "creator_name": names[i-start],
             "update_time": posts[i].update_time.strftime("%Y-%m-%d"), "content": posts[i].content,} for i in range(start,end)]
-    return JsonResponse({"total":(end-start),"posts":arr})
+    return JsonResponse({"total":len(posts),"posts":arr})
 

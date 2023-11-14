@@ -2,9 +2,16 @@
   <el-card shadow="hover" style="width:32%; border-radius: 3%;margin-top: 10px">
     <div class="card_layout">
       <div class="l_column">
-        <div class="image-container" v-if="flag === true">
-          <img :src="avatar_url" alt="can't find the jpg">
-        </div>
+        <el-skeleton :loading="flag" animated>
+          <template #template>
+            <el-skeleton-item variant="image" class="image-container"/>
+          </template>
+          <template #default>
+            <div class="image-container">
+              <img :src="avatar_url" alt="can't find the jpg">
+            </div>
+          </template>
+        </el-skeleton>
       </div>
       <div class="r_column">
         <div class="set_title">
@@ -18,8 +25,10 @@
           <div style="padding: 2px">{{ creator_name }} {{ date }}</div>
         </div>
         <div class="footer">
-          <el-button type="primary" :icon="TopRight" class="button"/>
+          <el-button type="primary" :icon="TopRight" class="button" @click="do_problem"/>
           <el-button type="primary" :icon="MagicStick" class="button"/>
+          <el-button type="danger" :icon="Edit" class="button"
+                     v-if="creator_name === user_name" @click="do_edit"/>
         </div>
       </div>
     </div>
@@ -30,6 +39,8 @@
 import {Edit, MagicStick, TopRight} from "@element-plus/icons-vue";
 import {fetch_set_avatar} from "@/views/main/api";
 import {ref} from "vue";
+import userStateStore from "@/store";
+import router from "@/router";
 
 export default {
   name: "ques_group_card",
@@ -47,21 +58,38 @@ export default {
 
   props: ['creator_name', 'set_name', 'date', 'introduction'],
 
-  setup(props){
+  setup(props) {
     const avatar_url = ref(null)
-    const flag = ref(false)
+    const flag = ref(true)
+    const store = userStateStore()
+    const user_name = ref(store.user_name)
+
+    const do_problem = () => {
+      router.push('/do_prob')
+    }
+
+    const do_edit = () => {
+      router.push('/edit_ques_group')
+    }
+
     const func = () => {
       fetch_set_avatar(props.set_name).then(
           (data) => {
             avatar_url.value = data.avatar.startsWith('/9j')
                 ? 'data:image/jpg;base64,' + data.avatar : 'data:image/png;base64,' + data.avatar;
-            flag.value = true;
+            flag.value = false;
           })
     }
+
     func()
-    return{
+
+    return {
       avatar_url,
-      flag
+      flag,
+      store,
+      user_name,
+      do_problem,
+      do_edit
     }
   }
 }
