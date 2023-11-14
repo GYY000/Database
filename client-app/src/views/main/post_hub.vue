@@ -5,7 +5,6 @@
       <input type="text" v-model="searchKeyword" placeholder="输入关键字搜索" />
       <button @click="searchPosts">搜索</button>
       <button @click="searchMyPosts">查看我的帖子</button>
-      <button @click="loadPosts">查看全部帖子</button>
 
       <div>
         <el-button type="primary" @click="showDialog">新建帖子</el-button>
@@ -92,12 +91,13 @@ export default {
         this.loadPosts();
       }
     },
-    reloadAllPosts() {
-      this.pageNo = 1;
-      this.loadPosts();
-      this.title = "全部帖子"
-    },
     searchPosts() {
+      if (this.searchKeyword == "") {
+        this.pageNo = 1;
+        this.loadPosts();
+        this.title = "全部帖子";
+        return;
+      }
       this.pageNo = 1
       this.posts = []
       const requestData = {
