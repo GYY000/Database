@@ -32,6 +32,10 @@
         <el-button v-if="is_login"
             @click="open_message_box" type="primary" :icon="Message" style="width:100%;"/>
       </el-badge>
+
+      <el-button v-if="is_login"
+        @click="()=>{this.open_private_message=true}" type="primary" :icon="Message" style="width:30px;"/>
+
       <el-button v-if="is_login" @click="logout" type="primary" :icon="SortDown" class="button">
         Logout
       </el-button>
@@ -54,6 +58,11 @@
           :time_list="messages.time_list"
       ></message_box>
     </el-dialog>
+
+    <el-dialog v-model="open_private_message" title="私信" center style="width: 1000px;" @before-close="(done) => {this.$refs.messageContainer.$destroy();done();}">
+      <message_container></message_container>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -128,10 +137,11 @@ import Post_hub from "@/views/main/post_hub.vue";
 import Team_hub from "@/views/main/team_hub.vue";
 import {fetch_all_application} from "@/views/main/api";
 import Message_box from "@/views/main/message_box.vue";
+import message_container from '@/views/main/site_message_component/message_container.vue';
 
 export default {
   name: "index",
-  components: {Message_box, Message, Team_hub, Post_hub, Question_hub},
+  components: {Message_box, Message, Team_hub, Post_hub, Question_hub, message_container},
   setup() {
     const store = userStateStore()
     const is_login = ref(store.getIsAuthentic);
@@ -140,6 +150,7 @@ export default {
     const user_name = ref(store.getUserName)
     const activeTab = ref(sessionStorage.getItem('activeTab') || '/main_page')
     const open_message = ref(false)
+    const open_private_message = ref(false)
     const messages = ref(null)
 
     watch(activeTab, (newValue) => {
@@ -190,7 +201,8 @@ export default {
       goto,
       open_message_box,
       open_message,
-      messages
+      messages,
+      open_private_message
     };
   },
 
