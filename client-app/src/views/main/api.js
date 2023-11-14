@@ -207,3 +207,15 @@ export function del_member(name, team_name) {
         return response.data
     })
 }
+
+export function fetch_ques_info(ques_set_name) {
+    return axios.request({
+        url: '/fetch_all_ques',
+        method: "post",
+        data: JSON.stringify({
+            ques_set_name: ques_set_name
+        })
+    }).then(response => {
+        return response.data
+    })
+}

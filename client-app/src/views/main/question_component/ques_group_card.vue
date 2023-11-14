@@ -69,6 +69,7 @@ export default {
     }
 
     const do_edit = () => {
+      store.into_ques_group(props.set_name)
       router.push('/edit_ques_group')
     }
 

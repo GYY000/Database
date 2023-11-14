@@ -55,7 +55,6 @@
       ></message_box>
     </el-dialog>
   </div>
-
 </template>
 
 <style scoped>
