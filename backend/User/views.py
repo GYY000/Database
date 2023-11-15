@@ -269,10 +269,7 @@ receiver_name
     inserted_message = Message.objects.get(id=message.id)
     # 将消息对象转换为字典形式
     message_dict = {
-        "sender_name": inserted_message.sender.user_name,
-        "sender_id": inserted_message.sender.uid,
-        "receiver_name": inserted_message.receiver.user_name,
-        "receiver_id": inserted_message.receiver.uid,
+        "is_sender": "true",
         "content": inserted_message.content,
         "time": inserted_message.time.strftime("%Y-%m-%d %H:%M"),
         "read": inserted_message.read,
@@ -736,8 +733,7 @@ def get_history_message(request):
     uid1=request_dict['uid1']
     uid2=request_dict['uid2']
     messages=Message.objects.filter(Q(sender=uid1, receiver=uid2) | Q(sender=uid2, receiver=uid1)).order_by('-time').reverse()
-    mes_list=[{"sender_name":_.sender.user_name,"sender_id":_.sender.uid,
-              "receiver_name":_.receiver.user_name,"receiver_id":_.receiver.uid,
+    mes_list=[{"is_sender": _.sender.uid != uid1,
                "content":_.content,"time":_.time.strftime("%Y-%m-%d %H:%M") ,"read": _.read, "id": _.id
                } for _ in messages]
     return JsonResponse(mes_list,safe=False)
@@ -754,4 +750,15 @@ def mark_as_read(request):
             _.read=True
             _.save()
     return JsonResponse({"description": "成功"})
+
+def search_user(request):
+    assert request.method=="POST"
+    request_dict=json.loads(request.body.decode('utf-8'))
+    user_name1=request_dict["user_name"]
+    try: 
+        user=User.objects.get(user_name=user_name1)
+        return JsonResponse({"has_user": True, "uid": user.uid})
+    except:
+        return JsonResponse({"has_user": False})
+
 

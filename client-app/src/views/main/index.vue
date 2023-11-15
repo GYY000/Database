@@ -59,8 +59,8 @@
       ></message_box>
     </el-dialog>
 
-    <el-dialog v-model="open_private_message" title="私信" center style="width: 1000px;" @before-close="(done) => {this.$refs.messageContainer.$destroy();done();}">
-      <message_container></message_container>
+    <el-dialog v-model="open_private_message" title="私信" center style="width: 1000px;" @close="before_close_pm" @open="before_open_pm">
+      <message_container ref="messageContainer"></message_container>
     </el-dialog>
 
   </div>
@@ -220,6 +220,18 @@ export default {
     SortDown() {
       return SortDown;
     },
+  },
+  methods: {
+    before_close_pm() {
+      if (this.$refs.messageContainer.$refs.chatDisplay) {
+        this.$refs.messageContainer.$refs.chatDisplay.stopTimer()
+      }
+    },
+    before_open_pm() {
+      if (this.$refs.messageContainer.$refs.chatDisplay) {
+        this.$refs.messageContainer.$refs.chatDisplay.updateData()
+      }
+    }
   },
 }
 </script>
