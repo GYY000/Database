@@ -209,6 +209,7 @@ export function del_member(name, team_name) {
 }
 
 export function fetch_ques_info(ques_set_name) {
+    console.log(ques_set_name)
     return axios.request({
         url: '/fetch_all_ques',
         method: "post",

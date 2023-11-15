@@ -61,6 +61,7 @@ export const userStateStore = defineStore("user", {
             this.isAuthentic = false
         },
         async into_ques_group(group_name) {
+            console.log(group_name)
             this.ques_group_name = group_name
         }
     }
