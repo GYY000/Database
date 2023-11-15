@@ -60,7 +60,7 @@ export const userStateStore = defineStore("user", {
         async logout() {
             this.isAuthentic = false
         },
-        async intoQuesGroup(group_name) {
+        async into_ques_group(group_name) {
             this.ques_group_name = group_name
         }
     }
