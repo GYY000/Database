@@ -1,7 +1,7 @@
 <template>
   <div class="message-container">
     <div v-for="message in messages" :key="message.id">
-      <div v-if="message.sender_id == my.id" class="message-right">
+      <div v-if="message.is_sender" class="message-right">
         <div style="display: flex;flex-direction: column;   align-items: flex-end; justify-content: flex-end;">
           <div class="time">{{ message.time }}</div>
           <div class="content">
@@ -82,6 +82,9 @@ export default {
         // 在回调函数中执行需要定时更新的操作
         this.getMessages();
       }, 1000); // 每隔5秒钟执行一次
+    },
+    stopTimer() {
+      clearInterval(this.timer);
     }
   },
 };
@@ -123,7 +126,7 @@ export default {
   border-radius: 10px;
   font-weight: bold;
   word-wrap: break-word;
-  max-width: 60%;
+  max-width: 400px;
 }
 
 .profile-photo {

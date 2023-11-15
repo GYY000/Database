@@ -3,14 +3,15 @@
     <el-container style="height: auto;">
       <el-aside :span="8">
         <h1>
-          我的消息 
+          我的消息
         </h1>
+        <el-input placeholder="请输入查找的用户" v-model="this.searched_username" @keyup.enter.native="search_user"> </el-input>
         <contact v-for="contact in contacts" :key="contact.user_id" :contact="contact" @open-message="handleContactClicked" />
         <div v-if="contacts.length == 0">没有人给你发消息</div>
       </el-aside>
       <el-container>
         <el-main>
-          <chat_display v-if="Object.keys(cur_contact).length > 0" :contact="cur_contact"></chat_display>
+          <chat_display v-if="Object.keys(cur_contact).length > 0" :contact="cur_contact" ref="chatDisplay"></chat_display>
           <div v-else>暂无</div>
         </el-main>
         <el-footer>
@@ -37,7 +38,8 @@ export default {
       contacts: [
       ],
       cur_contact: {},
-      new_message: ''
+      new_message: '',
+      searched_username: '',
     };
   },
   mounted () {
@@ -69,7 +71,6 @@ export default {
       const store = userStateStore()
       axios.post('/send_message', { sender_id: store.getUserId, receiver_name: this.cur_contact.user_name, content: this.new_message})
         .then(response => {
-          console.log(response)
           this.new_message = ''
           //this.messages.push(response.data)
         })
@@ -77,6 +78,23 @@ export default {
           console.error(error);
         });
     },
+    search_user() {
+      let contact = this.contacts.find(contact => contact.user_name === this.searched_username)
+      if (contact) {
+        this.cur_contact = contact
+        return
+      }
+      axios.post('/search_user', { user_name: this.searched_username })
+        .then(response => {
+          if (response.data.has_user)
+            this.contacts.push({user_name: this.searched_username, user_id: response.data.uid, has_unread_message: false})
+            this.searched_username = ''
+          //this.messages.push(response.data)
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    }
   }
 };
 </script>
