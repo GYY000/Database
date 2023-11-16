@@ -7,25 +7,32 @@
       <el-input v-model.number="form.serial_number" placeholder="请输入题目分数" clearable/>
     </el-form-item>
     <el-form-item label="题目类型">
-      <el-checkbox-group v-model="form.content.type">
-        <el-checkbox label="None" name="type"/>
-        <el-checkbox label="选择" name="type"/>
-        <el-checkbox label="填空" name="type"/>
-      </el-checkbox-group>
+      <el-radio-group v-model="form.content.type">
+        <el-radio label="None" name="type"/>
+        <el-radio label="选择" name="type"/>
+        <el-radio label="填空" name="type"/>
+      </el-radio-group>
     </el-form-item>
-    <el-form-item label="题目内容">
-      <mavon-editor style="height: 200px"></mavon-editor>
-    </el-form-item>
+
   </el-form>
+  <div class="editor">
+    <mavon-editor class="markdown"
+     :value="mark_data"
+     :subfield = "mavon_config.subfield"
+     :defaultOpen = "mavon_config.defaultOpen"
+     :toolbarsFlag = "mavon_config.toolbarsFlag"
+     :editable="mavon_config.editable"
+     :scrollStyle="mavon_config.scrollStyle">
+    </mavon-editor>
+  </div>
 </template>
 
 <script>
 import {ref} from "vue";
-import MavonEditor from "mavon-editor/src/mavon-editor.vue";
 
 export default {
   name: 'upload_ques_form',
-  components: {MavonEditor},
+  components: ["mavonEditor"],
   setup() {
     const form = ref(
         {
@@ -41,13 +48,29 @@ export default {
           }
         }
     )
+
+    const mavon_config = ref({
+          subfield: false,// 单双栏模式
+          defaultOpen: 'preview',//edit： 默认展示编辑区域 ， preview： 默认展示预览区域
+          editable: false,
+          toolbarsFlag: false,
+          scrollStyle: true
+        })
+
+    const mark_data = ref("**wsj**")
     return {
-      form
+      form,
+      mavon_config,
+      mark_data
     }
   }
 }
 </script>
 
 <style scoped>
-
+.editor {
+  margin: auto;
+  width: 80%;
+  height: 580px;
+}
 </style>
