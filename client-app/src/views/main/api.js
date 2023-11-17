@@ -209,7 +209,6 @@ export function del_member(name, team_name) {
 }
 
 export function fetch_ques_info(ques_set_name) {
-    console.log(ques_set_name)
     return axios.request({
         url: '/fetch_all_ques',
         method: "post",
@@ -219,4 +218,15 @@ export function fetch_ques_info(ques_set_name) {
     }).then(response => {
         return response.data
     })
+}
+
+export function upload_picture(pic_form) {
+    return axios.post('/editor_upload_pic', pic_form,
+        {
+            headers: {'Content-Type': 'multipart/form-data'}
+        }).then(
+        response => {
+            return response.data
+        }
+    )
 }

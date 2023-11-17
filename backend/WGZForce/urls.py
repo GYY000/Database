@@ -64,5 +64,6 @@ urlpatterns = [
     re_path("get_history_message",views.get_history_message),
     re_path("mark_as_read",views.mark_as_read),
     re_path("upload_ques",views.upload_ques),
-    re_path("search_user",views.search_user)
+    re_path("search_user",views.search_user),
+    re_path("editor_upload_pic", views.upload_pic)
 ]

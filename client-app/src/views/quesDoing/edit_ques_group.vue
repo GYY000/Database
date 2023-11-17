@@ -30,8 +30,7 @@
           <div :id="titleId" class="edit_title">上传问题</div>
         </div>
     </template>
-    <upload_ques_form>
-    </upload_ques_form>
+    <upload_ques_form/>
   </el-dialog>
 </template>
 

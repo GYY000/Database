@@ -1,6 +1,7 @@
 import json
 from datetime import timezone
 
+from django.core.files.storage import FileSystemStorage
 from django.http import JsonResponse
 from User.models import *  # fixme: 王士举修改路径
 import base64
@@ -8,6 +9,8 @@ from Levenshtein import distance
 import io
 from PIL import Image
 from django.db.models import Q
+from django.conf import settings
+import os
 
 
 # Create your views here.
@@ -762,3 +765,11 @@ def search_user(request):
         return JsonResponse({"has_user": False})
 
 
+def upload_pic(request):
+    image = request.FILES.get('image')
+    file_name = "images/"
+    fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, file_name))
+    img_name = fs.save(image.name, image)
+    # TODO:on server change here
+    img_url = '127.0.0.1:8000' + settings.MEDIA_URL + file_name + img_name
+    return JsonResponse({'img_url':img_url})
