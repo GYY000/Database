@@ -219,3 +219,14 @@ export function fetch_ques_info(ques_set_name) {
         return response.data
     })
 }
+
+export function upload_picture(pic_form) {
+    return axios.post('/editor_upload_pic', pic_form,
+        {
+            headers: {'Content-Type': 'multipart/form-data'}
+        }).then(
+        response => {
+            return response.data
+        }
+    )
+}
