@@ -1,48 +1,55 @@
 <template>
-  <el-form-item label="分数占比">
-    <el-input v-model.number="form.score" placeholder="请输入题目分数" clearable/>
-  </el-form-item>
-  <el-form-item label="题目类型">
-    <el-radio-group v-model="form.type">
-      <el-radio label="None" name="type"/>
-      <el-radio label="选择" name="type"/>
-      <el-radio label="填空" name="type"/>
-    </el-radio-group>
-  </el-form-item>
-  <el-form-item label="题目内容"></el-form-item>
-  <mavon-editor class="markdown"
-                v-model="form.ques_content"
-                :scrollStyle="mavon_config.scrollStyle"
-                :toolbars="mavon_config.toolbars"
-                placeholder="请输入内容"
-                style="height: 100px;width: 85%; left: 10%; margin-bottom: 10px"
-                @imgAdd="img_add"/>
-  <el-form-item v-if="form.type === '选择'" label="选项" style="margin-top: 15px">
-    <el-button @click="add_ops" :icon="Plus" style="width: 25%;">添加选项</el-button>
-  </el-form-item>
-  <el-form-item v-if="form.type === '选择'">
-    <ques_option v-for="(item,index) in form.ops" :index="index" :content=item
-                 @upload_op="upload_op" @delete_op="delete_op"
-                 style="width:90%;margin-bottom: 5px"></ques_option>
-  </el-form-item>
-  <el-form-item v-if="form.type === '选择'">
-    <el-select
-        v-model="ops_ans"
-        multiple
-        placeholder="正确答案"
-        style="width: 240px"
+  <div style="display: flex;justify-content: center">
+    <el-form
+        label-width="auto"
+        style="left:10%;width: 90%"
     >
-      <el-option
-          v-for="(item,index) in form.ops"
-          :key="item"
-          :label="String.fromCharCode(index + 65)"
-          :value="String.fromCharCode(index + 65)"
-      />
-    </el-select>
-  </el-form-item>
-  <el-form-item v-if="form.type === '填空'" label="答案">
-    <el-input v-model="blank_ans"></el-input>
-  </el-form-item>
+      <el-form-item label="分数占比">
+        <el-input v-model.number="form.score" placeholder="请输入题目分数" clearable/>
+      </el-form-item>
+      <el-form-item label="题目类型">
+        <el-radio-group v-model="form.type">
+          <el-radio label="None" name="type"/>
+          <el-radio label="选择" name="type"/>
+          <el-radio label="填空" name="type"/>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="题目内容"></el-form-item>
+      <mavon-editor class="markdown"
+                    v-model="form.ques_content"
+                    :scrollStyle="mavon_config.scrollStyle"
+                    :toolbars="mavon_config.toolbars"
+                    placeholder="请输入内容"
+                    style="height: 100px;width: 85%; left: 10%; margin-bottom: 10px"
+                    @imgAdd="img_add"/>
+      <el-form-item v-if="form.type === '选择'" style="margin-top: 15px">
+        <el-button @click="add_ops" :icon="Plus" style="width: 20%;">添加选项</el-button>
+      </el-form-item>
+      <el-form-item v-if="form.type === '选择'">
+        <ques_option v-for="(item,index) in form.ops" :index="index" :content=item
+                     @upload_op="upload_op" @delete_op="delete_op"
+                     style="width:90%;margin-bottom: 5px"></ques_option>
+      </el-form-item>
+      <el-form-item v-if="form.type === '选择'">
+        <el-select
+            v-model="ops_ans"
+            multiple
+            placeholder="正确答案"
+            style="width: 240px"
+        >
+          <el-option
+              v-for="(item,index) in form.ops"
+              :key="item"
+              :label="String.fromCharCode(index + 65)"
+              :value="String.fromCharCode(index + 65)"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item v-if="form.type === '填空'" label="答案">
+        <el-input v-model="blank_ans"></el-input>
+      </el-form-item>
+    </el-form>
+  </div>
   <div style="display: flex;width: 100%;justify-content: center;padding-top: 10px">
     <el-button @click="upload_sub_prob" style="margin-right: 20px">保存</el-button>
     <el-button @click="delete_sub_prob" type="danger">删除</el-button>
