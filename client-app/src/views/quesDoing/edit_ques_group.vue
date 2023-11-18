@@ -24,13 +24,14 @@
 
   <el-dialog
       v-model="edit_show"
-      :show-close="true">
+      :show-close="true"
+      center>
     <template #header="{ close, titleId}">
-        <div class="edit-header">
-          <div :id="titleId" class="edit_title">上传问题</div>
-        </div>
+      <div class="edit-header">
+        <div :id="titleId" class="edit_title">上传问题</div>
+      </div>
     </template>
-    <upload_ques_form/>
+    <upload_ques_form @close="close_form"/>
   </el-dialog>
 </template>
 
@@ -70,6 +71,10 @@ export default {
       )
     }
 
+    const close_form = () => {
+      edit_show.value = false
+    }
+
     const open_form = () => {
       edit_show.value = true
     }
@@ -85,7 +90,8 @@ export default {
       show,
       currentPage,
       edit_show,
-      open_form
+      open_form,
+      close_form
     }
   }
 }
@@ -130,7 +136,7 @@ export default {
   font-size: 50px;
 }
 
-.edit_title{
+.edit_title {
   font-family: "Microsoft YaHei";
   font-weight: bold;
   font-size: 30px;

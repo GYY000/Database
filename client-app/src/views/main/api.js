@@ -230,3 +230,19 @@ export function upload_picture(pic_form) {
         }
     )
 }
+
+export function upload_ques(form) {
+    return axios.request({
+        url: '/upload_ques',
+        method: "post",
+        data: JSON.stringify({
+            ques_set_name: form.ques_set_name,
+            content: form.content,
+            serial_num: form.serial_number,
+            score: form.score,
+            creator_id: form.creator_id
+        })
+    }).then(response => {
+        return response.data
+    })
+}
