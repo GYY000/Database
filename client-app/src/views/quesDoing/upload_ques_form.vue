@@ -216,6 +216,7 @@ export default {
                 showClose: true,
                 type: 'success',
               })
+              context.emit("close")
             }
           }
       )

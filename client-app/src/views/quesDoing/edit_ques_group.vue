@@ -1,26 +1,30 @@
 <template>
-  <img src="src/assets/image/background2.jpg" class="background">
+  <img src="src/assets/image/background3.jpg" class="background">
   <div class="secbackground"></div>
-  <div class="main_container">
-    <div class="title">
+  <div class="center_class">
+    <div class="main_container">
+    <div class="title center_class">
       {{ store.getQuesGroupName }}
-      做题网站
     </div>
-    <el-button @click="open_form"></el-button>
+    <div class="center_class">
+      <el-button :icon="Upload" @click="open_form" class="control_button">添加题目</el-button>
+      <el-button :icon="DocumentChecked" type="primary" @click="close_edit" v-if="edit_mode" class="control_button">保存</el-button>
+      <el-button :icon="Edit" type="danger" @click="open_edit" v-else class="control_button">编译</el-button>
+    </div>
     <div v-if="show">
       <el-pagination
           v-model:current-page="currentPage"
-          :page-size="10"
+          :page-size="page_size"
           :hide-on-single-page="true"
           layout="prev, pager, next, jumper"
-          :total="ques.length"
+          :total="questions.length"
           @current-change="handleCurrentChange"
       />
-      <div v-for="ques in display_ques">
-        <ques_display :ques="ques" @upload_ans="caught_ans"></ques_display>
-      </div>
+      <ques_display v-for="ques in display_ques" :ques="ques" :edit_mode="edit_mode"></ques_display>
     </div>
   </div>
+  </div>
+
 
   <el-dialog
       v-model="edit_show"
@@ -41,32 +45,48 @@ import {ref} from "vue";
 import Ques_display from "@/views/quesDoing/ques_display.vue";
 import {fetch_ques_info} from "@/views/main/api";
 import Upload_ques_form from "@/views/quesDoing/upload_ques_form.vue";
+import {DocumentChecked, Edit, Plus, Upload} from "@element-plus/icons-vue";
 
 export default {
   name: 'edit_ques_group',
+  computed: {
+    Upload() {
+      return Upload
+    },
+    DocumentChecked() {
+      return DocumentChecked
+    },
+    Edit() {
+      return Edit
+    },
+    Plus() {
+      return Plus
+    }
+  },
   components: {Upload_ques_form, Ques_display},
   setup() {
     const store = userStateStore()
-    const ques = ref([])
+    const questions = ref([])
     const page = ref(1)
     const display_ques = ref([])
     const show = ref(false)
     const currentPage = ref(1)
+    const page_size = ref(10)
     const edit_show = ref(false)
+    const edit_mode = ref(false)
 
     const handleCurrentChange = (val) => {
       page.value = val;
-    }
-
-    const caught_ans = (ans_form) => {
-
+      display_ques.value = questions.value.slice(page.value * page_size.value + 1, page_size.value)
     }
 
     const init = () => {
       fetch_ques_info(store.ques_group_name).then(
           (res) => {
-            ques.value = res
-            show.value = false
+            questions.value = res.questions
+            show.value = true
+            display_ques.value = questions.value.slice((page.value - 1) * page_size.value,
+                (page.value - 1) * page_size.value + page_size.value)
           }
       )
     }
@@ -81,17 +101,28 @@ export default {
 
     init()
 
+    const open_edit = () => {
+      edit_mode.value = true
+    }
+
+    const close_edit = () => {
+      edit_mode.value = false
+    }
+
     return {
       store,
-      ques,
+      questions,
       handleCurrentChange,
       display_ques,
-      caught_ans,
       show,
       currentPage,
       edit_show,
       open_form,
-      close_form
+      close_form,
+      page_size,
+      edit_mode,
+      open_edit,
+      close_edit
     }
   }
 }
@@ -104,8 +135,8 @@ export default {
   width: 96%;
   height: 100vh;
   position: fixed;
-  z-index: 0;
-  opacity: 90%;
+  z-index: -1;
+  opacity: 70%;
   background-color: #f2f2f2;
 }
 
@@ -134,11 +165,23 @@ export default {
 .title {
   font-family: 'YouSheBiaoTiHei', sans-serif;
   font-size: 50px;
+  color: blue;
 }
 
 .edit_title {
   font-family: "Microsoft YaHei";
   font-weight: bold;
   font-size: 30px;
+}
+
+.center_class {
+  display: flex;
+  justify-content: center;
+}
+
+.control_button {
+  width:8%;
+  min-width: 90px;
+  margin-right: 10px;
 }
 </style>

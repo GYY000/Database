@@ -216,6 +216,8 @@ export function fetch_ques_info(ques_set_name) {
             ques_set_name: ques_set_name
         })
     }).then(response => {
+        console.log("data")
+        console.log(response.data)
         return response.data
     })
 }
