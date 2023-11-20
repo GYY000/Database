@@ -243,30 +243,32 @@ ques_set_name           除了creator、ques_set_name别的都数组返回吧
     contents = []
     scores = []
     serial_nums = []
+    ques_ids = []
     for _ in questions:
+        ques_ids.append(_.qid)
         contents.append(_.content)
         scores.append(_.score)
         serial_nums.append(_.serial_num)
-    questions = merge_and_sort(serial_nums,scores,contents)
+    questions = merge_and_sort(serial_nums, scores, contents, ques_ids)
     return JsonResponse({"creator": creator, "ques_set_name": qs_name, "questions": questions})
 
 
-def merge_and_sort(serial_nums, scores, contents):
-    if len(serial_nums) != len(scores) or len(scores) != len(contents):
+def merge_and_sort(serial_nums, scores, contents, ques_ids):
+    if len(serial_nums) != len(scores) or len(scores) != len(contents) or len(ques_ids) != len(contents):
         print("无法合并数组，长度不同!")
         return []
         # 创建空的三元组数组
-    triplets = []
+    quarter_lets = []
 
     # 将三个数组合并为三元组数组
-    for serial_num, score, content in zip(serial_nums, scores, contents):
-        triplet = {"serial_num": serial_num, "score": score, "content": content}
-        triplets.append(triplet)
+    for serial_num, score, content, ques_id in zip(serial_nums, scores, contents, ques_ids):
+        quarter_let = {"serial_num": serial_num, "score": score, "content": content, "id": ques_id}
+        quarter_lets.append(quarter_let)
 
     # 按照三元组中的第一个元素进行排序
-    sorted_triplets = sorted(triplets, key=lambda x: x["serial_num"])
+    sorted_quarter_lets = sorted(quarter_lets, key=lambda x: x["serial_num"])
 
-    return sorted_triplets
+    return sorted_quarter_lets
 
 
 def send_message(request):
