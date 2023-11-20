@@ -270,7 +270,7 @@ def merge_and_sort(serial_nums, scores, contents, ques_ids):
 
     return sorted_quarter_lets
 
-
+import sensi_filter
 def send_message(request):
     '''
     前->后	    后->前
@@ -280,7 +280,7 @@ receiver_name
     request_dict = json.loads(request.body.decode('utf-8'))
     sender_id = request_dict["sender_id"]
     receiver_name = request_dict["receiver_name"]
-    content = request_dict["content"]
+    content = sensi_filter.filer(request_dict["content"])
     try:
         sender = User.objects.get(uid=sender_id)
         receiver = User.objects.get(user_name=receiver_name)
@@ -390,7 +390,7 @@ def post_hub_param(request, pid):
     elif request.method == "POST":
         request_dict = json.loads(request.body.decode('utf-8'))
         uid = request_dict["uid"]
-        content = request_dict["content"]
+        content =sensi_filter.filter(request_dict["content"])
         comment = Comment(creator=User.objects.get(uid=uid), content=content, pid=Post.objects.get(pid=pid))
         comment.save()
         return JsonResponse({"description": "成功"})
@@ -400,7 +400,7 @@ def create_post(request):
     assert request.method == "POST"
     request_dict = json.loads(request.body.decode('utf-8'))
     post = Post(creator=User.objects.get(uid=request_dict["uid"]),
-                content=request_dict['content'],
+                content=sensi_filter.filter(request_dict['content']),
                 title=request_dict['title'])
     post.save()
     return JsonResponse({"description": "成功"})
@@ -796,3 +796,56 @@ def upload_pic(request):
     # TODO:on server change here
     img_url = '127.0.0.1:8000' + settings.MEDIA_URL + file_name + img_name
     return JsonResponse({'img_url': img_url})
+
+def update_ques(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    is_delete=request_dict['is_delete']
+    content=request_dict['content']
+    qid=request_dict['qid']
+    serial_num=request_dict['serial_num']
+    score=request_dict['score']
+    if is_delete:
+        Question.objects.get(qid=qid).delete()
+        return JsonResponse({"is_successful":"true"})
+    else:
+        ques=Question.objects.get(qid=qid)
+        ques.content=content
+        ques.serial_num=serial_num
+        ques.score=score
+        ques.save()
+        return JsonResponse({"is_successful":"true"})
+
+import math
+def judge_ans(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    qids=request_dict['qids']
+    answers=request_dict['answers']
+    standard_ans=request_dict['standard_ans']
+    all_scores=request_dict['all_scores']
+    hit_scores=[]
+    for i in range(len(answers)):
+        if len(standard_ans[i])==1:
+            if(standard_ans[i]==answers[i]): #单选
+                hit_scores.append(all_scores[i])
+            else:
+                hit_scores.append(0)
+        elif standard_ans[i].count(',')==int(len(standard_ans[i])/2): #多选
+            selects=answers[i].split(',')
+            standards=standard_ans[i].split(',')
+            flag=0
+            for _ in selects:
+                if not standards.__contains__(_):
+                    hit_scores.append(0)
+                    flag=1
+            #如果多选或者错选直接0昏
+            if flag==0:
+                hit_scores.append(int(all_scores[i]*len(selects)/len(standards)))
+        else: #文本题
+            len1, len2 = len(standard_ans[i]), len(answers[i])
+            max_len = max(len1, len2)
+            if max_len == 0:
+                return True  # 两个空字符串被认为是相似的
+            similarity = 1 - distance(standard_ans[i], answers[i]) / max_len
+            hit_scores.append(int(min(math.sqrt(similarity)/0.8,1)*all_scores[i]))#直接开根号乘10了，已捞不谢
+    return JsonResponse({"hit_scores":hit_scores})
+
