@@ -9,7 +9,7 @@
     <div class="center_class">
       <el-button :icon="Upload" @click="open_form" class="control_button">添加题目</el-button>
       <el-button :icon="DocumentChecked" type="primary" @click="close_edit" v-if="edit_mode" class="control_button">保存</el-button>
-      <el-button :icon="Edit" type="danger" @click="open_edit" v-else class="control_button">编译</el-button>
+      <el-button :icon="Edit" type="primary" @click="open_edit" v-else class="control_button">编辑</el-button>
     </div>
     <div v-if="show">
       <el-pagination

@@ -168,10 +168,12 @@ export default {
 
     const upload_sub = (data) => {
       form.value.content.sub_problem[data.index] = data.content
+      sub_dialog_open.value[data.index] = false
     }
 
     const delete_sub_prob = (index) => {
       form.value.content.sub_problem.splice(index, 1)
+      sub_dialog_open.value[index] = false
       sub_dialog_open.value.splice(index, 1)
     }
 
@@ -203,7 +205,7 @@ export default {
     }
 
     const upload = () => {
-      if(form.value.content.type === '选择') {
+      if (form.value.content.type === '选择') {
         form.value.content.ans = ops_ans.value.join(',')
       } else {
         form.value.content.ans = blank_ans.value

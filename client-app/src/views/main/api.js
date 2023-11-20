@@ -248,3 +248,25 @@ export function upload_ques(form) {
         return response.data
     })
 }
+
+export function api_update_ques(form) {
+    return axios.request(
+        {
+            url: 'update_ques',
+            method: "post",
+            data: JSON.stringify(
+                {
+                    is_delete: form.is_delete,
+                    content: form.content,
+                    qid: form.qid,
+                    serial_num: form.serial_num,
+                    score: form.score
+                }
+            )
+        }
+    ).then(
+        (response) => {
+            return response.data
+        }
+    )
+}

@@ -145,7 +145,7 @@ export default {
 
     const upload_sub_prob = () => {
       form.value.ans = form.value.type === '选择' ? ops_ans.value.join(',') : blank_ans
-      context.emit('upload_sub', form.value)
+      context.emit('upload_sub', {index: props.index, content: form.value})
     }
 
     const delete_sub_prob = () => {
