@@ -65,5 +65,7 @@ urlpatterns = [
     re_path("mark_as_read",views.mark_as_read),
     re_path("upload_ques",views.upload_ques),
     re_path("search_user",views.search_user),
-    re_path("editor_upload_pic", views.upload_pic)
+    re_path("editor_upload_pic", views.upload_pic),
+    re_path("update_ques",views.update_ques),
+    re_path("judge_ans",views.judge_ans),
 ]

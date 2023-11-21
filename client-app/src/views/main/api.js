@@ -216,6 +216,8 @@ export function fetch_ques_info(ques_set_name) {
             ques_set_name: ques_set_name
         })
     }).then(response => {
+        console.log("data")
+        console.log(response.data)
         return response.data
     })
 }
@@ -226,6 +228,44 @@ export function upload_picture(pic_form) {
             headers: {'Content-Type': 'multipart/form-data'}
         }).then(
         response => {
+            return response.data
+        }
+    )
+}
+
+export function upload_ques(form) {
+    return axios.request({
+        url: '/upload_ques',
+        method: "post",
+        data: JSON.stringify({
+            ques_set_name: form.ques_set_name,
+            content: form.content,
+            serial_num: form.serial_number,
+            score: form.score,
+            creator_id: form.creator_id
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
+export function api_update_ques(form) {
+    return axios.request(
+        {
+            url: 'update_ques',
+            method: "post",
+            data: JSON.stringify(
+                {
+                    is_delete: form.is_delete,
+                    content: form.content,
+                    qid: form.qid,
+                    serial_num: form.serial_num,
+                    score: form.score
+                }
+            )
+        }
+    ).then(
+        (response) => {
             return response.data
         }
     )

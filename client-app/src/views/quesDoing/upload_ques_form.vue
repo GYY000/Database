@@ -1,49 +1,117 @@
 <template>
-  <el-form label-width="120px">
-    <el-form-item label="题号">
-      <el-input v-model.number="form.serial_number" placeholder="请填写题号" clearable/>
-    </el-form-item>
-    <el-form-item label="分数占比">
-      <el-input v-model.number="form.serial_number" placeholder="请输入题目分数" clearable/>
-    </el-form-item>
-    <el-form-item label="题目类型">
-      <el-radio-group v-model="form.content.type">
-        <el-radio label="None" name="type"/>
-        <el-radio label="选择" name="type"/>
-        <el-radio label="填空" name="type"/>
-      </el-radio-group>
-    </el-form-item>
-    <el-form-item label="题目内容"></el-form-item>
+  <div style="display: flex;justify-content: center">
+    <el-form
+        label-width="auto"
+        style="left:10%;width: 90%"
+    >
+      <el-form-item label="题号">
+        <el-input v-model.number="form.serial_number" placeholder="请填写题号" clearable/>
+      </el-form-item>
+      <el-form-item label="分数占比">
+        <el-input v-model.number="form.score" placeholder="请输入题目分数" clearable/>
+      </el-form-item>
+      <el-form-item label="题目类型">
+        <el-radio-group v-model="form.content.type">
+          <el-radio label="None" name="type"/>
+          <el-radio label="选择" name="type"/>
+          <el-radio label="填空" name="type"/>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="题目内容"></el-form-item>
       <mavon-editor class="markdown"
                     v-model="form.content.ques_content"
                     :scrollStyle="mavon_config.scrollStyle"
                     :toolbars="mavon_config.toolbars"
                     placeholder="请输入内容"
-                    style="height: 200px"
+                    style="height: 200px;width: 90%; left: 5%;margin-bottom: 10px"
                     @imgAdd="img_add"/>
-  </el-form>
+      <el-form-item v-if="form.content.type === '选择'" style="margin-top: 15px">
+        <el-button @click="add_ops" :icon="Plus" style="width: 20%;">添加选项</el-button>
+      </el-form-item>
+      <el-form-item v-if="form.content.type === '选择' && form.content.ops.length !== 0">
+        <ques_option v-for="(item,index) in form.content.ops" :index="index" :content=item
+                     @upload_op="upload_op" @delete_op="delete_op"
+                     style="width:90%;margin-bottom: 5px"></ques_option>
+      </el-form-item>
+      <el-form-item v-if="form.content.type === '选择'">
+        <el-select
+            v-model="ops_ans"
+            multiple
+            placeholder="正确答案"
+            style="width: 240px"
+        >
+          <el-option
+              v-for="(item,index) in form.content.ops"
+              :key="item"
+              :label="String.fromCharCode(index + 65)"
+              :value="String.fromCharCode(index + 65)"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item v-if="form.content.type === '填空'" label="答案">
+        <el-input v-model="blank_ans"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="add_sub_prob" :icon="Plus" style="width: 20%">添加子问题</el-button>
+      </el-form-item>
+      <div v-for="(item, index) in form.content.sub_problem">
+        <el-form-item :label="`子问题${index + 1}`">
+          <el-button @click="open_sub_dialog(index)">查看</el-button>
+          <el-button type="danger" @click="delete_sub_prob(index)">删除</el-button>
+        </el-form-item>
+        <el-dialog v-model="sub_dialog_open[index]" :title="`子问题${index + 1}`" center>
+          <sub_prob_form :problem_content="item" :index="index"
+                         @upload_sub="upload_sub" @delete_sub_prob="delete_sub_prob"/>
+        </el-dialog>
+      </div>
+    </el-form>
+
+  </div>
+  <div style="display: flex;justify-content: center">
+    <el-button @click="upload" type='primary' style="margin-right: 30px">上传</el-button>
+    <el-button @click="cancel" type="danger">取消</el-button>
+  </div>
 </template>
 
 <script>
 import {ref} from "vue";
-import {upload_picture, upload_team} from "@/views/main/api";
+import {upload_picture, upload_ques} from "@/views/main/api";
+import Ques_option from "@/views/quesDoing/ques_option.vue";
+import Sub_prob_form from "@/views/quesDoing/sub_prob_form.vue";
+import {Plus} from "@element-plus/icons-vue";
 import {ElMessage} from "element-plus";
+import userStateStore from "@/store";
 
 export default {
   name: 'upload_ques_form',
-  components: ["mavonEditor"],
-  setup() {
+  computed: {
+    Plus() {
+      return Plus
+    }
+  },
+  components: {
+    Ques_option: Ques_option,
+    Sub_prob_form: Sub_prob_form
+  },
+  setup(_, context) {
+    const ops_ans = ref([])
+    const blank_ans = ref('')
+    const sub_dialog_open = ref([])
+    const store = userStateStore()
+
     const form = ref(
         {
+          ques_set_name: store.getQuesGroupName,
+          creator_id: store.getUserId,
           serial_number: 1,
           score: 1.0,
           content: {
             name: "",
             ques_content: "",
             type: "None",
-            ops: {},
-            ans: "",
-            sub_problem: []
+            ops: [],
+            ans: '',
+            sub_problem: [],
           }
         }
     )
@@ -84,22 +152,111 @@ export default {
         }
     )
 
-    const img_add= (pos, file) => {
+    const img_add = (pos, file) => {
       let form = new FormData
       form.append('image', file)
       upload_picture(form).then(
           (res) => {
-            this.$refs.mdedit.$img2Url(pos,res.img_url)
+            this.$refs.mdedit.$img2Url(pos, res.img_url)
           }
       )
     }
 
+    const open_sub_dialog = (index) => {
+      sub_dialog_open.value[index] = true
+    }
+
+    const upload_sub = (data) => {
+      form.value.content.sub_problem[data.index] = data.content
+      sub_dialog_open.value[data.index] = false
+    }
+
+    const delete_sub_prob = (index) => {
+      form.value.content.sub_problem.splice(index, 1)
+      sub_dialog_open.value[index] = false
+      sub_dialog_open.value.splice(index, 1)
+    }
+
     const mark_data = ref("**wsj**")
+
+    const add_sub_prob = () => {
+      form.value.content.sub_problem.push(
+          {
+            ques_content: "",
+            type: "None",
+            ops: [],
+            score: 1.0,
+            ans: "",
+          }
+      )
+      sub_dialog_open.value.push(true)
+    }
+
+    const upload_op = (data) => {
+      form.value.content.ops[data.index] = data.option
+    }
+
+    const delete_op = (index) => {
+      form.value.content.ops.splice(index, 1)
+    }
+
+    const add_ops = () => {
+      form.value.content.ops.push('请填入选项')
+    }
+
+    const upload = () => {
+      if (form.value.content.type === '选择') {
+        form.value.content.ans = ops_ans.value.join(',')
+      } else {
+        form.value.content.ans = blank_ans.value
+      }
+      upload_ques(form.value).then(
+          (res) => {
+            if (res.is_successful === 'true') {
+              ElMessage({
+                message: '题目上传成功',
+                showClose: true,
+                type: 'success',
+              })
+              context.emit("close")
+            }
+          }
+      )
+    }
+
+    const cancel = () => {
+      form.value = {
+        serial_number: 1,
+        score: 1.0,
+        content: {
+          name: "",
+          ques_content: "",
+          type: "None",
+          ops: [],
+          ans: '',
+          sub_problem: [],
+        }
+      }
+      context.emit("close")
+    }
+
     return {
       form,
       mavon_config,
       mark_data,
-      img_add
+      img_add,
+      upload_sub,
+      delete_sub_prob,
+      add_sub_prob,
+      add_ops,
+      upload_op,
+      delete_op,
+      ops_ans,
+      blank_ans,
+      sub_dialog_open,
+      open_sub_dialog,
+      upload,
+      cancel
     }
   }
 }
