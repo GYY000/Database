@@ -55,6 +55,7 @@ export default {
       pageSize: 3,
       totalPosts: 0,
       searchKeyword: '',
+      state: 'all',
       newPost: {}
     };
   },
@@ -74,7 +75,6 @@ export default {
         page_no: this.pageNo,
         page_size: this.pageSize
       };
-
       axios.post('/post_hub', requestData)
         .then(response => {
           // 处理返回的帖子数据和总数量
@@ -86,9 +86,11 @@ export default {
         });
     },
     loadPage(page) {
-      if (page >= 1 && page <= this.totalPages) {
-        this.pageNo = page; // 加载指定页码的帖子数据
-        this.loadPosts();
+      this.pageNo = page
+      switch(this.state) {
+        case "all": this.loadPosts(); break;
+        case "search": this.searchMyPosts(); break;
+        case "my": this.searchMyPosts(); break;
       }
     },
     searchPosts() {
@@ -96,10 +98,14 @@ export default {
         this.pageNo = 1;
         this.loadPosts();
         this.title = "全部帖子";
+        this.state = "all"
         return;
       }
-      this.pageNo = 1
-      this.posts = []
+      if (this.state != "search") {
+        this.state = "search";
+        this.pageNo = 1;
+        this.title = this.searchKeyword + "搜索结果";
+      }
       const requestData = {
         page_no: this.pageNo,
         page_size: this.pageSize,
@@ -117,8 +123,11 @@ export default {
         });
     },
     searchMyPosts() {
-      this.pageNo = 1
-      this.posts = []
+      if (this.state != "my") {
+        this.state = "my";
+        this.pageNo = 1;
+        this.title = "我的帖子";
+      }
       const store = userStateStore();
       const requestData = {
         page_no: this.pageNo,
@@ -136,10 +145,9 @@ export default {
           console.error('加载帖子失败', error);
         });
     },
-
     showDialog() {
-        this.dialogVisible = true;
-      },
+      this.dialogVisible = true;
+    },
     savePost() {
         // 这里可以添加保存帖子的逻辑，比如发送到后端API
         console.log('保存帖子', this.post);

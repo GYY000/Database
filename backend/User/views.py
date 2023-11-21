@@ -373,7 +373,11 @@ def post_hub_param(request, pid):
         content = request_dict["content"]
         comment = Comment(creator=User.objects.get(uid=uid), content=content, pid=Post.objects.get(pid=pid))
         comment.save()
-        return JsonResponse({"description": "成功"})
+        return JsonResponse({"cid": comment.id, "user_name": comment.creator.user_name,
+                     "uid": comment.creator.uid,
+                     "content": comment.content, 
+                     "create_time": comment.create_time.strftime("%Y-%m-%d %H:%M")
+                     })
 
 
 def create_post(request):

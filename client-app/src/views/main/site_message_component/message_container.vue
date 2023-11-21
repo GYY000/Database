@@ -14,8 +14,9 @@
           <chat_display v-if="Object.keys(cur_contact).length > 0" :contact="cur_contact" ref="chatDisplay"></chat_display>
           <div v-else>暂无</div>
         </el-main>
-        <el-footer>
+        <el-footer style="display: flex; align-items: center;">
           <el-input placeholder="请输入内容" v-model="this.new_message" @keyup.enter.native="send"> </el-input>
+          <el-button type="primary" @click="send">发送</el-button>
         </el-footer>
       </el-container>
     </el-container>
@@ -86,9 +87,14 @@ export default {
       }
       axios.post('/search_user', { user_name: this.searched_username })
         .then(response => {
-          if (response.data.has_user)
-            this.contacts.push({user_name: this.searched_username, user_id: response.data.uid, has_unread_message: false})
+          if (response.data.has_user) {
+            let new_contact = {user_name: this.searched_username, user_id: response.data.uid, has_unread_message: false}
+            this.contacts.unshift(new_contact)
             this.searched_username = ''
+            this.cur_contact = new_contact
+          } else {
+            alert("找不到用户" + this.searched_username)
+          }
           //this.messages.push(response.data)
         })
         .catch(error => {

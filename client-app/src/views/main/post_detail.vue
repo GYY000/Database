@@ -14,7 +14,7 @@
     <div class="line"></div> <!-- 添加分割线 -->
     <div class="comment-list">
       <comment v-for="comment in comments" :key="comment.cid" :comment="comment" />
-      <comment_editor></comment_editor>
+      <comment_editor :comments="this.comments"></comment_editor>
     </div>
   </div>
 </template>

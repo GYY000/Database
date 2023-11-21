@@ -1,12 +1,12 @@
 <template>
-  <div class="message-container">
-    <div v-for="message in messages" :key="message.id">
+  <div class="message-container" ref="container">
+    <div v-for="message in messages" :key="message.id" :class="[messageLoaded ? 'message-loaded' : '']">
       <div v-if="message.is_sender" class="message-right">
         <div style="display: flex;flex-direction: column;   align-items: flex-end; justify-content: flex-end;">
           <div class="time">{{ message.time }}</div>
           <div class="content">
             {{ message.content }}
-          </div>            
+          </div>
         </div>
         <img :src="my.profile_photo" alt="头像" class="profile-photo" />
       </div>
@@ -16,7 +16,7 @@
           <div class="time">{{ message.time }}</div>
           <div class="content">
             {{ message.content }}
-          </div>            
+          </div>
         </div>
       </div>
     </div>
@@ -43,16 +43,26 @@ export default {
         "id": store.getUserId,
         "profile_photo": store.getProfilePhoto
       },
+      messageLoaded: false,
     };
   },
   mounted() {
+    console.log("mounted钩子启动")
     this.getProfilePhoto();
     this.getMessages();
     this.updateData();
   },
-  beforeDestroy() {
-    console.log(destroyed)
-    clearInterval(this.timer);
+  watch: {
+    contact: function (oldVal, newVal) {
+      console.log("watch钩子启动")
+      this.stopTimer();
+      this.messages = []
+      this.$nextTick(() => {
+        this.getMessages();
+        this.getProfilePhoto();
+        this.updateData();
+      })
+    }
   },
   methods: {
     getProfilePhoto() {
@@ -67,24 +77,43 @@ export default {
           console.error(error);
         });
     },
+
     getMessages() {
       const store = userStateStore()
       axios.post('/get_history_message', { uid1: this.contact.user_id, uid2: store.getUserId })
         .then(response => {
-          this.messages = response.data
+          if (response.data.length > this.messages.length) {
+            const diff = response.data.length - this.messages.length;
+            this.messages.push(...response.data.slice(-diff));
+            this.scrollToBottom();
+          }
         })
         .catch(error => {
           console.error(error);
         });
     },
+
     updateData() {
       this.timer = setInterval(() => {
         // 在回调函数中执行需要定时更新的操作
         this.getMessages();
       }, 1000); // 每隔5秒钟执行一次
     },
+
     stopTimer() {
-      clearInterval(this.timer);
+      if (this.timer) {
+        clearInterval(this.timer);
+      }
+    },
+
+    scrollToBottom() {
+      var container = this.$refs.container;
+      if (container) {
+        this.$nextTick(() => {
+          container.scrollTop = container.scrollHeight;
+          console.log("移动到最下！", container.scrollHeight, container.scrollTop)
+        });
+      }
     }
   },
 };
@@ -94,19 +123,18 @@ export default {
 <style scoped>
 .message-container {
   /* 可根据实际需要设置高度 */
-  height: auto;
+  height: 420px;
   line-height: 1.5;
-
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  overflow-y: auto; /* 当消息过多时添加滚动条 */
-  padding-bottom: 60px; /* 设置底部留白 */
+  overflow-y: auto;
+  padding-bottom: 70px;
 }
 
 .message-right {
   display: flex;
-  flex-direction: row; 
+  flex-direction: row;
   align-items: flex-start;
   justify-content: flex-end;
   text-align: left;
@@ -117,7 +145,7 @@ export default {
   flex-direction: row;
   align-items: flex-start;
   justify-content: flex-start;
-  text-align: left; 
+  text-align: left;
 }
 
 .content {
@@ -138,8 +166,10 @@ export default {
 }
 
 .time {
-  font-size: 12px; /* 字体变小 */
-  color: #999; /* 颜色变淡 */
+  font-size: 12px;
+  /* 字体变小 */
+  color: #999;
+  /* 颜色变淡 */
   margin-top: 5px;
 }
 </style>
