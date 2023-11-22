@@ -798,7 +798,7 @@ def upload_pic(request):
     fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, file_name))
     img_name = fs.save(image.name, image)
     # TODO:on server change here
-    img_url = '127.0.0.1:8000' + settings.MEDIA_URL + file_name + img_name
+    img_url = 'http://127.0.0.1:8000' + settings.MEDIA_URL + file_name + img_name
     return JsonResponse({'img_url': img_url})
 
 def update_ques(request):

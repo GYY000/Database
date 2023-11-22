@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import re_path
 from User import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 # from backend.User import views
 
@@ -68,4 +70,4 @@ urlpatterns = [
     re_path("editor_upload_pic", views.upload_pic),
     re_path("update_ques",views.update_ques),
     re_path("judge_ans",views.judge_ans),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

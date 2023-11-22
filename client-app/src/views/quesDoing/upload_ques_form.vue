@@ -10,6 +10,9 @@
       <el-form-item label="分数占比">
         <el-input v-model.number="form.score" placeholder="请输入题目分数" clearable/>
       </el-form-item>
+      <el-form-item label="题目名">
+        <el-input v-model.number="form.content.name" placeholder="请输入题目名" clearable/>
+      </el-form-item>
       <el-form-item label="题目类型">
         <el-radio-group v-model="form.content.type">
           <el-radio label="None" name="type"/>
@@ -19,6 +22,7 @@
       </el-form-item>
       <el-form-item label="题目内容"></el-form-item>
       <mavon-editor class="markdown"
+                    :value="form.content.ques_content"
                     v-model="form.content.ques_content"
                     :scrollStyle="mavon_config.scrollStyle"
                     :toolbars="mavon_config.toolbars"
@@ -153,11 +157,24 @@ export default {
     )
 
     const img_add = (pos, file) => {
-      let form = new FormData
-      form.append('image', file)
-      upload_picture(form).then(
+      let form_data = new FormData
+      form_data.append('image', file)
+      upload_picture(form_data).then(
           (res) => {
-            this.$refs.mdedit.$img2Url(pos, res.img_url)
+            let content = form.value.content.ques_content
+            let name = file.name
+            console.log(file.name)
+            // 第二步.将返回的url替换到文本原位置![...](0) -> ![...](url)  这里是必须要有的
+            if (content.includes(name)) {
+              let oStr = `(${pos})`
+              let nStr = `(${res.img_url})`
+              let index = content.indexOf(oStr)
+              let str = content.replace(oStr, '')
+              let insertStr = (soure, start, newStr) => {
+                return soure.slice(0, start) + newStr + soure.slice(start)
+              }
+              form.value.content.ques_content = insertStr(str, index, nStr)
+            }
           }
       )
     }
@@ -176,8 +193,6 @@ export default {
       sub_dialog_open.value[index] = false
       sub_dialog_open.value.splice(index, 1)
     }
-
-    const mark_data = ref("**wsj**")
 
     const add_sub_prob = () => {
       form.value.content.sub_problem.push(
@@ -243,7 +258,6 @@ export default {
     return {
       form,
       mavon_config,
-      mark_data,
       img_add,
       upload_sub,
       delete_sub_prob,
