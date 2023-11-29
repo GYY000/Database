@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="width: 1000px;position:absolute;margin: auto;top: 0;left: 0;bottom: 0;right: 0;">
     <el-card class="box-card">
       <div class="card-content">
         <div class="post-header">
@@ -7,7 +7,7 @@
           <h2>{{ post.creator_name }}</h2>
         </div>
         <h3>{{ post.title }}</h3>
-        <p>{{ post.content }}</p>
+        <v-md-preview :text="post.content" ></v-md-preview>
         <p class="update-time">{{ post.update_time }}</p> <!-- 更新时间放在右下角 -->
       </div>
     </el-card>
@@ -23,6 +23,7 @@
 import comment from "@/views/main/post_component/comment.vue";
 import comment_editor from "@/views/main/post_component/comment_editor.vue";
 import axios from "axios";
+
 export default {
   name: "post_detail",
   components: {

@@ -757,14 +757,14 @@ def get_all_relative_person(request):
 def get_history_message(request):
     assert request.method == "POST"
     request_dict = json.loads(request.body.decode('utf-8'))
-    uid1 = request_dict['uid1']
-    uid2 = request_dict['uid2']
+    uid1 = request_dict['sender']
+    uid2 = request_dict['receiver']
     messages = Message.objects.filter(Q(sender=uid1, receiver=uid2) | Q(sender=uid2, receiver=uid1)).order_by(
         '-time').reverse()
-    mes_list = [{"is_sender": _.sender.uid != uid1,
+    mes_list = [{"is_sender": _.sender.uid != uid2,
                  "content": _.content, "time": _.time.strftime("%Y-%m-%d %H:%M"), "read": _.read, "id": _.id
                  } for _ in messages]
-    return JsonResponse(mes_list, safe=False)
+    return JsonResponse({"message_list": mes_list, "receiver": uid2}, safe=False)
 
 
 def mark_as_read(request):

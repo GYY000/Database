@@ -80,11 +80,11 @@ export default {
 
     getMessages() {
       const store = userStateStore()
-      axios.post('/get_history_message', { uid1: this.contact.user_id, uid2: store.getUserId })
+      axios.post('/get_history_message', { receiver: this.contact.user_id, sender: store.getUserId })
         .then(response => {
-          if (response.data.length > this.messages.length) {
-            const diff = response.data.length - this.messages.length;
-            this.messages.push(...response.data.slice(-diff));
+          if (response.data.receiver == this.contact.user_id && response.data.message_list.length > this.messages.length) {
+            const diff = response.data.message_list.length - this.messages.length;
+            this.messages.push(...response.data.message_list.slice(-diff));
             this.scrollToBottom();
           }
         })

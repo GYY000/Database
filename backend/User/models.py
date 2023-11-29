@@ -115,3 +115,8 @@ class JoinRequest(models.Model):
     tid = models.ForeignKey(Team, on_delete=models.CASCADE)
     create_time = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=30)
+
+class Favorite(models.Model):
+    id = models.AutoField(primary_key=True)
+    uid = models.ForeignKey(User, on_delete=models.CASCADE)
+    qsid = models.ForeignKey(QuestionSet, on_delete=models.CASCADE)
