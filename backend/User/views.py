@@ -389,6 +389,7 @@ def post_hub_param(request, pid):
 
     elif request.method == "POST":
         request_dict = json.loads(request.body.decode('utf-8'))
+        print(request_dict)
         uid = request_dict["uid"]
         content =sensi_filter.filter(request_dict["content"])
         comment = Comment(creator=User.objects.get(uid=uid), content=content, pid=Post.objects.get(pid=pid))

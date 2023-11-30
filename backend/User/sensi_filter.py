@@ -35,14 +35,14 @@ class SensiwordFilter:
             for tracker in trackers:
                 if tracker.is_end:
                     for j in range(tracker.depth):
-                        sentence[i-j]='*'
+                        sentence[i-j]='\*'
         return str.join('', sentence)
 
 def init_sensi_filter():
     global sensi_filter
     sensi_filter = SensiwordFilter()
-    from models import SensitiveWord
-    words = SensitiveWord.objects
+    from User.models import SensitiveWord
+    words = SensitiveWord.objects.values_list('word', flat=True)
     for word in words:
         sensi_filter.add_sensitive_word(word)
 

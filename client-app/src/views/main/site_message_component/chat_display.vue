@@ -1,5 +1,5 @@
 <template>
-  <div class="message-container" ref="container">
+  <div class="message-container" ref="container" style="height: 85%;">
     <div v-for="message in messages" :key="message.id" :class="[messageLoaded ? 'message-loaded' : '']">
       <div v-if="message.is_sender" class="message-right">
         <div style="display: flex;flex-direction: column;   align-items: flex-end; justify-content: flex-end;">

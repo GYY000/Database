@@ -41,12 +41,6 @@
     <div class="post-list">
       <post v-for="post in posts" :key="post.pid" :post="post" />
     </div>
-    <!--<div class="pagination">
-      <button @click="loadPage(pageNo - 1)" :disabled="pageNo === 1">上一页</button>
-      <button v-for="page in totalPages" :key="page" @click="loadPage(page)" :class="{ active: page === pageNo }">{{ page
-      }}</button>
-      <button @click="loadPage(pageNo + 1)" :disabled="pageNo === totalPages">下一页</button>
-    </div>-->
     <el-pagination background layout="prev, pager, next" :page-count="totalPages" @current-change="loadPage"/>
   </div>
 </template>

@@ -4,7 +4,8 @@
       <img :src="profile_photo" alt="头像" class="profile-photo" />
       <h2>{{ comment.user_name }}</h2>
     </div>
-    <p class="content">{{ comment.content }}</p>
+    <!--<p class="content">{{ comment.content }}</p>-->
+    <v-md-preview :text="comment.content" class="content"></v-md-preview>
     <p class="update-time">{{ comment.create_time }}</p> <!-- 更新时间放在右下角 -->
   </el-card>
 </template>
