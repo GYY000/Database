@@ -41,13 +41,13 @@
     <div class="post-list">
       <post v-for="post in posts" :key="post.pid" :post="post" />
     </div>
-    <div class="pagination">
+    <!--<div class="pagination">
       <button @click="loadPage(pageNo - 1)" :disabled="pageNo === 1">上一页</button>
       <button v-for="page in totalPages" :key="page" @click="loadPage(page)" :class="{ active: page === pageNo }">{{ page
       }}</button>
       <button @click="loadPage(pageNo + 1)" :disabled="pageNo === totalPages">下一页</button>
-    </div>
-    <el-pagination background layout="prev, pager, next" :total="totalPages" />
+    </div>-->
+    <el-pagination background layout="prev, pager, next" :page-count="totalPages" @current-change="loadPage"/>
   </div>
 </template>
     
@@ -111,9 +111,11 @@ export default {
       }
     }
     )
+    const totalPages = ref(1)
     return {
       dialogVisible,
-      mavon_config
+      mavon_config,
+      totalPages
     }
   },
   mounted() {
@@ -153,6 +155,7 @@ export default {
           // 处理返回的帖子数据和总数量
           this.posts = response.data.posts;
           this.totalPosts = response.data.total;
+          this.totalPages = Math.ceil(response.data.total / this.pageSize)
         })
         .catch(error => {
           console.error('加载帖子失败', error);
@@ -189,6 +192,7 @@ export default {
           // 处理返回的帖子数据和总数量
           this.posts = response.data.posts;
           this.totalPosts = response.data.total;
+          this.totalPages = Math.ceil(response.data.total / this.pageSize)
           this.title = this.searchKeyword + "的搜索结果";
         })
         .catch(error => {
@@ -212,6 +216,7 @@ export default {
           // 处理返回的帖子数据和总数量
           this.posts = response.data.posts;
           this.totalPosts = response.data.total;
+          this.totalPages = Math.ceil(response.data.total / this.pageSize)
           this.title = "我的帖子";
         })
         .catch(error => {
@@ -241,12 +246,6 @@ export default {
         });
     }
   },
-
-  computed: {
-    totalPages() {
-      return Math.ceil(this.totalPosts / this.pageSize);
-    }
-  }
 };
 </script>
 <style scoped>

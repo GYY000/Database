@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 1000px;position:absolute;margin: auto;top: 0;left: 0;bottom: 0;right: 0;">
+  <div ref="detailDiv" style="width: 1000px;position:absolute;margin: auto;top: 0;left: 0;bottom: 0;right: 0;height: auto;">
     <el-card class="box-card">
       <div class="card-content">
         <div class="post-header">
@@ -14,8 +14,8 @@
     <div class="line"></div> <!-- 添加分割线 -->
     <div class="comment-list">
       <comment v-for="comment in comments" :key="comment.cid" :comment="comment" />
-      <comment_editor :comments="this.comments"></comment_editor>
     </div>
+    <button ref="fixedButton" style="position: fixed;right: calc(50% - 600px); bottom: 5%;">按钮</button>
   </div>
 </template>
   
@@ -39,6 +39,10 @@ export default {
   },
   mounted() {
     this.fetchPostDetail();
+    window.addEventListener('scroll', this.handleScroll);
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.handleScroll);
   },
   methods: {
     fetchPostDetail() {
@@ -62,6 +66,21 @@ export default {
           console.error(error);
         });
     },
+
+    handleScroll() {
+      return
+      const button = this.$refs.fixedButton;
+      const detailDiv = this.$refs.detailDiv;
+      if (!button) return;
+
+      const rect = button.getBoundingClientRect();
+      const offsetBottom = 20; // 设置按钮与屏幕底部的偏移量
+      
+      const bottom = window.innerHeight - detailDiv.getBoundingClientRect().bottom;
+      console.log(detailDiv.getBoundingClientRect().bottom, window.innerHeight)
+      //button.style.bottom = `${bottom}px`;
+      //button.style.right = `${right}px`;
+    }
   },
 };
 </script>

@@ -29,7 +29,7 @@
       团队
     </el-menu-item>
 
-    <div class="r-container" style="position: absolute; right: 150px; top:20%">
+    <div class="r-container" style="position: absolute; right: 50px; top:20%">
       <el-badge :value="messages.id_list.length" v-if="messages !== null" :max="20" class="item" style="margin-right: 15px;" :hidden="messages.id_list.length === 0"> 
         <el-button plain
           v-if="is_login" @click="open_message_box" class="button">
@@ -77,8 +77,6 @@
     <keep-alive>
       <router-view name="team_hub"></router-view>
     </keep-alive>
-
-
   </div>
   <el-dialog v-model="open_message" title="申请中心" center>
     <message_box :applier_name_list="messages.applier_name_list" :id_list="messages.id_list"
@@ -112,12 +110,11 @@
 
 .main-container {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   width: 90%;
   height: 100vh;
   margin-top: 60px;
+  padding-left: 5%;
+  padding-right: 5%;
 }
 
 .button1 {
@@ -158,7 +155,7 @@
   height: 100vh;
   position: fixed;
   z-index: -1;
-  opacity: 30%;
+  opacity: 18%;
 }
 
 .avatar {
@@ -194,7 +191,7 @@ export default {
     const open_message = ref(false)
     const open_private_message = ref(false)
     const messages = ref(null)
-    const activeIndex = ref("1")
+    const activeIndex = ref("/main_page")
 
     watch(activeTab, (newValue) => {
       sessionStorage.setItem('activeTab', newValue);
@@ -230,7 +227,7 @@ export default {
       )
     }
 
-    init()
+    init();
 
     return {
       activeTab,
@@ -263,6 +260,9 @@ export default {
     SortDown() {
       return SortDown;
     },
+  },
+  mounted() {
+    this.$router.push("/main_page");
   },
   methods: {
     before_close_pm() {

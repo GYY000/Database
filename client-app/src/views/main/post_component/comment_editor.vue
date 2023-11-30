@@ -1,13 +1,10 @@
 <template>
-  <div>
     <!-- 页面内容... -->
-
     <!-- 悬浮输入框 -->
     <div class="fixed-input-container">
       <input type="text" v-model="inputValue" placeholder="在这里输入内容" />
       <button @click="submitForm">发送</button>
     </div>
-  </div>
 </template>
   
 <style>
