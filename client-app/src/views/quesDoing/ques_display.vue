@@ -133,11 +133,23 @@ export default {
     )
 
     const img_add = (pos, file) => {
-      let form = new FormData
-      form.append('image', file)
-      upload_picture(form).then(
+      let form_data = new FormData
+      form_data.append('image', file)
+      upload_picture(form_data).then(
           (res) => {
-            this.$refs.mdedit.$img2Url(pos, res.img_url)
+            let ques_content = content.value.ques_content
+            let name = file.name
+            console.log(file.name)
+            if (ques_content.includes(name)) {
+              let oStr = `(${pos})`
+              let nStr = `(${res.img_url})`
+              let index = ques_content.indexOf(oStr)
+              let str = ques_content.replace(oStr, '')
+              let insertStr = (soure, start, newStr) => {
+                return soure.slice(0, start) + newStr + soure.slice(start)
+              }
+              content.value.ques_content = insertStr(str, index, nStr)
+            }
           }
       )
     }
@@ -213,6 +225,10 @@ export default {
 </script>
 
 <style scoped>
+
+@import '../../assets/style/demo.css';
+@import '../../assets/style/tabler.css';
+
 .score_updater {
   width: 8%;
   font-size: 20px;

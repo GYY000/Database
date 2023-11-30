@@ -76,6 +76,8 @@ router.beforeEach((to, from, next) => {
         isLogin ? next("/main_page") : next()
     } else if (to.path !== "/main_page" && !isLogin) { // 拦截
         next("/log_reg")
+    } else if(to.path === '/') {
+        next("/main_page")
     } else {
         next()
     }
