@@ -226,8 +226,8 @@ export default {
 
 <style scoped>
 
-@import '../../assets/style/demo.css';
-@import '../../assets/style/tabler.css';
+@import 'src/assets/style/demo.css';
+@import 'src/assets/style/tabler.css';
 
 .score_updater {
   width: 8%;
