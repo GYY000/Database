@@ -35,7 +35,7 @@ class SensiwordFilter:
             for tracker in trackers:
                 if tracker.is_end:
                     for j in range(tracker.depth):
-                        sentence[i-j]='\*'
+                        sentence[i-j]='&'
         return str.join('', sentence)
 
 def init_sensi_filter():
