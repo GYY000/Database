@@ -1,9 +1,9 @@
 <template>
   <img src="@/assets/image/inside_backpage1.jpg" class="background">
   <!--<div class="secbackground"></div>-->
-
-  <el-menu :default-active="activeIndex" class="fixed-menu" mode="horizontal" @select="handleSelect">
-    <img src="@/assets/image/logo.png" alt="Element logo" style="margin-left: 10px;margin-right: 10px;" />
+  <el-menu :default-active="activeIndex" class="fixed-menu1" mode="horizontal" @select="handleSelect">
+    <img src="@/assets/image/logo.png" alt="Element logo"
+         style="margin-left: 10px;margin-right: 10px;" />
     <el-menu-item index="/main_page">
       <el-icon>
         <House />
@@ -58,24 +58,10 @@
         </el-button>
       </span>
     </div>
-
-
   </el-menu>
   <div class="main-container">
     <keep-alive>
-      <router-view name="main_page"></router-view>
-    </keep-alive>
-    <keep-alive>
-      <router-view name="question_hub"></router-view>
-    </keep-alive>
-    <keep-alive>
-      <router-view name="post_hub"></router-view>
-    </keep-alive>
-    <keep-alive>
-      <router-view name="post_detail"></router-view>
-    </keep-alive>
-    <keep-alive>
-      <router-view name="team_hub"></router-view>
+      <router-view></router-view>
     </keep-alive>
   </div>
   <el-dialog v-model="open_message" title="申请中心" center>
@@ -91,7 +77,7 @@
 
 
 <style scoped>
-.fixed-menu {
+.fixed-menu1 {
   position: fixed;
   top: 0;
   left: 0;

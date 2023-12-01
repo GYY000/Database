@@ -1,5 +1,5 @@
 <template>
-  <el-card shadow="never">
+  <div>
     <div style="font-weight: bold; font-size: 20px; display: flex; align-items: center;
     justify-content: space-between;">
       <div>
@@ -12,26 +12,16 @@
         </el-button>
         分
       </div>
-      <el-button :icon="DeleteFilled" type="danger" @click="update_ques(true)" style="margin-right: 50px">
+      <el-button :icon="Edit" type="primary" @click="edit_ques" class="control_button">
+        编辑
+      </el-button>
+      <el-button :icon="DeleteFilled" type="danger"
+                 @click="update_ques(true)" style="margin-right: 50px">
         删除题目
       </el-button>
     </div>
     <div style="display: flex;justify-content: left">
-      <!--<v-md-preview :text="content.ques_content" v-if="content_edit === false"
-                      @click="content_edit = true"></v-md-preview>-->
-      <mavon-editor class="markdown"
-                    :value="content.ques_content"
-                    v-model="content.ques_content"
-                    :scrollStyle="mavon_config.scrollStyle"
-                    :box-shadow="false"
-                    placeholder="请输入内容"
-                    :subfield="false"
-                    :toolbars-flag="false"
-                    :default-open="content_edit"
-                    style="height: auto;min-height:50px;width: 80%;margin-left:30px;margin-bottom: 10px"
-                    @imgAdd="img_add"
-                    @save="sava_content"
-                    @click="content_edit = 'edit'"/>
+      <v-md-preview :text="content.ques_content"></v-md-preview>
     </div>
     <div v-for="(item,index) in content.ops"
          style="display: flex;justify-content: left;width: 100%">
@@ -80,7 +70,19 @@
         </div>
       </div>
     </div>
-  </el-card>
+  </div>
+
+  <el-dialog
+      v-model="update_show"
+      :show-close="true"
+      center>
+    <template #header="{ close, titleId}">
+      <div class="edit-header">
+        <div :id="titleId" class="edit_title">编辑问题</div>
+      </div>
+    </template>
+    <update_ques_form @close="close_update_form" :ques="ques"/>
+  </el-dialog>
 </template>
 
 <script>
@@ -88,17 +90,21 @@ import {ref} from "vue";
 import {ElMessage} from "element-plus";
 import {api_update_ques, upload_picture} from "@/views/main/api";
 import Ques_option from "@/views/quesDoing/ques_option.vue";
-import {DeleteFilled} from "@element-plus/icons-vue";
+import {DeleteFilled, Edit} from "@element-plus/icons-vue";
+import Update_ques_form from "@/views/quesDoing/update_ques_form.vue";
 
 export default {
   name: "ques_display",
   computed: {
+    Edit() {
+      return Edit
+    },
     DeleteFilled() {
       return DeleteFilled
     }
   },
-  components: {Ques_option},
-  props: ["ques", "edit_mode"],
+  components: {Update_ques_form, Ques_option},
+  props: ["ques"],
 
   setup(props, context) {
     const ops_ans = ref((props.ques.content.type === '选择') ?
@@ -106,6 +112,12 @@ export default {
     const blank_ans = ref(props.ques.content.ans)
     const blank_ans_edit = ref(false)
     const content_edit = ref("preview")
+    const tool_bar = ref(false)
+    const update_show = ref(false)
+
+    const close_update_form = () => {
+      update_show.value = false;
+    }
 
     const content = ref(
         {
@@ -126,11 +138,6 @@ export default {
       edit_score.value = false
       update_ques(false)
     }
-
-    const mavon_config = ref({
-          scrollStyle: true
-        }
-    )
 
     const img_add = (pos, file) => {
       let form_data = new FormData
@@ -155,6 +162,7 @@ export default {
     }
 
     const update_ques = (is_delete) => {
+      context.emit("upload_change", {'score': score.value, 'id': props.ques.id})
       content.value.ans =
           (content.value.type === '选择') ? ops_ans.value.join(',') : blank_ans.value;
       let form = {
@@ -167,6 +175,7 @@ export default {
       api_update_ques(form).then(
           (res) => {
             if (res.is_successful === "true") {
+              console.log("suc")
               ElMessage({
                 message: "更新成功",
                 type: "success",
@@ -197,9 +206,14 @@ export default {
     }
 
     const sava_content = (value, render) => {
+      tool_bar.value = false
       content.value.ques_content = value
       content_edit.value = "preview"
       update_ques(false)
+    }
+
+    const edit_ques = () => {
+      update_show.value = true
     }
 
     return {
@@ -216,9 +230,12 @@ export default {
       blank_ans_edit,
       update_blank_ans,
       content_edit,
-      mavon_config,
       img_add,
-      sava_content
+      sava_content,
+      tool_bar,
+      edit_ques,
+      close_update_form,
+      update_show
     }
   }
 }
@@ -226,12 +243,15 @@ export default {
 
 <style scoped>
 
-@import 'src/assets/style/demo.css';
-@import 'src/assets/style/tabler.css';
-
 .score_updater {
   width: 8%;
   font-size: 20px;
+}
+
+.edit_title {
+  font-family: "Microsoft YaHei";
+  font-weight: bold;
+  font-size: 30px;
 }
 
 .blank_ans {

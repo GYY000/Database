@@ -6,6 +6,10 @@ import user_center from "@/views/main/user_center.vue";
 import do_problem from "@/views/quesDoing/do_problem.vue";
 import edit_ques_group from "@/views/quesDoing/edit_ques_group.vue";
 import post_detail from '@/views/main/post_detail.vue'
+import main_page from "@/views/main/main_page.vue";
+import post_hub from "@/views/main/post_hub.vue";
+import team_hub from "@/views/main/team_hub.vue";
+import question_hub from "@/views/main/question_hub.vue";
 
 const routes = [
     {
@@ -16,28 +20,33 @@ const routes = [
             {
                 path: '/question_hub',
                 name: "question_hub",
-                components: {question_hub: () => import('@/views/main/question_hub.vue')}
+                component: question_hub
             },
             {
                 path: '/team_hub',
                 name: "team_hub",
-                components: {team_hub: () => import('@/views/main/team_hub.vue')},
+                component: team_hub
             },
             {
                 path: '/post_hub',
                 name: "post_hub",
-                components: {post_hub: () => import('@/views/main/post_hub.vue')}
+                component: post_hub
             },
             {
                 path: '/main_page',
                 name: "main_page",
-                components: {main_page: () => import('@/views/main/main_page.vue')}
+                component: main_page
             },
             {
                 path: '/post_detail/:pid',
                 name: "post_detail",
-                components: {post_detail: () => import('@/views/main/post_detail.vue')},
+                component: post_detail
             },
+            {
+                path: '/edit_ques_group',
+                name: "edit_ques_group",
+                component: edit_ques_group
+            }
         ]
     },
     {
@@ -46,19 +55,14 @@ const routes = [
         component: log_reg,
     },
     {
-        path: '/user_center',
-        name: "user_center",
-        component: user_center
-    },
-    {
         path: '/do_prob',
         name: "do_prob",
         component: do_problem
     },
     {
-        path: '/edit_ques_group',
-        name: "edit_ques_group",
-        component: edit_ques_group
+        path: '/user_center',
+        name: "user_center",
+        component: user_center
     }
 ]
 
@@ -76,7 +80,7 @@ router.beforeEach((to, from, next) => {
         isLogin ? next("/main_page") : next()
     } else if (to.path !== "/main_page" && !isLogin) { // 拦截
         next("/log_reg")
-    } else if(to.path === '/') {
+    } else if (to.path === '/') {
         next("/main_page")
     } else {
         next()

@@ -43,6 +43,7 @@ def fetch_info(request):
                                  "register_date": register_date.strftime("%Y-%m-%d"),
                                  "user_id": user.uid})
         else:
+
             return JsonResponse({"profile_photo": bytes.decode(profile_photo),
                                  "register_date": register_date.strftime("%Y-%m-%d"),
                                  "user_id": user.uid})
@@ -237,9 +238,12 @@ ques_set_name           除了creator、ques_set_name别的都数组返回吧
     '''
     request_dict = json.loads(request.body.decode('utf-8'))
     qs_name = request_dict['ques_set_name']
-    qs_id = QuestionSet.objects.get(set_name=qs_name).qsid
+    qs = QuestionSet.objects.get(set_name=qs_name)
+    qs_id = qs.qsid
     questions = Question.objects.filter(qsid=qs_id)
     creator = QuestionSet.objects.get(qsid=qs_id).creator.user_name
+    profile_photo = qs.profile_photo
+    introduction = qs.introduction
     contents = []
     scores = []
     serial_nums = []
@@ -250,7 +254,10 @@ ques_set_name           除了creator、ques_set_name别的都数组返回吧
         scores.append(_.score)
         serial_nums.append(_.serial_num)
     questions = merge_and_sort(serial_nums, scores, contents, ques_ids)
-    return JsonResponse({"creator": creator, "ques_set_name": qs_name, "questions": questions})
+    return JsonResponse(
+        {"creator": creator, "profile_photo": bytes.decode(profile_photo),
+         "introduction": introduction,
+         "ques_set_name": qs_name, "questions": questions})
 
 
 def merge_and_sort(serial_nums, scores, contents, ques_ids):
@@ -270,7 +277,10 @@ def merge_and_sort(serial_nums, scores, contents, ques_ids):
 
     return sorted_quarter_lets
 
+
 from User import sensi_filter
+
+
 def send_message(request):
     '''
     前->后	    后->前
@@ -391,14 +401,14 @@ def post_hub_param(request, pid):
         request_dict = json.loads(request.body.decode('utf-8'))
         print(request_dict)
         uid = request_dict["uid"]
-        content =sensi_filter.filter(request_dict["content"])
+        content = sensi_filter.filter(request_dict["content"])
         comment = Comment(creator=User.objects.get(uid=uid), content=content, pid=Post.objects.get(pid=pid))
         comment.save()
         return JsonResponse({"cid": comment.id, "user_name": comment.creator.user_name,
-                     "uid": comment.creator.uid,
-                     "content": comment.content, 
-                     "create_time": comment.create_time.strftime("%Y-%m-%d %H:%M")
-                     })
+                             "uid": comment.creator.uid,
+                             "content": comment.content,
+                             "create_time": comment.create_time.strftime("%Y-%m-%d %H:%M")
+                             })
 
 
 def create_post(request):
@@ -471,7 +481,6 @@ def search_for_team(request):
                          "introduction_list": introduction_list,
                          "creator_list": creator_list,
                          "date_list": date_list})
-
 
 def get_profile_photo(request):
     request_dict = json.loads(request.body.decode('utf-8'))
@@ -802,55 +811,58 @@ def upload_pic(request):
     img_url = 'http://127.0.0.1:8000' + settings.MEDIA_URL + file_name + img_name
     return JsonResponse({'img_url': img_url})
 
+
 def update_ques(request):
-    request_dict=json.loads(request.body.decode('utf-8'))
-    is_delete=request_dict['is_delete']
-    content=request_dict['content']
-    qid=request_dict['qid']
-    serial_num=request_dict['serial_num']
-    score=request_dict['score']
+    request_dict = json.loads(request.body.decode('utf-8'))
+    is_delete = request_dict['is_delete']
+    content = request_dict['content']
+    qid = request_dict['qid']
+    serial_num = request_dict['serial_num']
+    score = request_dict['score']
     if is_delete:
         Question.objects.get(qid=qid).delete()
-        return JsonResponse({"is_successful":"true"})
+        return JsonResponse({"is_successful": "true"})
     else:
-        ques=Question.objects.get(qid=qid)
-        ques.content=content
-        ques.serial_num=serial_num
-        ques.score=score
+        ques = Question.objects.get(qid=qid)
+        ques.content = content
+        ques.serial_num = serial_num
+        ques.score = score
         ques.save()
-        return JsonResponse({"is_successful":"true"})
+        return JsonResponse({"is_successful": "true"})
+
 
 import math
+
+
 def judge_ans(request):
-    request_dict=json.loads(request.body.decode('utf-8'))
-    qids=request_dict['qids']
-    answers=request_dict['answers']
-    standard_ans=request_dict['standard_ans']
-    all_scores=request_dict['all_scores']
-    hit_scores=[]
+    request_dict = json.loads(request.body.decode('utf-8'))
+    qids = request_dict['qids']
+    answers = request_dict['answers']
+    standard_ans = request_dict['standard_ans']
+    all_scores = request_dict['all_scores']
+    hit_scores = []
     for i in range(len(answers)):
-        if len(standard_ans[i])==1:
-            if(standard_ans[i]==answers[i]): #单选
+        if len(standard_ans[i]) == 1:
+            if (standard_ans[i] == answers[i]):  # 单选
                 hit_scores.append(all_scores[i])
             else:
                 hit_scores.append(0)
-        elif standard_ans[i].count(',')==int(len(standard_ans[i])/2): #多选
-            selects=answers[i].split(',')
-            standards=standard_ans[i].split(',')
-            flag=0
+        elif standard_ans[i].count(',') == int(len(standard_ans[i]) / 2):  # 多选
+            selects = answers[i].split(',')
+            standards = standard_ans[i].split(',')
+            flag = 0
             for _ in selects:
                 if not standards.__contains__(_):
                     hit_scores.append(0)
-                    flag=1
-            #如果多选或者错选直接0昏
-            if flag==0:
-                hit_scores.append(int(all_scores[i]*len(selects)/len(standards)))
-        else: #文本题
+                    flag = 1
+            # 如果多选或者错选直接0昏
+            if flag == 0:
+                hit_scores.append(int(all_scores[i] * len(selects) / len(standards)))
+        else:  # 文本题
             len1, len2 = len(standard_ans[i]), len(answers[i])
             max_len = max(len1, len2)
             if max_len == 0:
                 return True  # 两个空字符串被认为是相似的
             similarity = 1 - distance(standard_ans[i], answers[i]) / max_len
-            hit_scores.append(int(min(math.sqrt(similarity)/0.8,1)*all_scores[i]))#直接开根号乘10了，已捞不谢
-    return JsonResponse({"hit_scores":hit_scores})
-
+            hit_scores.append(int(min(math.sqrt(similarity) / 0.8, 1) * all_scores[i]))  # 直接开根号乘10了，已捞不谢
+    return JsonResponse({"hit_scores": hit_scores})
