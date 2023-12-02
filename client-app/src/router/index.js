@@ -43,7 +43,7 @@ const routes = [
                 component: post_detail
             },
             {
-                path: '/edit_ques_group',
+                path: '/edit_ques_group/:qs_id',
                 name: "edit_ques_group",
                 component: edit_ques_group
             }

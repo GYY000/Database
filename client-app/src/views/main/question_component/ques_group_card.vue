@@ -56,7 +56,7 @@ export default {
     }
   },
 
-  props: ['creator_name', 'set_name', 'date', 'introduction'],
+  props: ['creator_name', 'set_name', 'date', 'introduction',"qs_id"],
 
   setup(props) {
     const avatar_url = ref(null)
@@ -69,8 +69,7 @@ export default {
     }
 
     const do_edit = () => {
-      store.into_ques_group(props.set_name)
-      router.push('/edit_ques_group')
+      router.push('/edit_ques_group/' + props.qs_id)
     }
 
     const func = () => {

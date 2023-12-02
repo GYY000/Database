@@ -138,11 +138,13 @@ user_id	    name_list
             if not ques_sets.__contains__(quesSet):
                 ques_sets.append(quesSet)
     dict = {}
+    id_list = []
     name_list = []
     date_list = []
     introduction_list = []
     creator_list = [qs.creator.user_name for qs in ques_sets]
     for qs in ques_sets:
+        id_list.append(qs.qsid)
         name_list.append(qs.set_name)
         date_list.append(qs.create_time.strftime("%Y-%m-%d"))
         introduction_list.append(qs.introduction)
@@ -150,6 +152,7 @@ user_id	    name_list
     dict["creator_list"] = creator_list
     dict["date_list"] = date_list
     dict["introduction_list"] = introduction_list
+    dict["id_list"] = id_list
     return JsonResponse(dict)
 
 
@@ -237,13 +240,13 @@ def fetch_all_ques(request):
 ques_set_name           除了creator、ques_set_name别的都数组返回吧
     '''
     request_dict = json.loads(request.body.decode('utf-8'))
-    qs_name = request_dict['ques_set_name']
-    qs = QuestionSet.objects.get(set_name=qs_name)
-    qs_id = qs.qsid
+    qs_id = request_dict['qs_id']
+    qs = QuestionSet.objects.get(qsid=qs_id)
     questions = Question.objects.filter(qsid=qs_id)
     creator = QuestionSet.objects.get(qsid=qs_id).creator.user_name
     profile_photo = qs.profile_photo
     introduction = qs.introduction
+    qs_name = qs.set_name
     contents = []
     scores = []
     serial_nums = []
@@ -727,7 +730,7 @@ def upload_ques(request):
     request_dict = json.loads(request.body.decode('utf-8'))
     try:
         Question(creator=User.objects.get(uid=request_dict['creator_id']),
-                 qsid=QuestionSet.objects.get(set_name=request_dict['ques_set_name']),
+                 qsid=request_dict['qs_id'],
                  content=request_dict['content'],
                  serial_num=request_dict['serial_num'],
                  score=request_dict['score']

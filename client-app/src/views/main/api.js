@@ -208,16 +208,14 @@ export function del_member(name, team_name) {
     })
 }
 
-export function fetch_ques_info(ques_set_name) {
+export function fetch_ques_info(qs_id) {
     return axios.request({
         url: '/fetch_all_ques',
         method: "post",
         data: JSON.stringify({
-            ques_set_name: ques_set_name
+            qs_id: qs_id
         })
     }).then(response => {
-        console.log("data")
-        console.log(response.data)
         return response.data
     })
 }

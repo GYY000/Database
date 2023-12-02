@@ -115,11 +115,13 @@ export default {
       return Plus
     }
   },
+  props: ["qs_id"],
+
   components: {
     Ques_option: Ques_option,
     Sub_prob_form: Sub_prob_form
   },
-  setup(_, context) {
+  setup(props, context) {
     const ops_ans = ref([])
     const blank_ans = ref([])
     const sub_dialog_open = ref([])
@@ -127,7 +129,7 @@ export default {
 
     const form = ref(
         {
-          ques_set_name: store.getQuesGroupName,
+          qs_id: props.qs_id,
           creator_id: store.getUserId,
           serial_number: 1,
           score: 1.0,

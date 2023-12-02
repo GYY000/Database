@@ -33,20 +33,13 @@
     <create_ques_group_form @change_visible="change_dialog_visible" @refresh="refresh"></create_ques_group_form>
   </el-dialog>
   <el-row class="groups-container" v-if="begin_flag">
-    <ques_group_card v-for="(item,index) in start_ques_sets.creator_list" :creator_name="item"
-                     :set_name="start_ques_sets.name_list[index]"
-                     :date="start_ques_sets.date_list[index]"
-                     :introduction="start_ques_sets.introduction_list[index]">
+    <ques_group_card v-for="(item,index) in ques_sets.creator_list" :creator_name="item"
+                     :qs_id="ques_sets.id_list[index]"
+                     :set_name="ques_sets.name_list[index]"
+                     :date="ques_sets.date_list[index]"
+                     :introduction="ques_sets.introduction_list[index]">
     </ques_group_card>
   </el-row>
-  <el-row class="groups-container" v-else>
-    <ques_group_card v-for="(item,index) in new_ques_sets.creator_list" :creator_name="item"
-                     :set_name="new_ques_sets.name_list[index]"
-                     :date="new_ques_sets.date_list[index]"
-                     :introduction="new_ques_sets.introduction_list[index]">
-    </ques_group_card>
-  </el-row>
-
 </template>
 
 <script>
@@ -66,29 +59,23 @@ export default {
     }
   },
   components: {Create_ques_group_form, ques_group_card},
-  data() {
-    return {
-      start_ques_sets: {},
-      store: userStateStore(),
-      flag: true,
-    }
-  },
-  created() {
-    if (this.flag) {
-      fetch_all_visible_ques_set(this.store.getUserId).then(
-          (data) => {
-            this.start_ques_sets = data;
-            this.flag = false;
-          })
-    }
-  },
 
   setup() {
     const dialog_visible = ref(false)
     const search_content = ref("")
     const store = userStateStore()
-    const new_ques_sets = ref(null)
-    const begin_flag = ref(true)
+    const ques_sets = ref(null)
+    const begin_flag = ref(false)
+
+    const init = () => {
+      fetch_all_visible_ques_set(store.getUserId).then(
+          (data) => {
+            ques_sets.value = data;
+            begin_flag.value = true;
+          })
+    }
+
+    init()
 
     const change_dialog_visible = (flag) => {
       dialog_visible.value = flag
@@ -97,7 +84,7 @@ export default {
     const search = (event) => {
       fetch_search_res(store.getUserId, search_content.value).then(
           (res) => {
-            new_ques_sets.value = res;
+            ques_sets.value = res;
             begin_flag.value = false;
           }
       )
@@ -106,7 +93,7 @@ export default {
     const get_my_sets = () => {
       fetch_my_ques_sets(store.getUserId).then(
           (res) => {
-            new_ques_sets.value = res;
+            ques_sets.value = res;
             begin_flag.value = false;
           }
       )
@@ -132,7 +119,7 @@ export default {
       change_dialog_visible,
       search_content,
       search,
-      new_ques_sets,
+      ques_sets,
       begin_flag,
       get_my_sets,
       refresh

@@ -4,7 +4,7 @@
   <div class="center_class">
     <div class="main_container">
       <div class="title center_class">
-        {{ store.getQuesGroupName }}
+        {{ ques_set_name }}
       </div>
       <el-row style="margin-top: 15px">
         <el-col :span="4" :offset="8" style="margin-right: 10px">
@@ -75,6 +75,8 @@ import {fetch_ques_info} from "@/views/main/api";
 import Upload_ques_form from "@/views/quesDoing/upload_ques_form.vue";
 import Update_ques_form from "@/views/quesDoing/update_ques_form.vue";
 import {DocumentChecked, Edit, Plus, Upload} from "@element-plus/icons-vue";
+import router from "@/router";
+import {useRouter} from "vue-router";
 
 export default {
   name: 'edit_ques_group',
@@ -106,6 +108,7 @@ export default {
     const profile_photo = ref('')
     const photo_flag = ref(true)
     const sum_score = ref(0.0)
+    const ques_set_name = ref('')
     const introduction = ref()
 
     const handlePageChange = (val) => {
@@ -114,8 +117,10 @@ export default {
     }
 
     const init = () => {
-      fetch_ques_info(store.ques_group_name).then(
+      let router = useRouter()
+      fetch_ques_info(router.currentRoute.value.params.qs_id).then(
           (res) => {
+            ques_set_name.value = res.ques_set_name
             questions.value = res.questions
             introduction.value = res.introduction
             show.value = true
@@ -176,7 +181,8 @@ export default {
       photo_flag,
       change_info,
       sum_score,
-      introduction
+      introduction,
+      ques_set_name
     }
   }
 }
@@ -251,7 +257,7 @@ export default {
   color: grey;
 }
 
-.intro{
+.intro {
   color: grey;
   display: -webkit-box;
   -webkit-line-clamp: 3;

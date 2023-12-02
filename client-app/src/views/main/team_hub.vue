@@ -27,17 +27,10 @@
     <create_team_form @change_visible="change_dialog_visible" @refresh="refresh"></create_team_form>
   </el-dialog>
   <el-row class="groups-container" v-if="begin_flag">
-    <team_card v-for="(item,index) in start_team_sets.creator_list" :creator_name="item"
-               :group_name="start_team_sets.group_name_list[index]"
-               :date="start_team_sets.date_list[index]"
-               :introduction="start_team_sets.introduction_list[index]">
-    </team_card>
-  </el-row>
-  <el-row class="groups-container" v-else>
-    <team_card v-for="(item,index) in new_team_sets.creator_list" :creator_name="item"
-               :group_name="new_team_sets.group_name_list[index]"
-               :date="new_team_sets.date_list[index]"
-               :introduction="new_team_sets.introduction_list[index]">
+    <team_card v-for="(item,index) in team_sets.creator_list" :creator_name="item"
+               :group_name="team_sets.group_name_list[index]"
+               :date="team_sets.date_list[index]"
+               :introduction="team_sets.introduction_list[index]">
     </team_card>
   </el-row>
 </template>
@@ -66,39 +59,32 @@ export default {
     }
   },
   components: {Edit_team, Create_team_form, team_card},
-  data() {
-    return {
-      start_team_sets: {},
-      store: userStateStore(),
-      flag: true,
-    }
-  },
-
-  created() {
-    if (this.flag) {
-      fetch_all_teams().then(
-          (data) => {
-            this.start_team_sets = data;
-            this.flag = false;
-          })
-    }
-  },
 
   setup() {
     const dialog_visible = ref(false)
     const search_content = ref("")
     const store = userStateStore()
-    const new_team_sets = ref(null)
-    const begin_flag = ref(true)
+    const team_sets = ref(null)
+    const begin_flag = ref(false)
 
     const change_dialog_visible = (flag) => {
       dialog_visible.value = flag
     }
 
+    const init = () => {
+      fetch_all_teams().then(
+          (data) => {
+            team_sets.value = data;
+            begin_flag.value = true
+          })
+    }
+
+    init()
+
     const search = (event) => {
       fetch_search_team_res(search_content.value).then(
           (res) => {
-            new_team_sets.value = res;
+            team_sets.value = res;
             begin_flag.value = false;
           }
       )
@@ -124,7 +110,7 @@ export default {
       change_dialog_visible,
       search_content,
       search,
-      new_team_sets,
+      team_sets,
       begin_flag,
       refresh
     }
