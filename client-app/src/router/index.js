@@ -10,6 +10,7 @@ import main_page from "@/views/main/main_page.vue";
 import post_hub from "@/views/main/post_hub.vue";
 import team_hub from "@/views/main/team_hub.vue";
 import question_hub from "@/views/main/question_hub.vue";
+import panel_del_index from "@/views/main/panel_del_index.vue";
 
 const routes = [
     {
@@ -50,14 +51,21 @@ const routes = [
         ]
     },
     {
+        path: '/panel_del_index',
+        name: "panel_del_index",
+        component: panel_del_index,
+        children: [
+            {
+                path: 'do_prob/:qs_id',
+                name: "do_prob",
+                component: do_problem
+            }
+        ]
+    },
+    {
         path: "/log_reg",
         name: "log_reg",
         component: log_reg,
-    },
-    {
-        path: '/do_prob',
-        name: "do_prob",
-        component: do_problem
     },
     {
         path: '/user_center',

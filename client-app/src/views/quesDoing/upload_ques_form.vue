@@ -8,7 +8,8 @@
         <el-input v-model.number="form.serial_number" placeholder="请填写题号" clearable/>
       </el-form-item>
       <el-form-item label="分数占比">
-        <el-input v-model.number="form.score" placeholder="请输入题目分数" clearable/>
+        <el-input v-if="form.content.type !== '复合'"
+                  v-model.number="form.score" placeholder="请输入题目分数" clearable/>
       </el-form-item>
       <el-form-item label="题目名">
         <el-input v-model.number="form.content.name" placeholder="请输入题目名" clearable/>
@@ -251,6 +252,11 @@ export default {
         form.value.content.ans = ops_ans.value.join(',')
       } else if (form.value.content.type === '填空') {
         form.value.content.ans = blank_ans.value.join(',')
+      } else if(form.value.content.type === '复合') {
+        form.value.score = 0.0
+        for(let sub_prob of form.value.content.sub_problem) {
+          form.value.score = form.value.score + sub_prob.score
+        }
       }
       upload_ques(form.value).then(
           (res) => {

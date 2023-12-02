@@ -1,45 +1,55 @@
 <template>
-  <img src="src/assets/image/background3.jpg" class="background">
+  <img src="@/assets/image/background3.jpg" class="background">
   <div class="secbackground"></div>
+  <!-- TODO BackGround -->
   <div class="center_class">
     <div class="main_container">
+      <el-row style="margin-top: 30px">
+        <el-col :span="1" :offset="18">
+          <el-button :icon="Upload" @click="open_form" class="control_button"
+                     style="margin-right: 8px">
+            添加题目
+          </el-button>
+        </el-col>
+      </el-row>
       <div class="title center_class">
-        {{ ques_set_name }}
-      </div>
-      <el-row style="margin-top: 15px">
-        <el-col :span="4" :offset="8" style="margin-right: 10px">
+        <span>
           <el-skeleton :loading="photo_flag" animated>
             <template #template>
-              <el-skeleton-item variant="image" style="width: 140px;height: 140px;border-radius: 50%"/>
+              <el-skeleton-item variant="image" class="image_container1"/>
             </template>
             <template #default>
               <img :src="profile_photo" class="image_container1" alt="can't find the jpg">
             </template>
           </el-skeleton>
-        </el-col>
-        <el-col :span="5">
-          <div class="intro_font" style="margin-bottom: 5px">总题数 {{ questions.length }}</div>
-          <div class="intro_font" style="margin-bottom: 5px">总分数 {{ sum_score }}</div>
-          <div class="intro" style="margin-bottom: 5px"> {{ introduction }}</div>
-          <div>
-            <el-button :icon="Upload" @click="open_form" class="control_button"
-                       style="margin-right: 8px">添加题目
-            </el-button>
-            <el-button :icon="DocumentChecked" type="primary" @click="close_edit" v-if="edit_mode"
-                       class="control_button">
-              保存
-            </el-button>
-            <el-button :icon="Edit" type="primary" @click="open_edit" v-else class="control_button">
-              编辑
-            </el-button>
-          </div>
-          <!-- TODO: Tags-->
-        </el-col>
-      </el-row>
-      <div class="center_class">
-
+        </span>
+        <span style="height: 45px;margin-left: 10px">
+          {{ ques_set_name }}
+        </span>
       </div>
-      <div v-if="show">
+      <div class="row_margin">
+        <el-col :offset="6" class="sub_title">
+          问题组简介
+        </el-col>
+        <el-col :offset="6" :span="12" class="sub_content">
+          {{ introduction }}
+        </el-col>
+      </div >
+      <div class="row_margin">
+        <el-col :offset="6" class="sub_title">
+          题型情况
+        </el-col>
+        <el-col :offset="6" :span="12">
+          <el-table :data="statistic" style="width: 100%">
+            <el-table-column prop="sum" label="汇总"/>
+            <el-table-column v-if="statistic[0].choice > 0" prop="choice" label="选择"/>
+            <el-table-column v-if="statistic[0].blank > 0" prop="blank" label="填空"/>
+            <el-table-column v-if="statistic[0].quesAndAns > 0" prop="quesAndAns" label="问答"/>
+            <el-table-column v-if="statistic[0].mixture > 0" prop="mixture" label="复合"/>
+          </el-table>
+        </el-col>
+      </div>
+      <div v-if="show" style="margin-top: 15px">
         <el-pagination
             v-model:current-page="currentPage"
             :page-size="page_size"
@@ -48,11 +58,13 @@
             :total="questions.length"
             @current-change="handleCurrentChange"
         />
-        <ques_display v-for="ques in display_ques" :ques="ques"></ques_display>
+        <div v-for="(ques, index) in display_ques" style="margin-bottom: 25px">
+          <div v-if="index !== 0" class="dashed-divider"></div>
+          <ques_display :ques="ques"></ques_display>
+        </div>
       </div>
     </div>
   </div>
-
 
   <el-dialog
       v-model="edit_show"
@@ -96,6 +108,22 @@ export default {
   },
   components: {Upload_ques_form, Ques_display, Update_ques_form},
   setup() {
+    const statistic = ref([
+      {
+        sum: 0,
+        choice: 0,
+        blank: 0,
+        quesAndAns: 0,
+        mixture: 0,
+      },
+      {
+        sum: 0.0,
+        choice: 0.0,
+        blank: 0.0,
+        quesAndAns: 0.0,
+        mixture: 0.0,
+      },
+    ])
     const store = userStateStore()
     const questions = ref([])
     const page = ref(1)
@@ -133,6 +161,25 @@ export default {
             for (let i = 0; i < questions.value.length; i = i + 1) {
               sum_score.value = sum_score.value + questions.value[i].score
             }
+            for (let ques of Object.values(questions.value)) {
+              if (ques.content.type === '选择') {
+                statistic.value[0].choice = statistic.value[0].choice + 1
+                statistic.value[1].choice = statistic.value[1].choice + ques.score
+              } else if (ques.content.type === '填空') {
+                statistic.value[0].blank = statistic.value[0].blank + 1
+                statistic.value[1].blank = statistic.value[1].blank + ques.score
+              } else if (ques.content.type === '问答') {
+                statistic.value[0].quesAndAns = statistic.value[0].quesAndAns + 1
+                statistic.value[1].quesAndAns = statistic.value[1].quesAndAns + ques.score
+              } else if (ques.content.type === '复合') {
+                statistic.value[0].mixture = statistic.value[0].mixture + 1
+                statistic.value[1].mixture = statistic.value[1].mixture + ques.score
+              }
+            }
+            statistic.value[0].sum = statistic.value[0].choice + statistic.value[0].blank +
+                statistic.value[0].quesAndAns + statistic.value[0].mixture
+            statistic.value[1].sum = statistic.value[1].choice + statistic.value[1].blank +
+                statistic.value[1].quesAndAns + statistic.value[1].mixture
           }
       )
     }
@@ -182,7 +229,8 @@ export default {
       change_info,
       sum_score,
       introduction,
-      ques_set_name
+      ques_set_name,
+      statistic
     }
   }
 }
@@ -190,7 +238,7 @@ export default {
 
 <style scoped>
 .secbackground {
-  top: 10%;
+  top: 8%;
   left: 2%;
   width: 96%;
   height: 100vh;
@@ -224,9 +272,11 @@ export default {
 
 .title {
   font-family: "Microsoft YaHei";
-  font-size: 45px;
+  font-size: 30px;
   font-weight: bold;
   color: black;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .edit_title {
@@ -238,6 +288,7 @@ export default {
 .center_class {
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .control_button {
@@ -246,8 +297,8 @@ export default {
 }
 
 .image_container1 {
-  width: 140px;
-  height: 140px;
+  width: 45px;
+  height: 45px;
   object-fit: cover;
   border-radius: 50%;
 }
@@ -266,5 +317,26 @@ export default {
   text-overflow: ellipsis;
   white-space: normal;
   min-height: calc(3em * 1.2);
+}
+
+.sub_title {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.sub_content {
+  font-size: 14px;
+  color: dimgray;
+}
+
+.row_margin {
+  margin-bottom: 10px;
+}
+
+.dashed-divider {
+  border-top: 1px dashed grey;
+  opacity: 50%;
+  margin-bottom: 25px;
+  width: 100%;
 }
 </style>

@@ -6,7 +6,7 @@
       <el-form-item label="题号">
         <el-input v-model.number="form.serial_number" placeholder="请填写题号" clearable/>
       </el-form-item>
-      <el-form-item label="分数占比">
+      <el-form-item label="分数占比" v-if="form.content.type !== '复合'">
         <el-input v-model.number="form.score" placeholder="请输入题目分数" clearable/>
       </el-form-item>
       <el-form-item label="题目名">
@@ -253,13 +253,20 @@ export default {
 
     const update = (is_delete) => {
       form.value.content.ans =
-          (form.value.content.type === '选择') ? ops_ans.value.join(',') : blank_ans.value;
+          (form.value.content.type === '选择') ? ops_ans.value.join(',') :
+              ((form.value.content.type === '填空')? blank_ans.value.join(',') : form.value.content.ans);
       let form1 = {
         is_delete: is_delete,
         qid: props.ques.id,
         serial_num: form.value.serial_number,
         content: form.value.content,
         score: form.value.score
+      }
+      if(form1.content.type === '复合') {
+        form1.score = 0.0
+        for(let sub_prob of form.value.content.sub_problem) {
+          form1.score = form1.score + sub_prob.score
+        }
       }
       api_update_ques(form1).then(
           (res) => {
@@ -282,15 +289,15 @@ export default {
 
     const cancel = () => {
       form.value = {
-        serial_number: 1,
-        score: 1.0,
+        serial_number: props.ques.serial_num,
+        score: props.ques.score,
         content: {
-          name: "",
-          ques_content: "",
-          type: "None",
-          ops: [],
-          ans: '',
-          sub_problem: [],
+          name: props.ques.content.name,
+          ques_content: props.ques.content.ques_content,
+          type: props.ques.content.type,
+          ops: props.ques.content.ops,
+          ans: props.ques.content.ans,
+          sub_problem: props.ques.content.ans,
         }
       }
       context.emit("close_update_form")

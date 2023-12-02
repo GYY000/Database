@@ -65,7 +65,7 @@ export default {
     const user_name = ref(store.user_name)
 
     const do_problem = () => {
-      router.push('/do_prob')
+      router.push('panel_del_index/do_prob/' + props.qs_id)
     }
 
     const do_edit = () => {

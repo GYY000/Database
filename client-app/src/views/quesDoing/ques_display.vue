@@ -1,69 +1,90 @@
 <template>
-  <div>
-    <el-row style="font-weight: bold; font-size: 20px;">
-      <el-col :span="17">
-        {{ ques.serial_num }}.
-        {{ content.name }}
-        <span style="font-weight: normal">
-          ({{ score }}分)
-        </span>
-      </el-col>
-      <el-col :span="7">
-        <el-button :icon="Edit" type="primary" @click="update_show = true" class="control_button">
-          编辑
-        </el-button>
-        <el-button :icon="DeleteFilled" type="danger"
-                   @click="delete_ques" style="margin-right: 50px">
-          删除题目
-        </el-button>
-      </el-col>
-    </el-row>
-    <div style="display: flex;justify-content: left">
+  <el-row style="margin-bottom: 5px">
+    <el-col>
+      <el-tag class="mx-1" size="large" v-if="content.type === '选择'">选择题</el-tag>
+      <el-tag class="mx-1" size="large" v-if="content.type === '填空'">填空题</el-tag>
+      <el-tag class="mx-1" size="large" v-if="content.type === '问答'">问答题</el-tag>
+      <el-tag class="mx-1" size="large" v-if="content.type === '复合'">复合题型</el-tag>
+      <el-tag class="mx-1" size="large" :type="'success'" style="margin-left: 10px">{{ score }}分</el-tag>
+    </el-col>
+  </el-row>
+  <el-row style="font-weight: bold">
+    <div style="width: 32px;display: inline-block">
+      {{ ques.serial_num }}.
+    </div>
+    <span style="display:inline-block;">
+      {{ content.name }}
+    </span>
+  </el-row>
+  <el-row>
+    <el-col :span="22">
       <v-md-preview :text="content.ques_content"></v-md-preview>
+    </el-col>
+  </el-row>
+  <div v-if="content.type === '选择'">
+    <el-checkbox-group v-model="ans" v-for="(item,index) in content.ops" size="small">
+      <el-row>
+        <el-checkbox size="large" :label="String.fromCharCode(index + 65) + '.' + item"
+                     style="width: 90%; margin-bottom: 10px" border disabled/>
+      </el-row>
+    </el-checkbox-group>
+    <el-form-item v-if="content.type === '选择'"
+                  style="margin-bottom: 10px;width: 80%">
+      <el-tag size="large" style="margin-right: 20px" effect="dark">答案</el-tag>
+      <el-select
+          v-model="ans"
+          multiple
+          placeholder="正确答案"
+          style="width: 240px"
+          disabled
+      >
+        <el-option
+            v-for="(item,index) in content.ops"
+            :key="item"
+            :label="String.fromCharCode(index + 65)"
+            :value="String.fromCharCode(index + 65)"
+        />
+      </el-select>
+    </el-form-item>
+  </div>
+  <div v-if="content.type === '填空'">
+    <div style="margin-bottom: 10px">
+      <el-tag size="large" effect="dark">答案Demo</el-tag>
     </div>
-    <div v-for="(item,index) in content.ops"
-         style="display: flex;justify-content: left;width: 100%">
-      <ques_option v-if="content.type === '选择'"
-                   :index="index"
-                   :content="item"
-                   style="margin-left:30px; margin-bottom: 10px;width: 80%"></ques_option>
-    </div>
-    <div style="display: flex;justify-content: left;width: 100%">
-      <el-form-item v-if="content.type === '选择'" style="margin-left:30px; margin-bottom: 10px;width: 80%">
-        当前答案：
-        <el-select
-            v-model="ops_ans"
-            multiple
-            placeholder="正确答案"
-            style="width: 240px"
-            disabled
-        >
-          <el-option
-              v-for="(item,index) in content.ops"
-              :key="item"
-              :label="String.fromCharCode(index + 65)"
-              :value="String.fromCharCode(index + 65)"
-          />
-        </el-select>
-      </el-form-item>
-    </div>
-    <div v-if="content.type === '填空'" style="display: flex;justify-content: left;width: 100%">
-      <div style="margin-left:30px; margin-bottom: 10px;width: 80%">
-        当前答案：
-        <el-button text class="blank_ans">
-          {{ content.ans }}
-        </el-button>
+    <el-form style="margin-bottom: 10px;width: 80%" label-width="auto">
+      <div v-for="(item,index) in ans">
+        <el-form-item :label="`空格 ${index + 1}`">
+          <el-input :value="ans[index]" disabled></el-input>
+        </el-form-item>
       </div>
-    </div>
-    <div v-if="content.sub_problem.length !== 0"
-         style="display: flex;justify-content: left;width: 100%">
-      <div style="margin-left:30px; margin-bottom: 10px;width: 80%">
-        <div>
-          <sub_problem_show v-for="(item, index) in content.sub_problem" :sub_problem="item" :id="index"/>
-        </div>
-      </div>
+    </el-form>
+  </div>
+  <div v-if="content.type === '复合'"
+       style="display: flex;justify-content: left;width: 100%">
+    <div style="width: 100%">
+      <sub_problem_show v-for="(item, index) in content.sub_problem" :sub_problem="item" :id="index"/>
     </div>
   </div>
+  <div v-if="content.type === '问答'" style="margin-bottom: 10px">
+    <div style="margin-bottom: 10px">
+      <el-tag size="large" effect="dark">答案Demo</el-tag>
+    </div>
+    <mavon-editor :box-shadow="true" :default-open="'preview'" :editable="false"
+                  :toolbars-flag="false" :subfield="false" style="min-width: 0px; width:60%;min-height: 200px"
+                  :value="content.ans" v-model="content.ans">
+    </mavon-editor>
+  </div>
+  <el-row>
+    <el-col>
+      <el-button :icon="Edit" type="primary" @click="update_show = true" class="control_button">
+        编辑
+      </el-button>
+      <el-button :icon="DeleteFilled" type="danger"
+                 @click="delete_ques" style="margin-right: 50px">
+        删除题目
+      </el-button>
+    </el-col>
+  </el-row>
 
   <el-dialog
       v-model="update_show"
@@ -101,9 +122,10 @@ export default {
   props: ["ques"],
 
   setup(props) {
-    const ops_ans = ref((props.ques.content.type === '选择') ?
-        props.ques.content.ans.split(',') : null)
+    const ans = ref((props.ques.content.type === '选择' || props.ques.content.type === '填空') ?
+        props.ques.content.ans.split(',') : props.ques.content.ans)
     const update_show = ref(false)
+    const option_answer = ref([''])
 
     const close_update_form = () => {
       update_show.value = false;
@@ -119,6 +141,14 @@ export default {
           sub_problem: props.ques.content.sub_problem
         }
     )
+
+    const init = () => {
+      console.log(content.value)
+      console.log(ans.value)
+    }
+
+    init()
+
     const serial_num = ref(props.ques.serial_num)
     const score = ref(props.ques.score)
 
@@ -149,10 +179,11 @@ export default {
       content,
       serial_num,
       score,
-      ops_ans,
+      ans,
       close_update_form,
       update_show,
-      delete_ques
+      delete_ques,
+      option_answer
     }
   }
 }
@@ -168,5 +199,25 @@ export default {
 
 .blank_ans {
   width: 85%
+}
+
+.circle {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.circle:hover {
+  background-color: lightblue;
+}
+
+.letter {
+  font-size: 15px;
 }
 </style>
