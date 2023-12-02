@@ -1,25 +1,23 @@
 <template>
   <div>
-    <div style="font-weight: bold; font-size: 20px; display: flex; align-items: center;
-    justify-content: space-between;">
-      <div>
+    <el-row style="font-weight: bold; font-size: 20px;">
+      <el-col :span="17">
         {{ ques.serial_num }}.
         {{ content.name }}
-        <el-input v-model="score" v-if="edit_score"
-                  @keyup.enter.native="update_score" class="score_updater"/>
-        <el-button text @click="edit_score = true" v-else class="score_updater">
-          {{ score }}
+        <span style="font-weight: normal">
+          ({{ score }}分)
+        </span>
+      </el-col>
+      <el-col :span="7">
+        <el-button :icon="Edit" type="primary" @click="update_show = true" class="control_button">
+          编辑
         </el-button>
-        分
-      </div>
-      <el-button :icon="Edit" type="primary" @click="edit_ques" class="control_button">
-        编辑
-      </el-button>
-      <el-button :icon="DeleteFilled" type="danger"
-                 @click="update_ques(true)" style="margin-right: 50px">
-        删除题目
-      </el-button>
-    </div>
+        <el-button :icon="DeleteFilled" type="danger"
+                   @click="delete_ques" style="margin-right: 50px">
+          删除题目
+        </el-button>
+      </el-col>
+    </el-row>
     <div style="display: flex;justify-content: left">
       <v-md-preview :text="content.ques_content"></v-md-preview>
     </div>
@@ -28,8 +26,6 @@
       <ques_option v-if="content.type === '选择'"
                    :index="index"
                    :content="item"
-                   @delete_op="delete_op"
-                   @upload_op="upload_op"
                    style="margin-left:30px; margin-bottom: 10px;width: 80%"></ques_option>
     </div>
     <div style="display: flex;justify-content: left;width: 100%">
@@ -40,7 +36,7 @@
             multiple
             placeholder="正确答案"
             style="width: 240px"
-            @change="update_ques(false)"
+            disabled
         >
           <el-option
               v-for="(item,index) in content.ops"
@@ -54,10 +50,7 @@
     <div v-if="content.type === '填空'" style="display: flex;justify-content: left;width: 100%">
       <div style="margin-left:30px; margin-bottom: 10px;width: 80%">
         当前答案：
-        <el-input v-model="content.ans" v-if="blank_ans_edit"
-                  @keyup.enter.native="update_blank_ans"
-                  clearable placeholder="请输入正确答案" class="blank_ans"/>
-        <el-button text @click="blank_ans_edit = true" v-else class="blank_ans">
+        <el-button text class="blank_ans">
           {{ content.ans }}
         </el-button>
       </div>
@@ -66,7 +59,7 @@
          style="display: flex;justify-content: left;width: 100%">
       <div style="margin-left:30px; margin-bottom: 10px;width: 80%">
         <div>
-          subproblem:
+          <sub_problem_show v-for="(item, index) in content.sub_problem" :sub_problem="item" :id="index"/>
         </div>
       </div>
     </div>
@@ -81,17 +74,18 @@
         <div :id="titleId" class="edit_title">编辑问题</div>
       </div>
     </template>
-    <update_ques_form @close="close_update_form" :ques="ques"/>
+    <update_ques_form @close_update_form="close_update_form" :ques="ques"/>
   </el-dialog>
 </template>
 
 <script>
 import {ref} from "vue";
 import {ElMessage} from "element-plus";
-import {api_update_ques, upload_picture} from "@/views/main/api";
+import {api_update_ques} from "@/views/main/api";
 import Ques_option from "@/views/quesDoing/ques_option.vue";
 import {DeleteFilled, Edit} from "@element-plus/icons-vue";
 import Update_ques_form from "@/views/quesDoing/update_ques_form.vue";
+import Sub_problem_show from "@/views/quesDoing/sub_problem_show.vue";
 
 export default {
   name: "ques_display",
@@ -103,16 +97,12 @@ export default {
       return DeleteFilled
     }
   },
-  components: {Update_ques_form, Ques_option},
+  components: {Sub_problem_show, Update_ques_form, Ques_option},
   props: ["ques"],
 
-  setup(props, context) {
+  setup(props) {
     const ops_ans = ref((props.ques.content.type === '选择') ?
         props.ques.content.ans.split(',') : null)
-    const blank_ans = ref(props.ques.content.ans)
-    const blank_ans_edit = ref(false)
-    const content_edit = ref("preview")
-    const tool_bar = ref(false)
     const update_show = ref(false)
 
     const close_update_form = () => {
@@ -129,60 +119,25 @@ export default {
           sub_problem: props.ques.content.sub_problem
         }
     )
-
     const serial_num = ref(props.ques.serial_num)
     const score = ref(props.ques.score)
-    const edit_score = ref(false)
 
-    const update_score = () => {
-      edit_score.value = false
-      update_ques(false)
-    }
-
-    const img_add = (pos, file) => {
-      let form_data = new FormData
-      form_data.append('image', file)
-      upload_picture(form_data).then(
-          (res) => {
-            let ques_content = content.value.ques_content
-            let name = file.name
-            console.log(file.name)
-            if (ques_content.includes(name)) {
-              let oStr = `(${pos})`
-              let nStr = `(${res.img_url})`
-              let index = ques_content.indexOf(oStr)
-              let str = ques_content.replace(oStr, '')
-              let insertStr = (soure, start, newStr) => {
-                return soure.slice(0, start) + newStr + soure.slice(start)
-              }
-              content.value.ques_content = insertStr(str, index, nStr)
-            }
-          }
-      )
-    }
-
-    const update_ques = (is_delete) => {
-      context.emit("upload_change", {'score': score.value, 'id': props.ques.id})
-      content.value.ans =
-          (content.value.type === '选择') ? ops_ans.value.join(',') : blank_ans.value;
-      let form = {
-        is_delete: is_delete,
+    const delete_ques = () => {
+      let form1 = {
+        is_delete: true,
         qid: props.ques.id,
-        serial_num: serial_num.value,
-        content: content.value,
-        score: score.value
       }
-      api_update_ques(form).then(
+      api_update_ques(form1).then(
           (res) => {
+            console.log(res)
             if (res.is_successful === "true") {
-              console.log("suc")
               ElMessage({
-                message: "更新成功",
+                message: "删除成功",
                 type: "success",
               });
             } else {
               ElMessage({
-                message: "更新失败",
+                message: "删除失败",
                 type: "error",
               });
             }
@@ -190,63 +145,20 @@ export default {
       )
     }
 
-    const delete_op = (index) => {
-      content.value.ops.splice(index, 1)
-      update_ques(false)
-    }
-
-    const upload_op = (data) => {
-      content.value.ops[data.index] = data.option
-      update_ques(false)
-    }
-
-    const update_blank_ans = () => {
-      blank_ans_edit.value = false
-      update_ques(false)
-    }
-
-    const sava_content = (value, render) => {
-      tool_bar.value = false
-      content.value.ques_content = value
-      content_edit.value = "preview"
-      update_ques(false)
-    }
-
-    const edit_ques = () => {
-      update_show.value = true
-    }
-
     return {
-      update_ques,
       content,
       serial_num,
       score,
-      update_score,
-      edit_score,
-      delete_op,
-      upload_op,
       ops_ans,
-      blank_ans,
-      blank_ans_edit,
-      update_blank_ans,
-      content_edit,
-      img_add,
-      sava_content,
-      tool_bar,
-      edit_ques,
       close_update_form,
-      update_show
+      update_show,
+      delete_ques
     }
   }
 }
 </script>
 
 <style scoped>
-
-.score_updater {
-  width: 8%;
-  font-size: 20px;
-}
 
 .edit_title {
   font-family: "Microsoft YaHei";

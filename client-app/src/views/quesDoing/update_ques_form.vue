@@ -14,9 +14,10 @@
       </el-form-item>
       <el-form-item label="题目类型">
         <el-radio-group v-model="form.content.type">
-          <el-radio label="None" name="type"/>
           <el-radio label="选择" name="type"/>
           <el-radio label="填空" name="type"/>
+          <el-radio label="问答" name="type"/>
+          <el-radio label="复合" name="type"/>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="题目内容"></el-form-item>
@@ -51,13 +52,35 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item v-if="form.content.type === '填空'" label="答案">
-        <el-input v-model="blank_ans"></el-input>
+      <el-form-item v-if="form.content.type === '填空'">
+        <el-button @click="add_blank" :icon="Plus" style="width: 20%;">添加空格</el-button>
       </el-form-item>
-      <el-form-item>
+      <div v-if="form.content.type === '填空' && blank_ans.length !== 0">
+        <el-form-item v-for="(item,index) in blank_ans" :label="`答案 ${index + 1}`">
+          <el-row style="width: 100%">
+            <el-col :span="16" style="margin-right: 10px">
+              <el-input v-model="blank_ans[index]" placeholder="请填入填空答案"></el-input>
+            </el-col>
+            <el-col :span="7">
+              <el-button type="danger" @click="delete_blank(index)">删除</el-button>
+            </el-col>
+          </el-row>
+        </el-form-item>
+      </div>
+      <el-form-item label="答案" v-if="form.content.type === '问答'"></el-form-item>
+      <mavon-editor class="markdown"
+                    v-if="form.content.type === '问答'"
+                    :value="form.content.ans"
+                    v-model="form.content.ans"
+                    :scrollStyle="mavon_config.scrollStyle"
+                    :toolbars="mavon_config.toolbars"
+                    placeholder="请输入您的答案"
+                    style="height: 200px;width: 90%; left: 5%;margin-bottom: 10px"
+                    @imgAdd="img_add"/>
+      <el-form-item v-if="form.content.type==='复合'">
         <el-button @click="add_sub_prob" :icon="Plus" style="width: 20%">添加子问题</el-button>
       </el-form-item>
-      <div v-for="(item, index) in form.content.sub_problem">
+      <div v-for="(item, index) in form.content.sub_problem" v-if="form.content.type==='复合'">
         <el-form-item :label="`子问题${index + 1}`">
           <el-button @click="open_sub_dialog(index)">查看</el-button>
           <el-button type="danger" @click="delete_sub_prob(index)">删除</el-button>
@@ -78,7 +101,7 @@
 
 <script>
 import {ref} from "vue";
-import {api_update_ques, upload_picture, upload_ques} from "@/views/main/api";
+import {api_update_ques, upload_picture} from "@/views/main/api";
 import Ques_option from "@/views/quesDoing/ques_option.vue";
 import Sub_prob_form from "@/views/quesDoing/sub_prob_form.vue";
 import {Plus} from "@element-plus/icons-vue";
@@ -100,7 +123,8 @@ export default {
   setup(props, context) {
     const ops_ans = ref((props.ques.content.type === '选择') ?
                         props.ques.content.ans.split(',') : null)
-    const blank_ans = ref(props.ques.content.ans)
+    const blank_ans = ref((props.ques.content.type === '填空') ?
+                        props.ques.content.ans.split(',') : null)
     const sub_dialog_open = ref(new Array(props.ques.content.sub_problem.length).fill(false))
     const store = userStateStore()
 
@@ -115,7 +139,7 @@ export default {
             ques_content: props.ques.content.ques_content,
             type: props.ques.content.type,
             ops: props.ques.content.ops,
-            ans: null,
+            ans: props.ques.content.ans,
             sub_problem: props.ques.content.sub_problem,
           }
         }
@@ -207,6 +231,14 @@ export default {
       sub_dialog_open.value.push(true)
     }
 
+    const add_blank = () => {
+      blank_ans.value.push("")
+    }
+
+    const delete_blank = (index) => {
+      blank_ans.value.splice(index, 1)
+    }
+
     const upload_op = (data) => {
       form.value.content.ops[data.index] = data.option
     }
@@ -245,7 +277,7 @@ export default {
             }
           }
       )
-      context.emit("close")
+      context.emit("close_update_form")
     }
 
     const cancel = () => {
@@ -261,7 +293,7 @@ export default {
           sub_problem: [],
         }
       }
-      context.emit("close")
+      context.emit("close_update_form")
     }
 
     return {
@@ -279,7 +311,9 @@ export default {
       sub_dialog_open,
       open_sub_dialog,
       update,
-      cancel
+      cancel,
+      add_blank,
+      delete_blank
     }
   }
 }

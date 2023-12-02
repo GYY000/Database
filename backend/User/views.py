@@ -815,14 +815,14 @@ def upload_pic(request):
 def update_ques(request):
     request_dict = json.loads(request.body.decode('utf-8'))
     is_delete = request_dict['is_delete']
-    content = request_dict['content']
     qid = request_dict['qid']
-    serial_num = request_dict['serial_num']
-    score = request_dict['score']
     if is_delete:
         Question.objects.get(qid=qid).delete()
         return JsonResponse({"is_successful": "true"})
     else:
+        content = request_dict['content']
+        serial_num = request_dict['serial_num']
+        score = request_dict['score']
         ques = Question.objects.get(qid=qid)
         ques.content = content
         ques.serial_num = serial_num

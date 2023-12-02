@@ -15,9 +15,10 @@
       </el-form-item>
       <el-form-item label="题目类型">
         <el-radio-group v-model="form.content.type">
-          <el-radio label="None" name="type"/>
           <el-radio label="选择" name="type"/>
           <el-radio label="填空" name="type"/>
+          <el-radio label="问答" name="type"/>
+          <el-radio label="复合" name="type"/>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="题目内容"></el-form-item>
@@ -52,13 +53,35 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item v-if="form.content.type === '填空'" label="答案">
-        <el-input v-model="blank_ans"></el-input>
+      <el-form-item v-if="form.content.type === '填空'">
+        <el-button @click="add_blanks" :icon="Plus" style="width: 20%;">添加空格</el-button>
       </el-form-item>
-      <el-form-item>
+      <div v-if="form.content.type === '填空' && blank_ans.length !== 0">
+        <el-form-item v-for="(item,index) in blank_ans" :label="`答案 ${index + 1}`">
+          <el-row style="width: 100%">
+            <el-col :span="16" style="margin-right: 10px">
+              <el-input v-model="blank_ans[index]" placeholder="请填入填空答案"></el-input>
+            </el-col>
+            <el-col :span="7">
+              <el-button type="danger" @click="delete_blank(index)">删除</el-button>
+            </el-col>
+          </el-row>
+        </el-form-item>
+      </div>
+      <el-form-item label="答案" v-if="form.content.type === '问答'"></el-form-item>
+      <mavon-editor class="markdown"
+                    v-if="form.content.type === '问答'"
+                    :value="form.content.ans"
+                    v-model="form.content.ans"
+                    :scrollStyle="mavon_config.scrollStyle"
+                    :toolbars="mavon_config.toolbars"
+                    placeholder="请输入您的答案"
+                    style="height: 200px;width: 90%; left: 5%;margin-bottom: 10px"
+                    @imgAdd="img_add"/>
+      <el-form-item v-if="form.content.type === '复合'">
         <el-button @click="add_sub_prob" :icon="Plus" style="width: 20%">添加子问题</el-button>
       </el-form-item>
-      <div v-for="(item, index) in form.content.sub_problem">
+      <div v-if="form.content.type === '复合'" v-for="(item, index) in form.content.sub_problem">
         <el-form-item :label="`子问题${index + 1}`">
           <el-button @click="open_sub_dialog(index)">查看</el-button>
           <el-button type="danger" @click="delete_sub_prob(index)">删除</el-button>
@@ -69,7 +92,6 @@
         </el-dialog>
       </div>
     </el-form>
-
   </div>
   <div style="display: flex;justify-content: center">
     <el-button @click="upload" type='primary' style="margin-right: 30px">上传</el-button>
@@ -99,7 +121,7 @@ export default {
   },
   setup(_, context) {
     const ops_ans = ref([])
-    const blank_ans = ref('')
+    const blank_ans = ref([])
     const sub_dialog_open = ref([])
     const store = userStateStore()
 
@@ -112,7 +134,7 @@ export default {
           content: {
             name: "",
             ques_content: "",
-            type: "None",
+            type: "选择",
             ops: [],
             ans: '',
             sub_problem: [],
@@ -153,8 +175,7 @@ export default {
             subfield: true, // 单双栏模式
             preview: true, // 预览
           }
-        }
-    )
+        })
 
     const img_add = (pos, file) => {
       let form_data = new FormData
@@ -198,7 +219,7 @@ export default {
       form.value.content.sub_problem.push(
           {
             ques_content: "",
-            type: "None",
+            type: "选择",
             ops: [],
             score: 1.0,
             ans: "",
@@ -219,11 +240,15 @@ export default {
       form.value.content.ops.push('请填入选项')
     }
 
+    const add_blanks = () => {
+      blank_ans.value.push("")
+    }
+
     const upload = () => {
       if (form.value.content.type === '选择') {
         form.value.content.ans = ops_ans.value.join(',')
-      } else {
-        form.value.content.ans = blank_ans.value
+      } else if (form.value.content.type === '填空') {
+        form.value.content.ans = blank_ans.value.join(',')
       }
       upload_ques(form.value).then(
           (res) => {
@@ -246,13 +271,17 @@ export default {
         content: {
           name: "",
           ques_content: "",
-          type: "None",
+          type: "选择",
           ops: [],
           ans: '',
           sub_problem: [],
         }
       }
       context.emit("close")
+    }
+
+    const delete_blank = (index) => {
+      blank_ans.value.splice(index, 1)
     }
 
     return {
@@ -270,7 +299,9 @@ export default {
       sub_dialog_open,
       open_sub_dialog,
       upload,
-      cancel
+      cancel,
+      add_blanks,
+      delete_blank
     }
   }
 }
