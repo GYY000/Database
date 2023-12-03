@@ -102,7 +102,7 @@
 <script>
 import {ref} from "vue";
 import {ElMessage} from "element-plus";
-import {api_update_ques} from "@/views/main/api";
+import {api_update_ques, string2Array} from "@/views/main/api";
 import Ques_option from "@/views/quesDoing/ques_option.vue";
 import {DeleteFilled, Edit} from "@element-plus/icons-vue";
 import Update_ques_form from "@/views/quesDoing/update_ques_form.vue";
@@ -122,8 +122,11 @@ export default {
   props: ["ques"],
 
   setup(props) {
-    const ans = ref((props.ques.content.type === '选择' || props.ques.content.type === '填空') ?
-        props.ques.content.ans.split(',') : props.ques.content.ans)
+    const ans = ref((props.ques.content.type === '选择') ?
+        props.ques.content.ans.split(',') :
+        ((props.ques.content.type === '填空')?
+            string2Array(props.ques.content.ans) :
+            props.ques.content.ans));
     const update_show = ref(false)
     const option_answer = ref([''])
 

@@ -26,8 +26,7 @@ export function fetch_all_teams() {
     return axios.request({
         url: '/fetch_all_teams',
         method: "post",
-        data: JSON.stringify({
-        })
+        data: JSON.stringify({})
     }).then(response => {
         return response.data
     })
@@ -135,7 +134,7 @@ export function apply_for_team(creator_name, team_name, applier_id) {
         url: '/apply_for_team',
         method: "post",
         data: JSON.stringify({
-            creator_name:creator_name,
+            creator_name: creator_name,
             applier_id: applier_id,
             team_name: team_name,
         })
@@ -173,9 +172,9 @@ export function respond(id, team_name, applier_name, agree) {
         url: '/answer_to_req',
         method: "post",
         data: JSON.stringify({
-            id:id,
-            team_name:team_name,
-            applier_name:applier_name,
+            id: id,
+            team_name: team_name,
+            applier_name: applier_name,
             agree: agree
         })
     }).then(response => {
@@ -188,7 +187,7 @@ export function fetch_all_member(team_name) {
         url: '/fetch_all_users_in_team',
         method: "post",
         data: JSON.stringify({
-            team_name:team_name,
+            team_name: team_name,
         })
     }).then(response => {
         return response.data
@@ -267,4 +266,12 @@ export function api_update_ques(form) {
             return response.data
         }
     )
+}
+
+export function string2Array(string) {
+    return string.match(/'([^']+)'/g).map(item => item.slice(1, -1))
+}
+
+export function array2String(array) {
+    return "[" + array.map(item => "'" + item + "'").join(", ") + "]"
 }

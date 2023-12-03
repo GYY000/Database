@@ -99,12 +99,6 @@ export default {
         }
     )
 
-    const init = () => {
-      console.log(content.value)
-    }
-
-    init()
-
     const serial_num = ref(props.ques.serial_num)
     const score = ref(props.ques.score)
 

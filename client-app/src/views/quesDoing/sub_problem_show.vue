@@ -66,6 +66,7 @@ import {ref} from "vue";
 import Ques_option from "@/views/quesDoing/ques_option.vue";
 import {DeleteFilled, Edit} from "@element-plus/icons-vue";
 import Update_ques_form from "@/views/quesDoing/update_ques_form.vue";
+import {string2Array} from "@/views/main/api";
 
 export default {
   name: "sub_problem_show",
@@ -81,8 +82,11 @@ export default {
   props: ["sub_problem", "id"],
 
   setup(props) {
-    const ans = ref((props.sub_problem.type === '选择' || props.sub_problem.type === '填空') ?
-        props.sub_problem.ans.split(',') : props.sub_problem.ans)
+    const ans = ref((props.sub_problem.type === '选择') ?
+        props.sub_problem.ans.split(',') :
+        ((props.sub_problem.type === '填空') ?
+            string2Array(props.sub_problem.ans) :
+            props.sub_problem.ans))
 
     const content = ref(
         {
@@ -93,12 +97,6 @@ export default {
         }
     )
 
-    const init = () => {
-      console.log("sub")
-      console.log(props.sub_problem)
-    }
-
-    init()
     return {
       content,
       ans,

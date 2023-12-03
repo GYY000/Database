@@ -251,7 +251,7 @@ export default {
       if (form.value.content.type === '选择') {
         form.value.content.ans = ops_ans.value.join(',')
       } else if (form.value.content.type === '填空') {
-        form.value.content.ans = blank_ans.value.join(',')
+        form.value.content.ans = array2String(blank_ans.value)
       } else if(form.value.content.type === '复合') {
         form.value.score = 0.0
         for(let sub_prob of form.value.content.sub_problem) {

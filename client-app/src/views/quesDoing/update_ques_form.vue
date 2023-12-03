@@ -101,7 +101,7 @@
 
 <script>
 import {ref} from "vue";
-import {api_update_ques, upload_picture} from "@/views/main/api";
+import {api_update_ques, array2String, string2Array, upload_picture} from "@/views/main/api";
 import Ques_option from "@/views/quesDoing/ques_option.vue";
 import Sub_prob_form from "@/views/quesDoing/sub_prob_form.vue";
 import {Plus} from "@element-plus/icons-vue";
@@ -123,8 +123,9 @@ export default {
   setup(props, context) {
     const ops_ans = ref((props.ques.content.type === '选择') ?
                         props.ques.content.ans.split(',') : null)
-    const blank_ans = ref((props.ques.content.type === '填空') ?
-                        props.ques.content.ans.split(',') : null)
+    const blank_ans = ref((props.ques.content.type === '填空'
+        && props.ques.content.type === '填空') ?
+        string2Array(props.ques.content.ans) : null)
     const sub_dialog_open = ref(new Array(props.ques.content.sub_problem.length).fill(false))
     const store = userStateStore()
 
@@ -254,7 +255,8 @@ export default {
     const update = (is_delete) => {
       form.value.content.ans =
           (form.value.content.type === '选择') ? ops_ans.value.join(',') :
-              ((form.value.content.type === '填空')? blank_ans.value.join(',') : form.value.content.ans);
+              ((form.value.content.type === '填空')?
+                  array2String(blank_ans.value) : form.value.content.ans);
       let form1 = {
         is_delete: is_delete,
         qid: props.ques.id,

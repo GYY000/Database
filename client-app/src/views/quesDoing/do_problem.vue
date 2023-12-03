@@ -104,7 +104,7 @@
 import userStateStore from "@/store";
 import {ref} from "vue";
 import Ques_display from "@/views/quesDoing/ques_display.vue";
-import {fetch_ques_info} from "@/views/main/api";
+import {fetch_ques_info, string2Array} from "@/views/main/api";
 import Upload_ques_form from "@/views/quesDoing/upload_ques_form.vue";
 import Update_ques_form from "@/views/quesDoing/update_ques_form.vue";
 import {DocumentChecked, Edit, Plus, Timer, Upload} from "@element-plus/icons-vue";
@@ -223,12 +223,14 @@ export default {
     const introduction = ref()
     const exit_dialog = ref(false)
     const hand_in_dialog = ref(false)
+
     const hand_in_form = ref(
         {
           qids: [],
           types: [],
           all_scores: [],
-          answers: []
+          answers: [],
+          standard_ans: []
         }
     )
 
@@ -239,6 +241,9 @@ export default {
 
     const init = () => {
       let router = useRouter()
+      let string = "['ans1,', 'ans,2', 'ans3']"
+      let array = string2Array(string)
+      console.log(array);
       fetch_ques_info(router.currentRoute.value.params.qs_id).then(
           (res) => {
             ques_set_name.value = res.ques_set_name
@@ -255,17 +260,46 @@ export default {
               sum_score.value = sum_score.value + questions.value[i].score
             }
             for (let ques of Object.values(questions.value)) {
-              console.log(ques)
+              hand_in_form.value.qids.push(ques.id)
               if (ques.content.type === '选择') {
+                hand_in_form.value.types.push('选择')
+                hand_in_form.value.standard_ans.push(ques.content.ans)
+                hand_in_form.value.answers.push('')
+                hand_in_form.value.all_scores.push(ques.score)
                 statistic.value[0].choice = statistic.value[0].choice + 1
                 statistic.value[1].choice = statistic.value[1].choice + ques.score
               } else if (ques.content.type === '填空') {
+                hand_in_form.value.types.push('填空')
+                hand_in_form.value.standard_ans.push(ques.content.ans)
+                hand_in_form.value.answers.push(new Array(
+                    string2Array(ques.content.ans).length).fill(''))
+                hand_in_form.value.all_scores.push(ques.score)
                 statistic.value[0].blank = statistic.value[0].blank + 1
                 statistic.value[1].blank = statistic.value[1].blank + ques.score
               } else if (ques.content.type === '问答') {
+                hand_in_form.value.types.push('问答')
+                hand_in_form.value.standard_ans.push(ques.content.ans)
+                hand_in_form.value.answers.push('')
+                hand_in_form.value.all_scores.push(ques.score)
                 statistic.value[0].quesAndAns = statistic.value[0].quesAndAns + 1
                 statistic.value[1].quesAndAns = statistic.value[1].quesAndAns + ques.score
               } else if (ques.content.type === '复合') {
+                let temp_type = []
+                let temp_score = []
+                let temp_answers = []
+                let temp_standard_ans = []
+                for (let sub_ques in ques.content.sub_problem) {
+                  temp_type.push(sub_ques.type)
+                  temp_score.push(sub_ques.score)
+                  temp_standard_ans.push(sub_ques.ans)
+                  if (sub_ques.type === '选择' || sub_ques.type === '问答') {
+                    temp_answers.push('')
+                  } else if (sub_ques.type === '填空') {
+                    temp_answers.push(new Array(
+                        string2Array(sub_ques).length).fill('')
+                    )
+                  }
+                }
                 statistic.value[0].mixture = statistic.value[0].mixture + 1
                 statistic.value[1].mixture = statistic.value[1].mixture + ques.score
               }
