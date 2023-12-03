@@ -83,7 +83,7 @@
 import Ques_option from "@/views/quesDoing/ques_option.vue";
 import {ref} from "vue";
 import {Plus} from "@element-plus/icons-vue";
-import {upload_picture} from "@/views/main/api";
+import {array2String, string2Array, upload_picture} from "@/views/main/api";
 
 export default {
   name: 'sub_prob_form',
@@ -96,7 +96,8 @@ export default {
   props: ['index', 'problem_content'],
   setup(props, context) {
     const ops_ans = ref(props.problem_content.ans ? props.problem_content.ans.split(',') : [])
-    const blank_ans = ref(props.problem_content.ans ? props.problem_content.ans.split(',') : [])
+    const blank_ans = ref(props.problem_content.ans && props.problem_content.type === '填空' ?
+        string2Array(props.problem_content.ans) : [])
 
     const form = ref(
         {
@@ -189,7 +190,8 @@ export default {
 
     const upload_sub_prob = () => {
       form.value.ans = form.value.type === '选择' ? ops_ans.value.join(',') :
-          (form.value.type === '填空' ? blank_ans.value.join(',') : form.value.ans)
+          (form.value.type === '填空' ? array2String(blank_ans.value)
+              : form.value.ans)
       context.emit('upload_sub', {index: props.index, content: form.value})
     }
 
