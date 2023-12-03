@@ -280,9 +280,7 @@ def merge_and_sort(serial_nums, scores, contents, ques_ids):
 
     return sorted_quarter_lets
 
-
 from User import sensi_filter
-
 
 def send_message(request):
     '''
@@ -837,35 +835,70 @@ def update_ques(request):
 import math
 
 
+def judge_select(ans,std,score):
+    assert type(ans)==str
+    assert type(std)==str
+    if len(std) == 1:
+        return score if ans==std else 0
+    else:  # 多选
+        selects = ans.split(',')
+        standards = std.split(',')
+        for _ in selects:
+            if not standards.__contains__(_):
+                return 0
+        # 如果多选或者错选直接0昏
+        return score * len(selects) / len(standards) #分数是浮点
+
+
+def compute_text_score(ans,std,score):
+    assert type(ans)==str
+    assert type(std)==str
+    len1, len2 = len(std), len(ans)
+    max_len = max(len1, len2)
+    if max_len == 0:
+        return True  # 两个空字符串被认为是相似的
+    similarity = 1 - distance(std, ans) / max_len
+    return min(math.sqrt(similarity) / 0.8, 1) * score
+
+def judge_fill(ans,std,score):
+    assert type(ans)==list
+    assert type(std)==list
+    sum=0
+    for i in range(len(ans)):
+        sum+=compute_text_score(ans[i],std[i],score)
+    sum/=len(ans)
+    return sum
+
+
+
+def judge_fussion(type_list,ans_list,std_list,score_list):
+    scores=[]
+    for i in range(len(type_list)):
+        if type_list[i]=='选择':
+            scores.append(judge_select(ans_list[i],std_list[i],score_list[i]))
+        elif type_list[i]=='填空':
+            scores.append(judge_fill(ans_list[i],std_list[i],score_list[i]))
+        else:
+            scores.append(score_list[i])
+    return scores
+
+
+
 def judge_ans(request):
     request_dict = json.loads(request.body.decode('utf-8'))
     qids = request_dict['qids']
+    types=request_dict['types']
     answers = request_dict['answers']
     standard_ans = request_dict['standard_ans']
     all_scores = request_dict['all_scores']
     hit_scores = []
-    for i in range(len(answers)):
-        if len(standard_ans[i]) == 1:
-            if (standard_ans[i] == answers[i]):  # 单选
-                hit_scores.append(all_scores[i])
-            else:
-                hit_scores.append(0)
-        elif standard_ans[i].count(',') == int(len(standard_ans[i]) / 2):  # 多选
-            selects = answers[i].split(',')
-            standards = standard_ans[i].split(',')
-            flag = 0
-            for _ in selects:
-                if not standards.__contains__(_):
-                    hit_scores.append(0)
-                    flag = 1
-            # 如果多选或者错选直接0昏
-            if flag == 0:
-                hit_scores.append(int(all_scores[i] * len(selects) / len(standards)))
-        else:  # 文本题
-            len1, len2 = len(standard_ans[i]), len(answers[i])
-            max_len = max(len1, len2)
-            if max_len == 0:
-                return True  # 两个空字符串被认为是相似的
-            similarity = 1 - distance(standard_ans[i], answers[i]) / max_len
-            hit_scores.append(int(min(math.sqrt(similarity) / 0.8, 1) * all_scores[i]))  # 直接开根号乘10了，已捞不谢
+    for i in range(len(types)):
+        if types[i]=='选择':
+            hit_scores.append(judge_select(answers[i],standard_ans[i],all_scores[i]))
+        elif types[i]=='填空':
+            hit_scores.append(judge_fill(answers[i],standard_ans[i],all_scores[i]))
+        elif types[i]=='问答':
+            hit_scores.append(all_scores[i])
+        else:
+            hit_scores.append(judge_fussion(types[i],answers[i],standard_ans[i],all_scores[i]))
     return JsonResponse({"hit_scores": hit_scores})
