@@ -270,7 +270,7 @@ def merge_and_sort(serial_nums, scores, contents, ques_ids):
 
     return sorted_quarter_lets
 
-import sensi_filter
+import User.sensi_filter
 def send_message(request):
     '''
     前->后	    后->前
