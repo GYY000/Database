@@ -188,6 +188,7 @@ export default {
           this.totalPosts = response.data.total;
           this.totalPages = Math.ceil(response.data.total / this.pageSize)
           this.title = this.searchKeyword + "的搜索结果";
+          this.searchKeyword = '';
         })
         .catch(error => {
           console.error('加载帖子失败', error);

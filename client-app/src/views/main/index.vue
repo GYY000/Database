@@ -163,6 +163,7 @@ import Team_hub from "@/views/main/team_hub.vue";
 import { fetch_all_application } from "@/views/main/api";
 import Message_box from "@/views/main/message_box.vue";
 import message_container from '@/views/main/site_message_component/message_container.vue';
+import { useRoute } from 'vue-router';
 
 export default {
   name: "index",
@@ -177,7 +178,12 @@ export default {
     const open_message = ref(false)
     const open_private_message = ref(false)
     const messages = ref(null)
-    const activeIndex = ref("/main_page")
+
+    let lastPath = useRoute().fullPath;
+    if (lastPath == "/") {
+      lastPath = "/main_page"
+    }
+    const activeIndex = ref(lastPath)
 
     watch(activeTab, (newValue) => {
       sessionStorage.setItem('activeTab', newValue);
@@ -214,7 +220,6 @@ export default {
     }
 
     init();
-
     return {
       activeTab,
       is_login,
@@ -248,7 +253,7 @@ export default {
     },
   },
   mounted() {
-    this.$router.push("/main_page");
+    this.$router.push(this.activeIndex);
   },
   methods: {
     before_close_pm() {

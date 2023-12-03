@@ -293,7 +293,7 @@ receiver_name
     request_dict = json.loads(request.body.decode('utf-8'))
     sender_id = request_dict["sender_id"]
     receiver_name = request_dict["receiver_name"]
-    content = sensi_filter.filer(request_dict["content"])
+    content = sensi_filter.filter(request_dict["content"])
     try:
         sender = User.objects.get(uid=sender_id)
         receiver = User.objects.get(user_name=receiver_name)
