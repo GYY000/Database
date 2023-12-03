@@ -165,19 +165,14 @@ import Message_box from "@/views/main/message_box.vue";
 import message_container from '@/views/main/site_message_component/message_container.vue';
 
 window.addEventListener('scroll', function () {
-  // 获取上层 panel 的元素
   var upperPanel = document.getElementById('upperPanel');
-
-  // 获取滚动距离
   var scrollDistance = window.pageYOffset || document.documentElement.scrollTop;
-
-  // 设置一个阈值，当滚动距离小于阈值时显示上层 panel
   var threshold = 20;
 
   if (scrollDistance < threshold || scrollDistance === 0) {
     upperPanel.removeAttribute("style");
   } else {
-    upperPanel.style.display = 'none'; // 隐藏上层 panel
+    upperPanel.style.display = 'none';
   }
 });
 

@@ -1,12 +1,33 @@
 <template>
   <img src="@/assets/image/background3.jpg" class="background">
+  <div class="lower_panel" id="lower_panel">
+    <el-row style="width: 100%" class="vertical-align-center">
+      <el-col :span="3" style="height: 100%; margin-left: 30px;display: flex;align-items: center"
+              @click="open_exit" class="hover_class">
+        <el-icon style="width: 40px; height: 45px;margin-top: 12px">
+          <ArrowLeft/>
+        </el-icon>
+        <div style="font-size: 16px;margin-top: 12px;display: inline-block">退出答题</div>
+      </el-col>
+      <el-col :span="8" :offset="7" style="height: 100%;font-size: 16px;color: #545455">
+        {{ ques_set_name }}
+      </el-col>
+      <el-col :span="5">
+        <el-button type="success" style="min-width: 80px;margin-right: 10px" plain round>
+          提交
+        </el-button>
+        <el-button text :icon="Timer" @click="stopTimer">
+          <span style="font-size: 16px">{{ formattedTime }}</span>
+        </el-button>
+      </el-col>
+    </el-row>
+  </div>
   <div class="secbackground"></div>
-
   <!-- TODO BackGround -->
   <div class="center_class">
-    <div class="main_container">
+    <div class="main_container" id="main_container">
       <div class="title center_class">
-        <span style="height: 45px;margin-left: 10px">
+        <span style="height: 45px;margin-left: 10px;margin-top: 50px">
           {{ ques_set_name }}
         </span>
       </div>
@@ -17,7 +38,7 @@
         <el-col :offset="6" :span="12" class="sub_content">
           {{ introduction }}
         </el-col>
-      </div >
+      </div>
       <div class="row_margin">
         <el-col :offset="6" class="sub_title">
           题型情况
@@ -43,11 +64,40 @@
         />
         <div v-for="(ques, index) in display_ques" style="margin-bottom: 25px">
           <div v-if="index !== 0" class="dashed-divider"></div>
-          <ques_display :ques="ques"></ques_display>
+          <ques_do_display :ques="ques"></ques_do_display>
         </div>
       </div>
     </div>
   </div>
+
+  <el-dialog
+      v-model="exit_dialog"
+      title="退出答题"
+      width="30%"
+  >
+    <span>确定退出吗，退出后您的答题结果不会被保留</span>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button type="danger" @click="exit">
+          确定
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
+  <el-dialog
+      v-model="stop_dialog"
+      title="准备好继续了吗"
+      width="30%"
+  >
+    <img src="@/assets/image/ready.png" style="width: 350px;height: auto;">
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button type="primary" @click="regoTimer">
+          继续
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script>
@@ -57,13 +107,72 @@ import Ques_display from "@/views/quesDoing/ques_display.vue";
 import {fetch_ques_info} from "@/views/main/api";
 import Upload_ques_form from "@/views/quesDoing/upload_ques_form.vue";
 import Update_ques_form from "@/views/quesDoing/update_ques_form.vue";
-import {DocumentChecked, Edit, Plus, Upload} from "@element-plus/icons-vue";
-import router from "@/router";
+import {DocumentChecked, Edit, Plus, Timer, Upload} from "@element-plus/icons-vue";
 import {useRouter} from "vue-router";
+import router from "@/router";
+import Ques_do_display from "@/views/quesDoing/ques_do_display.vue";
+
+window.addEventListener('scroll', function () {
+  let lower_panel = document.getElementById('lower_panel');
+  let scrollDistance = window.pageYOffset || document.documentElement.scrollTop;
+  let threshold = 20;
+
+  if (scrollDistance < threshold || scrollDistance === 0) {
+    lower_panel.style.top = '60px';
+  } else {
+    lower_panel.style.top = '0px';
+  }
+});
 
 export default {
   name: 'do_problem',
+  data() {
+    return {
+      seconds: 0,
+      timerInterval: null,
+      stop_dialog: false
+    };
+  },
+  methods: {
+    stopTimer() {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+      this.stop_dialog = true;
+    },
+    regoTimer() {
+      this.stop_dialog = false
+      this.timerInterval = setInterval(() => {
+        this.updateTimer();
+      }, 1000);
+    },
+    startTimer() {
+      this.timerInterval = setInterval(() => {
+        this.updateTimer();
+      }, 1000);
+    },
+    updateTimer() {
+      this.seconds++;
+    },
+    pad(number) {
+      return number < 10 ? '0' + number : number;
+    }
+  },
+  mounted() {
+    this.startTimer();
+  },
+  beforeDestroy() {
+    clearInterval(this.timerInterval);
+  },
   computed: {
+    Timer() {
+      return Timer
+    },
+    formattedTime() {
+      const hours = Math.floor(this.seconds / 3600);
+      const minutes = Math.floor((this.seconds % 3600) / 60);
+      const remainingSeconds = this.seconds % 60;
+      return `${this.pad(hours)}:${this.pad(minutes)}:${this.pad(remainingSeconds)}`;
+    },
     Upload() {
       return Upload
     },
@@ -77,7 +186,10 @@ export default {
       return Plus
     }
   },
-  components: {Upload_ques_form, Ques_display, Update_ques_form},
+  components: {
+    Ques_do_display,
+    Upload_ques_form, Ques_display, Update_ques_form
+  },
   setup() {
     const statistic = ref([
       {
@@ -109,6 +221,16 @@ export default {
     const sum_score = ref(0.0)
     const ques_set_name = ref('')
     const introduction = ref()
+    const exit_dialog = ref(false)
+    const hand_in_dialog = ref(false)
+    const hand_in_form = ref(
+        {
+          qids: [],
+          types: [],
+          all_scores: [],
+          answers: []
+        }
+    )
 
     const handlePageChange = (val) => {
       page.value = val;
@@ -133,6 +255,7 @@ export default {
               sum_score.value = sum_score.value + questions.value[i].score
             }
             for (let ques of Object.values(questions.value)) {
+              console.log(ques)
               if (ques.content.type === '选择') {
                 statistic.value[0].choice = statistic.value[0].choice + 1
                 statistic.value[1].choice = statistic.value[1].choice + ques.score
@@ -181,8 +304,21 @@ export default {
       }
     }
 
+    const open_exit = () => {
+      exit_dialog.value = true
+    }
+
+    const open_hand_in = () => {
+      hand_in_dialog.value = true
+    }
+
+    const exit = () => {
+      router.push('/question_hub')
+    }
+
     return {
       store,
+      hand_in_form,
       questions,
       handleCurrentChange: handlePageChange,
       display_ques,
@@ -201,7 +337,12 @@ export default {
       sum_score,
       introduction,
       ques_set_name,
-      statistic
+      statistic,
+      hand_in_dialog,
+      exit_dialog,
+      open_exit,
+      open_hand_in,
+      exit
     }
   }
 }
@@ -230,10 +371,8 @@ export default {
 }
 
 .main_container {
-  top: 3%;
   left: 5%;
   width: 90%;
-  height: 100vh;
 }
 
 @font-face {
@@ -250,12 +389,6 @@ export default {
   margin-bottom: 10px;
 }
 
-.edit_title {
-  font-family: "Microsoft YaHei";
-  font-weight: bold;
-  font-size: 30px;
-}
-
 .center_class {
   display: flex;
   justify-content: center;
@@ -265,29 +398,6 @@ export default {
 .control_button {
   width: 8%;
   min-width: 90px;
-}
-
-.image_container1 {
-  width: 45px;
-  height: 45px;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-.intro_font {
-  font-size: 15px;
-  color: grey;
-}
-
-.intro {
-  color: grey;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: normal;
-  min-height: calc(3em * 1.2);
 }
 
 .sub_title {
@@ -310,4 +420,29 @@ export default {
   margin-bottom: 25px;
   width: 100%;
 }
+
+.lower_panel {
+  background: white;
+  height: 70px;
+  left: 0;
+  top: 60px;
+  width: 100%;
+  position: fixed;
+  z-index: 10;
+}
+
+.vertical-align-center {
+  display: flex;
+  align-items: center;
+}
+
+.hover_class:hover {
+  color: #545455;
+  cursor: pointer;
+}
+
+.hover_class {
+  color: #545455;
+}
+
 </style>
