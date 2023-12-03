@@ -13,7 +13,8 @@
         {{ ques_set_name }}
       </el-col>
       <el-col :span="5">
-        <el-button type="success" style="min-width: 80px;margin-right: 10px" plain round>
+        <el-button type="success" style="min-width: 80px;margin-right: 10px" plain round
+        @click="open_hand_in">
           提交
         </el-button>
         <el-button text :icon="Timer" @click="stopTimer">
@@ -64,7 +65,7 @@
         />
         <div v-for="(ques, index) in display_ques" style="margin-bottom: 25px">
           <div v-if="index !== 0" class="dashed-divider"></div>
-          <ques_do_display :ques="ques"></ques_do_display>
+          <ques_do_display :ques="ques" :id="index" @update_ans="update_ans"></ques_do_display>
         </div>
       </div>
     </div>
@@ -94,6 +95,20 @@
       <span class="dialog-footer">
         <el-button type="primary" @click="regoTimer">
           继续
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
+  <el-dialog
+      v-model="hand_in_dialog"
+      title="上交答案"
+      width="30%"
+  >
+    <span>您确定上传答案吗，上传答案之后将不能更改</span>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button type="danger" @click="hand_in">
+          确定
         </el-button>
       </span>
     </template>
@@ -241,9 +256,6 @@ export default {
 
     const init = () => {
       let router = useRouter()
-      let string = "['ans1,', 'ans,2', 'ans3']"
-      let array = string2Array(string)
-      console.log(array);
       fetch_ques_info(router.currentRoute.value.params.qs_id).then(
           (res) => {
             ques_set_name.value = res.ques_set_name
@@ -270,7 +282,7 @@ export default {
                 statistic.value[1].choice = statistic.value[1].choice + ques.score
               } else if (ques.content.type === '填空') {
                 hand_in_form.value.types.push('填空')
-                hand_in_form.value.standard_ans.push(ques.content.ans)
+                hand_in_form.value.standard_ans.push(string2Array(ques.content.ans))
                 hand_in_form.value.answers.push(new Array(
                     string2Array(ques.content.ans).length).fill(''))
                 hand_in_form.value.all_scores.push(ques.score)
@@ -291,15 +303,20 @@ export default {
                 for (let sub_ques in ques.content.sub_problem) {
                   temp_type.push(sub_ques.type)
                   temp_score.push(sub_ques.score)
-                  temp_standard_ans.push(sub_ques.ans)
                   if (sub_ques.type === '选择' || sub_ques.type === '问答') {
+                    temp_standard_ans.push(sub_ques.ans)
                     temp_answers.push('')
                   } else if (sub_ques.type === '填空') {
+                    temp_standard_ans.push(string2Array(sub_ques.ans))
                     temp_answers.push(new Array(
                         string2Array(sub_ques).length).fill('')
                     )
                   }
                 }
+                hand_in_form.value.types.push(temp_type)
+                hand_in_form.value.standard_ans.push(temp_standard_ans)
+                hand_in_form.value.answers.push(temp_answers)
+                hand_in_form.value.all_scores.push(temp_score)
                 statistic.value[0].mixture = statistic.value[0].mixture + 1
                 statistic.value[1].mixture = statistic.value[1].mixture + ques.score
               }
@@ -310,6 +327,10 @@ export default {
                 statistic.value[1].quesAndAns + statistic.value[1].mixture
           }
       )
+    }
+
+    const update_ans = (data) => {
+      hand_in_form.value.answers[data.id] = data.ans
     }
 
     const close_form = () => {
@@ -342,12 +363,15 @@ export default {
       exit_dialog.value = true
     }
 
+    const exit = () => {
+      router.push('/question_hub')
+    }
+
     const open_hand_in = () => {
       hand_in_dialog.value = true
     }
-
-    const exit = () => {
-      router.push('/question_hub')
+    const hand_in = () => {
+      console.log(hand_in_form.value)
     }
 
     return {
@@ -376,7 +400,9 @@ export default {
       exit_dialog,
       open_exit,
       open_hand_in,
-      exit
+      exit,
+      update_ans,
+      hand_in
     }
   }
 }

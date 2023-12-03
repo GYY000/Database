@@ -22,21 +22,21 @@
     </el-col>
   </el-row>
   <div v-if="content.type === '选择'">
-    <el-checkbox-group v-model="option_answer" v-for="(item,index) in content.ops" size="small">
+    <el-checkbox-group v-model="option_ans" v-for="(item,index) in content.ops" size="small"
+                       @change="update_ans">
       <el-row>
-        <el-checkbox size="large" :label="String.fromCharCode(index + 65) + '.' + item"
-                     style="width: 90%; margin-bottom: 10px" border/>
+        <el-checkbox size="large" :label="String.fromCharCode(index + 65)"
+                     style="width: 90%; margin-bottom: 10px" border>
+          {{String.fromCharCode(index + 65) + '.' + item}}
+        </el-checkbox>
       </el-row>
     </el-checkbox-group>
   </div>
   <div v-if="content.type === '填空'">
-    <div style="margin-bottom: 10px">
-      <el-tag size="large" effect="dark">答案Demo</el-tag>
-    </div>
     <el-form style="margin-bottom: 10px;width: 80%" label-width="auto">
-      <div v-for="(item,index) in ans">
+      <div v-for="(item,index) in blank_ans">
         <el-form-item :label="`空格 ${index + 1}`">
-          <el-input :value="ans[index]" disabled></el-input>
+          <el-input v-model="blank_ans[index]" placeholder="请输入您的答案" @change="update_ans"></el-input>
         </el-form-item>
       </div>
     </el-form>
@@ -44,48 +44,42 @@
   <div v-if="content.type === '复合'"
        style="display: flex;justify-content: left;width: 100%">
     <div style="width: 100%">
-      <sub_problem_show v-for="(item, index) in content.sub_problem" :sub_problem="item" :id="index"/>
+      <sub_problem_do v-for="(item, index) in content.sub_problem"
+                      :sub_problem="item" :id="index"
+                      @update_sub_ans="update_sub_ans"/>
     </div>
   </div>
   <div v-if="content.type === '问答'" style="margin-bottom: 10px">
-    <div style="margin-bottom: 10px">
-      <el-tag size="large" effect="dark">答案Demo</el-tag>
-    </div>
-    <mavon-editor :box-shadow="true" :default-open="'preview'" :editable="false"
-                  :toolbars-flag="false" :subfield="false"
-                  style="min-width: 0px; width:60%;min-height: 200px"
+    <mavon-editor :box-shadow="true" default-open="edit" :editable="true"
+                  :toolbars-flag="true" :subfield="true"
+                  style="min-width: 0px; width:70%;min-height: 400px"
                   placeholder="请输入您的答案"
-                  :value="content.ans" v-model="q_and_a_ans">
+                  @change="update_ans"
+                  :value="q_and_a_ans" v-model="q_and_a_ans">
     </mavon-editor>
   </div>
 </template>
 
 <script>
 import {ref} from "vue";
-import {ElMessage} from "element-plus";
 import Ques_option from "@/views/quesDoing/ques_option.vue";
 import {DeleteFilled, Edit} from "@element-plus/icons-vue";
 import Update_ques_form from "@/views/quesDoing/update_ques_form.vue";
 import Sub_problem_show from "@/views/quesDoing/sub_problem_show.vue";
+import Sub_problem_do from "@/views/quesDoing/sub_problem_do.vue";
+import {string2Array} from "@/views/main/api";
 
 export default {
   name: "ques_do_display",
-  computed: {
-    Edit() {
-      return Edit
-    },
-    DeleteFilled() {
-      return DeleteFilled
-    }
-  },
-  components: {Sub_problem_show, Update_ques_form, Ques_option},
-  props: ["ques"],
+  components: {Sub_problem_do, Sub_problem_show, Update_ques_form, Ques_option},
+  props: ["ques", "id"],
+  emits: ['update_ans'],
 
-  setup(props) {
+  setup(props, context) {
     const option_ans = ref([])
-    const blank_ans = ref([])
-    const sub_ans = ref([])
-    const option_answer = ref([''])
+    const blank_ans = ref((props.ques.content.type === '填空') ?
+        new Array(string2Array(props.ques.content.ans).length).fill('') : [])
+    const sub_ans = ref(new Array(props.ques.content.sub_problem.length).fill(''))
     const q_and_a_ans = ref('')
 
     const content = ref(
@@ -99,6 +93,25 @@ export default {
         }
     )
 
+    const update_sub_ans = (data) => {
+      sub_ans.value[data.id] = data.ans
+      update_ans()
+    }
+
+    const update_ans = () => {
+      let ans = null
+      if (props.ques.content.type === '选择') {
+        ans = option_ans.value.join(',')
+      } else if (props.ques.content.type === '填空') {
+        ans = blank_ans.value
+      } else if (props.ques.content.type === '问答') {
+        ans = q_and_a_ans.value
+      } else {
+        ans = sub_ans.value
+      }
+      context.emit("update_ans", {id: props.id, ans: ans})
+    }
+
     const serial_num = ref(props.ques.serial_num)
     const score = ref(props.ques.score)
 
@@ -106,9 +119,11 @@ export default {
       content,
       serial_num,
       score,
-      option_answer,
+      option_ans,
       blank_ans,
-      q_and_a_ans
+      q_and_a_ans,
+      update_sub_ans,
+      update_ans
     }
   }
 }

@@ -189,7 +189,7 @@ export default {
     const open_message = ref(false)
     const open_private_message = ref(false)
     const messages = ref(null)
-    const activeIndex = ref("/main_page")
+    const activeIndex = ref("/question_hub")
 
     watch(activeTab, (newValue) => {
       sessionStorage.setItem('activeTab', newValue);

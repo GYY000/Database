@@ -12,7 +12,7 @@
       <v-md-preview :text="content.ques_content"></v-md-preview>
     </el-col>
   </el-row>
-  <div v-if="content.type === '选择'" style=";margin-left: 30px">
+  <div v-if="content.type === '选择'" style="margin-left: 30px">
     <el-checkbox-group v-model="ans" v-for="(item,index) in content.ops" size="small">
       <el-row>
         <el-checkbox size="large" :label="String.fromCharCode(index + 65) + '.' + item"
@@ -38,7 +38,7 @@
       </el-select>
     </el-form-item>
   </div>
-  <div v-if="content.type === '填空'" style="margin-left: 30px">
+  <div v-if="content.type === '填空'" >
     <div style="margin-bottom: 10px">
       <el-tag size="large" effect="dark">答案Demo</el-tag>
     </div>
