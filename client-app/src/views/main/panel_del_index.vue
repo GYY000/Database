@@ -1,46 +1,48 @@
 <template>
   <img src="@/assets/image/inside_backpage1.jpg" class="background">
   <!--<div class="secbackground"></div>-->
-  <el-menu :default-active="activeIndex" class="fixed-menu1" mode="horizontal" @select="handleSelect">
+
+  <el-menu :default-active="activeIndex" id="upperPanel"
+           class="fixed-menu1" mode="horizontal" @select="handleSelect">
     <img src="@/assets/image/logo.png" alt="Element logo"
-         style="margin-left: 10px;margin-right: 10px;" />
+         style="margin-left: 10px;margin-right: 10px;"/>
     <el-menu-item index="/main_page">
       <el-icon>
-        <House />
+        <House/>
       </el-icon>
       首页
     </el-menu-item>
     <el-menu-item index="/question_hub">
       <el-icon>
-        <Document />
+        <Document/>
       </el-icon>
       题目
     </el-menu-item>
     <el-menu-item index="/post_hub">
       <el-icon>
-        <Postcard />
+        <Postcard/>
       </el-icon>
       帖子
     </el-menu-item>
     <el-menu-item index="/team_hub">
       <el-icon>
-        <Avatar />
+        <Avatar/>
       </el-icon>
       团队
     </el-menu-item>
-
     <div class="r-container" style="position: absolute; right: 50px; top:20%">
-      <el-badge :value="messages.id_list.length" v-if="messages !== null" :max="20" class="item" style="margin-right: 15px;" :hidden="messages.id_list.length === 0"> 
+      <el-badge :value="messages.id_list.length" v-if="messages !== null" :max="20" class="item"
+                style="margin-right: 15px;" :hidden="messages.id_list.length === 0">
         <el-button plain
-          v-if="is_login" @click="open_message_box" class="button">
+                   v-if="is_login" @click="open_message_box" class="button">
           <el-icon>
-            <Plus />
+            <Plus/>
           </el-icon>
           申请
         </el-button>
       </el-badge>
       <el-button plain v-if="is_login" @click="() => { this.open_private_message = true }" :icon="Message"
-        class="button">
+                 class="button">
         消息
       </el-button>
 
@@ -66,15 +68,13 @@
   </div>
   <el-dialog v-model="open_message" title="申请中心" center>
     <message_box :applier_name_list="messages.applier_name_list" :id_list="messages.id_list"
-      :team_name_list="messages.team_name_list" :time_list="messages.time_list"></message_box>
+                 :team_name_list="messages.team_name_list" :time_list="messages.time_list"></message_box>
   </el-dialog>
   <el-dialog v-model="open_private_message" title="私信" center style="width: 1000px;" @close="before_close_pm"
-    @open="before_open_pm">
+             @open="before_open_pm">
     <message_container ref="messageContainer"></message_container>
   </el-dialog>
 </template>
-
-
 
 <style scoped>
 .fixed-menu1 {
@@ -153,21 +153,37 @@
 </style>
 
 <script>
-import { Message, SortDown, SortUp, User, Plus } from '@element-plus/icons-vue'
-import { ref, watch } from "vue";
+import {Message, SortDown, SortUp, User, Plus} from '@element-plus/icons-vue'
+import {ref, watch} from "vue";
 import router from "@/router";
-import { userStateStore } from "@/store";
+import {userStateStore} from "@/store";
 import Question_hub from "@/views/main/question_hub.vue";
 import Post_hub from "@/views/main/post_hub.vue";
 import Team_hub from "@/views/main/team_hub.vue";
-import { fetch_all_application } from "@/views/main/api";
+import {fetch_all_application} from "@/views/main/api";
 import Message_box from "@/views/main/message_box.vue";
 import message_container from '@/views/main/site_message_component/message_container.vue';
-import { useRoute } from 'vue-router';
+
+window.addEventListener('scroll', function () {
+  // 获取上层 panel 的元素
+  var upperPanel = document.getElementById('upperPanel');
+
+  // 获取滚动距离
+  var scrollDistance = window.pageYOffset || document.documentElement.scrollTop;
+
+  // 设置一个阈值，当滚动距离小于阈值时显示上层 panel
+  var threshold = 20;
+
+  if (scrollDistance < threshold || scrollDistance === 0) {
+    upperPanel.removeAttribute("style");
+  } else {
+    upperPanel.style.display = 'none'; // 隐藏上层 panel
+  }
+});
 
 export default {
-  name: "index",
-  components: { Message_box, Message, Team_hub, Post_hub, Question_hub, message_container },
+  name: "panel_del_index",
+  components: {Message_box, Message, Team_hub, Post_hub, Question_hub, message_container},
   setup() {
     const store = userStateStore()
     const is_login = ref(store.getIsAuthentic);
@@ -178,12 +194,7 @@ export default {
     const open_message = ref(false)
     const open_private_message = ref(false)
     const messages = ref(null)
-
-    let lastPath = useRoute().fullPath;
-    if (lastPath == "/") {
-      lastPath = "/main_page"
-    }
-    const activeIndex = ref(lastPath)
+    const activeIndex = ref("/main_page")
 
     watch(activeTab, (newValue) => {
       sessionStorage.setItem('activeTab', newValue);
@@ -191,20 +202,20 @@ export default {
 
     const change_tab = (name) => {
       tab_path.value = name;
-      router.push({ path: tab_path.value })
+      router.push({path: tab_path.value})
     };
 
     const goto = (name) => {
-      router.push({ path: name })
+      router.push({path: name})
     };
 
     const logout = () => {
       store.logout()
-      router.push({ path: '/log_reg' });
+      router.push({path: '/log_reg'});
     };
 
     const login = () => {
-      router.push({ path: '/log_reg' });
+      router.push({path: '/log_reg'});
     };
 
     const open_message_box = () => {
@@ -213,13 +224,14 @@ export default {
 
     const init = () => {
       fetch_all_application(store.user_id).then(
-        (response) => {
-          messages.value = response
-        }
+          (response) => {
+            messages.value = response
+          }
       )
     }
 
     init();
+
     return {
       activeTab,
       is_login,
@@ -251,9 +263,6 @@ export default {
     SortDown() {
       return SortDown;
     },
-  },
-  mounted() {
-    this.$router.push(this.activeIndex);
   },
   methods: {
     before_close_pm() {

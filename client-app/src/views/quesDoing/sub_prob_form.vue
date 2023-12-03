@@ -9,14 +9,15 @@
       </el-form-item>
       <el-form-item label="题目类型">
         <el-radio-group v-model="form.type">
-          <el-radio label="None" name="type"/>
           <el-radio label="选择" name="type"/>
           <el-radio label="填空" name="type"/>
+          <el-radio label="问答" name="type"/>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="题目内容"></el-form-item>
       <mavon-editor class="markdown"
                     v-model="form.ques_content"
+                    :value="form.ques_content"
                     :scrollStyle="mavon_config.scrollStyle"
                     :toolbars="mavon_config.toolbars"
                     placeholder="请输入内容"
@@ -45,9 +46,31 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item v-if="form.type === '填空'" label="答案">
-        <el-input v-model="blank_ans"></el-input>
+      <el-form-item v-if="form.type === '填空'">
+        <el-button @click="add_blank" :icon="Plus" style="width: 20%;">添加空格</el-button>
       </el-form-item>
+      <div v-if="form.type === '填空' && blank_ans.length !== 0">
+        <el-form-item v-for="(item,index) in blank_ans" :label="`答案 ${index + 1}`">
+          <el-row style="width: 100%">
+            <el-col :span="16" style="margin-right: 10px">
+              <el-input v-model="blank_ans[index]" placeholder="请填入填空答案"></el-input>
+            </el-col>
+            <el-col :span="7">
+              <el-button type="danger" @click="delete_blank(index)">删除</el-button>
+            </el-col>
+          </el-row>
+        </el-form-item>
+      </div>
+      <el-form-item label="答案" v-if="form.type === '问答'"></el-form-item>
+      <mavon-editor class="markdown"
+                    v-if="form.type === '问答'"
+                    :value="form.ans"
+                    v-model="form.ans"
+                    :scrollStyle="mavon_config.scrollStyle"
+                    :toolbars="mavon_config.toolbars"
+                    placeholder="请输入您的答案"
+                    style="height: 200px;width: 90%; left: 5%;margin-bottom: 10px"
+                    @imgAdd="img_add"/>
     </el-form>
   </div>
   <div style="display: flex;width: 100%;justify-content: center;padding-top: 10px">
@@ -73,7 +96,7 @@ export default {
   props: ['index', 'problem_content'],
   setup(props, context) {
     const ops_ans = ref(props.problem_content.ans ? props.problem_content.ans.split(',') : [])
-    const blank_ans = ref(props.problem_content.ans)
+    const blank_ans = ref(props.problem_content.ans ? props.problem_content.ans.split(',') : [])
 
     const form = ref(
         {
@@ -81,7 +104,7 @@ export default {
           type: props.problem_content.type,
           ops: props.problem_content.ops,
           score: props.problem_content.score,
-          ans: [],
+          ans: props.problem_content.ans,
         }
     )
 
@@ -133,18 +156,40 @@ export default {
       form.value.ops.push('请填入选项')
     }
 
+    const add_blank = () => {
+      blank_ans.value.push("")
+    }
+
+    const delete_blank = (index) => {
+      blank_ans.value.splice(index, 1)
+    }
+
     const img_add = (pos, file) => {
-      let form = new FormData
-      form.append('image', file)
-      upload_picture(form).then(
+      let form_data = new FormData
+      form_data.append('image', file)
+      upload_picture(form_data).then(
           (res) => {
-            this.$refs.mdedit.$img2Url(pos, res.img_url)
+            let content = form.value.content.ques_content
+            let name = file.name
+            console.log(file.name)
+            // 第二步.将返回的url替换到文本原位置![...](0) -> ![...](url)  这里是必须要有的
+            if (content.includes(name)) {
+              let oStr = `(${pos})`
+              let nStr = `(${res.img_url})`
+              let index = content.indexOf(oStr)
+              let str = content.replace(oStr, '')
+              let insertStr = (soure, start, newStr) => {
+                return soure.slice(0, start) + newStr + soure.slice(start)
+              }
+              form.value.content.ques_content = insertStr(str, index, nStr)
+            }
           }
       )
     }
 
     const upload_sub_prob = () => {
-      form.value.ans = form.value.type === '选择' ? ops_ans.value.join(',') : blank_ans
+      form.value.ans = form.value.type === '选择' ? ops_ans.value.join(',') :
+          (form.value.type === '填空' ? blank_ans.value.join(',') : form.value.ans)
       context.emit('upload_sub', {index: props.index, content: form.value})
     }
 
@@ -162,7 +207,9 @@ export default {
       delete_op,
       img_add,
       delete_sub_prob,
-      upload_sub_prob
+      upload_sub_prob,
+      add_blank,
+      delete_blank
     }
   }
 }

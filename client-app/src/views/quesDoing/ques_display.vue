@@ -1,111 +1,135 @@
 <template>
-  <el-card shadow="never">
-    <div style="font-weight: bold; font-size: 20px; display: flex; align-items: center;
-    justify-content: space-between;">
-      <div>
-        {{ ques.serial_num }}.
-        {{ content.name }}
-        <el-input v-model="score" v-if="edit_score"
-                  @keyup.enter.native="update_score" class="score_updater"/>
-        <el-button text @click="edit_score = true" v-else class="score_updater">
-          {{ score }}
-        </el-button>
-        分
+  <el-row style="margin-bottom: 5px">
+    <el-col>
+      <el-tag class="mx-1" size="large" v-if="content.type === '选择'">选择题</el-tag>
+      <el-tag class="mx-1" size="large" v-if="content.type === '填空'">填空题</el-tag>
+      <el-tag class="mx-1" size="large" v-if="content.type === '问答'">问答题</el-tag>
+      <el-tag class="mx-1" size="large" v-if="content.type === '复合'">复合题型</el-tag>
+      <el-tag class="mx-1" size="large" :type="'success'" style="margin-left: 10px">{{ score }}分</el-tag>
+    </el-col>
+  </el-row>
+  <el-row style="font-weight: bold">
+    <div style="width: 32px;display: inline-block">
+      {{ ques.serial_num }}.
+    </div>
+    <span style="display:inline-block;">
+      {{ content.name }}
+    </span>
+  </el-row>
+  <el-row>
+    <el-col :span="22">
+      <v-md-preview :text="content.ques_content"></v-md-preview>
+    </el-col>
+  </el-row>
+  <div v-if="content.type === '选择'">
+    <el-checkbox-group v-model="ans" v-for="(item,index) in content.ops" size="small">
+      <el-row>
+        <el-checkbox size="large" :label="String.fromCharCode(index + 65) + '.' + item"
+                     style="width: 90%; margin-bottom: 10px" border disabled/>
+      </el-row>
+    </el-checkbox-group>
+    <el-form-item v-if="content.type === '选择'"
+                  style="margin-bottom: 10px;width: 80%">
+      <el-tag size="large" style="margin-right: 20px" effect="dark">答案</el-tag>
+      <el-select
+          v-model="ans"
+          multiple
+          placeholder="正确答案"
+          style="width: 240px"
+          disabled
+      >
+        <el-option
+            v-for="(item,index) in content.ops"
+            :key="item"
+            :label="String.fromCharCode(index + 65)"
+            :value="String.fromCharCode(index + 65)"
+        />
+      </el-select>
+    </el-form-item>
+  </div>
+  <div v-if="content.type === '填空'">
+    <div style="margin-bottom: 10px">
+      <el-tag size="large" effect="dark">答案Demo</el-tag>
+    </div>
+    <el-form style="margin-bottom: 10px;width: 80%" label-width="auto">
+      <div v-for="(item,index) in ans">
+        <el-form-item :label="`空格 ${index + 1}`">
+          <el-input :value="ans[index]" disabled></el-input>
+        </el-form-item>
       </div>
-      <el-button :icon="DeleteFilled" type="danger" @click="update_ques(true)" style="margin-right: 50px">
+    </el-form>
+  </div>
+  <div v-if="content.type === '复合'"
+       style="display: flex;justify-content: left;width: 100%">
+    <div style="width: 100%">
+      <sub_problem_show v-for="(item, index) in content.sub_problem" :sub_problem="item" :id="index"/>
+    </div>
+  </div>
+  <div v-if="content.type === '问答'" style="margin-bottom: 10px">
+    <div style="margin-bottom: 10px">
+      <el-tag size="large" effect="dark">答案Demo</el-tag>
+    </div>
+    <mavon-editor :box-shadow="true" :default-open="'preview'" :editable="false"
+                  :toolbars-flag="false" :subfield="false" style="min-width: 0px; width:60%;min-height: 200px"
+                  :value="content.ans" v-model="content.ans">
+    </mavon-editor>
+  </div>
+  <el-row>
+    <el-col>
+      <el-button :icon="Edit" type="primary" @click="update_show = true" class="control_button">
+        编辑
+      </el-button>
+      <el-button :icon="DeleteFilled" type="danger"
+                 @click="delete_ques" style="margin-right: 50px">
         删除题目
       </el-button>
-    </div>
-    <div style="display: flex;justify-content: left">
-      <!--<v-md-preview :text="content.ques_content" v-if="content_edit === false"
-                      @click="content_edit = true"></v-md-preview>-->
-      <mavon-editor class="markdown"
-                    :value="content.ques_content"
-                    v-model="content.ques_content"
-                    :scrollStyle="mavon_config.scrollStyle"
-                    :box-shadow="false"
-                    placeholder="请输入内容"
-                    :subfield="false"
-                    :toolbars-flag="false"
-                    :default-open="content_edit"
-                    style="height: auto;min-height:50px;width: 80%;margin-left:30px;margin-bottom: 10px"
-                    @imgAdd="img_add"
-                    @save="sava_content"
-                    @click="content_edit = 'edit'"/>
-    </div>
-    <div v-for="(item,index) in content.ops"
-         style="display: flex;justify-content: left;width: 100%">
-      <ques_option v-if="content.type === '选择'"
-                   :index="index"
-                   :content="item"
-                   @delete_op="delete_op"
-                   @upload_op="upload_op"
-                   style="margin-left:30px; margin-bottom: 10px;width: 80%"></ques_option>
-    </div>
-    <div style="display: flex;justify-content: left;width: 100%">
-      <el-form-item v-if="content.type === '选择'" style="margin-left:30px; margin-bottom: 10px;width: 80%">
-        当前答案：
-        <el-select
-            v-model="ops_ans"
-            multiple
-            placeholder="正确答案"
-            style="width: 240px"
-            @change="update_ques(false)"
-        >
-          <el-option
-              v-for="(item,index) in content.ops"
-              :key="item"
-              :label="String.fromCharCode(index + 65)"
-              :value="String.fromCharCode(index + 65)"
-          />
-        </el-select>
-      </el-form-item>
-    </div>
-    <div v-if="content.type === '填空'" style="display: flex;justify-content: left;width: 100%">
-      <div style="margin-left:30px; margin-bottom: 10px;width: 80%">
-        当前答案：
-        <el-input v-model="content.ans" v-if="blank_ans_edit"
-                  @keyup.enter.native="update_blank_ans"
-                  clearable placeholder="请输入正确答案" class="blank_ans"/>
-        <el-button text @click="blank_ans_edit = true" v-else class="blank_ans">
-          {{ content.ans }}
-        </el-button>
+    </el-col>
+  </el-row>
+
+  <el-dialog
+      v-model="update_show"
+      :show-close="true"
+      center>
+    <template #header="{ close, titleId}">
+      <div class="edit-header">
+        <div :id="titleId" class="edit_title">编辑问题</div>
       </div>
-    </div>
-    <div v-if="content.sub_problem.length !== 0"
-         style="display: flex;justify-content: left;width: 100%">
-      <div style="margin-left:30px; margin-bottom: 10px;width: 80%">
-        <div>
-          subproblem:
-        </div>
-      </div>
-    </div>
-  </el-card>
+    </template>
+    <update_ques_form @close_update_form="close_update_form" :ques="ques"/>
+  </el-dialog>
 </template>
 
 <script>
 import {ref} from "vue";
 import {ElMessage} from "element-plus";
-import {api_update_ques, upload_picture} from "@/views/main/api";
+import {api_update_ques} from "@/views/main/api";
 import Ques_option from "@/views/quesDoing/ques_option.vue";
-import {DeleteFilled} from "@element-plus/icons-vue";
+import {DeleteFilled, Edit} from "@element-plus/icons-vue";
+import Update_ques_form from "@/views/quesDoing/update_ques_form.vue";
+import Sub_problem_show from "@/views/quesDoing/sub_problem_show.vue";
 
 export default {
   name: "ques_display",
   computed: {
+    Edit() {
+      return Edit
+    },
     DeleteFilled() {
       return DeleteFilled
     }
   },
-  components: {Ques_option},
-  props: ["ques", "edit_mode"],
+  components: {Sub_problem_show, Update_ques_form, Ques_option},
+  props: ["ques"],
 
-  setup(props, context) {
-    const ops_ans = ref((props.ques.content.type === '选择') ?
-        props.ques.content.ans.split(',') : null)
-    const blank_ans = ref(props.ques.content.ans)
-    const blank_ans_edit = ref(false)
-    const content_edit = ref("preview")
+  setup(props) {
+    const ans = ref((props.ques.content.type === '选择' || props.ques.content.type === '填空') ?
+        props.ques.content.ans.split(',') : props.ques.content.ans)
+    const update_show = ref(false)
+    const option_answer = ref([''])
+
+    const close_update_form = () => {
+      update_show.value = false;
+    }
 
     const content = ref(
         {
@@ -118,50 +142,32 @@ export default {
         }
     )
 
+    const init = () => {
+      console.log(content.value)
+      console.log(ans.value)
+    }
+
+    init()
+
     const serial_num = ref(props.ques.serial_num)
     const score = ref(props.ques.score)
-    const edit_score = ref(false)
 
-    const update_score = () => {
-      edit_score.value = false
-      update_ques(false)
-    }
-
-    const mavon_config = ref({
-          scrollStyle: true
-        }
-    )
-
-    const img_add = (pos, file) => {
-      let form = new FormData
-      form.append('image', file)
-      upload_picture(form).then(
-          (res) => {
-            this.$refs.mdedit.$img2Url(pos, res.img_url)
-          }
-      )
-    }
-
-    const update_ques = (is_delete) => {
-      content.value.ans =
-          (content.value.type === '选择') ? ops_ans.value.join(',') : blank_ans.value;
-      let form = {
-        is_delete: is_delete,
+    const delete_ques = () => {
+      let form1 = {
+        is_delete: true,
         qid: props.ques.id,
-        serial_num: serial_num.value,
-        content: content.value,
-        score: score.value
       }
-      api_update_ques(form).then(
+      api_update_ques(form1).then(
           (res) => {
+            console.log(res)
             if (res.is_successful === "true") {
               ElMessage({
-                message: "更新成功",
+                message: "删除成功",
                 type: "success",
               });
             } else {
               ElMessage({
-                message: "更新失败",
+                message: "删除失败",
                 type: "error",
               });
             }
@@ -169,56 +175,49 @@ export default {
       )
     }
 
-    const delete_op = (index) => {
-      content.value.ops.splice(index, 1)
-      update_ques(false)
-    }
-
-    const upload_op = (data) => {
-      content.value.ops[data.index] = data.option
-      update_ques(false)
-    }
-
-    const update_blank_ans = () => {
-      blank_ans_edit.value = false
-      update_ques(false)
-    }
-
-    const sava_content = (value, render) => {
-      content.value.ques_content = value
-      content_edit.value = "preview"
-      update_ques(false)
-    }
-
     return {
-      update_ques,
       content,
       serial_num,
       score,
-      update_score,
-      edit_score,
-      delete_op,
-      upload_op,
-      ops_ans,
-      blank_ans,
-      blank_ans_edit,
-      update_blank_ans,
-      content_edit,
-      mavon_config,
-      img_add,
-      sava_content
+      ans,
+      close_update_form,
+      update_show,
+      delete_ques,
+      option_answer
     }
   }
 }
 </script>
 
 <style scoped>
-.score_updater {
-  width: 8%;
-  font-size: 20px;
+
+.edit_title {
+  font-family: "Microsoft YaHei";
+  font-weight: bold;
+  font-size: 30px;
 }
 
 .blank_ans {
   width: 85%
+}
+
+.circle {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.circle:hover {
+  background-color: lightblue;
+}
+
+.letter {
+  font-size: 15px;
 }
 </style>
