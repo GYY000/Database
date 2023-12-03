@@ -2,6 +2,7 @@
   <el-card style="width: 100%">
     <el-tag style="margin-right: 10px;">{{op}}</el-tag>
     <el-input v-if="edit_mode === true"
+              placeholder="请输入选项名"
               v-model="edit_content" @keyup.enter.native="upload_op" style="width: 70%;height:60%"></el-input>
     <div v-else @click="change_edit(true)" style="width: 70%;height:60%;display: inline-block">{{content}}</div>
     <el-button @click="delete_op" type="danger"

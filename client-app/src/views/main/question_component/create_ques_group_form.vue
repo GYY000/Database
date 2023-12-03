@@ -1,23 +1,32 @@
 <template>
   <el-form>
-    <div v-show="image_src !== ''" class="image-container">
-      <img :src="image_src" id="show">
-    </div>
-    <input id="file" type="file"
-           accept="image/jpeg,image/png" ref="upload_img"
-           @change="show_pic" style="padding-bottom: 15px"/>
+    <el-upload
+        class="avatar-uploader"
+        action="#"
+        :show-file-list="false"
+        :auto-upload="false"
+        :on-change="handle_change"
+    >
+      <img v-if="image_src" :src="image_src" class="avatar"/>
+      <el-icon v-else class="avatar-uploader-icon">
+        <Plus/>
+      </el-icon>
+    </el-upload>
+    <div class="form-label">问题组名称</div>
     <el-input v-model="set_name" placeholder="请输入问题组的名字"
               clearable style="padding-bottom: 10px" maxlength="15"></el-input>
+    <div class="form-label">问题组介绍</div>
     <el-input v-model="introduction" placeholder="请输入问题组的简介"
               :autosize="{ minRows: 3, maxRows: 5 }"
               type="textarea"
               clearable maxlength="30"></el-input>
+    <div class="form-label" style="margin-bottom: 0px">问题组类型</div>
     <div>
       <el-radio-group v-model="is_public" class="ml-4">
         <el-radio label="public" size="large">公有</el-radio>
         <el-radio label="group" size="large">组间共享</el-radio>
       </el-radio-group>
-      <el-input v-if="is_public !== 'public'" placeholder="组名" v-model="group_name" clearable
+      <el-input v-if="is_public !== 'public'" placeholder="请输入组名" v-model="group_name" clearable
                 style="padding-bottom: 15px"></el-input>
     </div>
   </el-form>
@@ -32,6 +41,7 @@ import {ref} from "vue";
 import userStateStore from "@/store/index";
 import {check_inside_group, upload_ques_set} from "@/views/main/api";
 import {ElMessage} from "element-plus";
+import {Plus} from "@element-plus/icons-vue";
 
 export default {
   name: "create_ques_group",
@@ -40,14 +50,15 @@ export default {
   setup(_, context) {
     const store = userStateStore()
     const is_public = ref('public')
-    const group_name = ref('none')
+    const group_name = ref('')
     const set_name = ref('')
-    const upload_img = ref(null)
+    const avatar = ref('')
     const image_src = ref('')
     const introduction = ref('')
+    const upload_img = ref(null)
 
     const closure = () => {
-      upload_img.value = ''
+      avatar.value = ''
       set_name.value = ''
       group_name.value = ''
       image_src.value = ''
@@ -56,17 +67,31 @@ export default {
       context.emit('refresh')
     }
 
+    const handle_change = (uploadFile, uploadFiles) => {
+      if (uploadFile.raw.type !== "image/jpeg" && uploadFile.raw.type !== "image/png") {
+        ElMessage.error('Avatar picture must be JPG format!');
+        return false;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        image_src.value = e.target.result;
+      };
+      reader.readAsDataURL(uploadFile.raw);
+      avatar.value = uploadFile.raw;
+      return true;
+    }
+
     const add_ques_set = () => {
       let form = new FormData
       form.append("user_id", store.getUserId)
-      if (is_public === 'group') {
+      if (is_public.value === 'group') {
         form.append("group_name", group_name.value)
       } else {
         form.append("group_name", 'none')
       }
       form.append('introduction', introduction.value)
       form.append('set_name', set_name.value)
-      form.append('file', upload_img.value.files[0])
+      form.append('file', avatar.value)
       //TODO: 后续可加入tag
       upload_ques_set(form).then(
           (res) => {
@@ -128,6 +153,7 @@ export default {
         )
       }
     }
+
     return {
       closure,
       is_public,
@@ -135,10 +161,12 @@ export default {
       transmit,
       set_name,
       add_ques_set,
-      upload_img,
+      avatar,
       show_pic,
       image_src,
-      introduction
+      introduction,
+      handle_change,
+      upload_img
     }
   }
 }
@@ -156,5 +184,42 @@ export default {
   width: auto;
   height: 100%;
   object-fit: cover;
+}
+
+.avatar-uploader .avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+  object-fit: cover;
+}
+</style>
+
+<style>
+.avatar-uploader .el-upload {
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: var(--el-transition-duration-fast);
+  margin-bottom: 15px;
+}
+
+.avatar-uploader .el-upload:hover {
+  border-color: var(--el-color-primary);
+}
+
+.el-icon.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  text-align: center;
+}
+
+.form-label {
+  font-size: 15px;
+  font-weight: bold;
+  margin-bottom: 8px;
 }
 </style>

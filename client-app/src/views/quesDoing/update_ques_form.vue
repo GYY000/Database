@@ -1,15 +1,13 @@
 <template>
   <div style="display: flex;justify-content: center">
-    <el-form
-        label-width="auto"
+    <el-form label-width="auto"
         style="left:10%;width: 90%"
     >
       <el-form-item label="题号">
         <el-input v-model.number="form.serial_number" placeholder="请填写题号" clearable/>
       </el-form-item>
-      <el-form-item label="分数占比">
-        <el-input v-if="form.content.type !== '复合'"
-                  v-model.number="form.score" placeholder="请输入题目分数" clearable/>
+      <el-form-item label="分数占比" v-if="form.content.type !== '复合'">
+        <el-input v-model.number="form.score" placeholder="请输入题目分数" clearable/>
       </el-form-item>
       <el-form-item label="题目名">
         <el-input v-model.number="form.content.name" placeholder="请输入题目名" clearable/>
@@ -55,7 +53,7 @@
         </el-select>
       </el-form-item>
       <el-form-item v-if="form.content.type === '填空'">
-        <el-button @click="add_blanks" :icon="Plus" style="width: 20%;">添加空格</el-button>
+        <el-button @click="add_blank" :icon="Plus" style="width: 20%;">添加空格</el-button>
       </el-form-item>
       <div v-if="form.content.type === '填空' && blank_ans.length !== 0">
         <el-form-item v-for="(item,index) in blank_ans" :label="`答案 ${index + 1}`">
@@ -79,10 +77,10 @@
                     placeholder="请输入您的答案"
                     style="height: 200px;width: 90%; left: 5%;margin-bottom: 10px"
                     @imgAdd="img_add"/>
-      <el-form-item v-if="form.content.type === '复合'">
+      <el-form-item v-if="form.content.type==='复合'">
         <el-button @click="add_sub_prob" :icon="Plus" style="width: 20%">添加子问题</el-button>
       </el-form-item>
-      <div v-if="form.content.type === '复合'" v-for="(item, index) in form.content.sub_problem">
+      <div v-for="(item, index) in form.content.sub_problem" v-if="form.content.type==='复合'">
         <el-form-item :label="`子问题${index + 1}`">
           <el-button @click="open_sub_dialog(index)">查看</el-button>
           <el-button type="danger" @click="delete_sub_prob(index)">删除</el-button>
@@ -95,14 +93,15 @@
     </el-form>
   </div>
   <div style="display: flex;justify-content: center">
-    <el-button @click="upload" type='primary' style="margin-right: 30px">上传</el-button>
+    <el-button @click="update(false)"
+               type='primary' style="margin-right: 30px">更新</el-button>
     <el-button @click="cancel" type="danger">取消</el-button>
   </div>
 </template>
 
 <script>
 import {ref} from "vue";
-import {upload_picture, upload_ques} from "@/views/main/api";
+import {api_update_ques, upload_picture} from "@/views/main/api";
 import Ques_option from "@/views/quesDoing/ques_option.vue";
 import Sub_prob_form from "@/views/quesDoing/sub_prob_form.vue";
 import {Plus} from "@element-plus/icons-vue";
@@ -110,37 +109,38 @@ import {ElMessage} from "element-plus";
 import userStateStore from "@/store";
 
 export default {
-  name: 'upload_ques_form',
+  name: 'update_ques_form',
   computed: {
     Plus() {
       return Plus
     }
   },
-  props: ["qs_id"],
-
+  props: ["ques", "qs_id"],
   components: {
     Ques_option: Ques_option,
     Sub_prob_form: Sub_prob_form
   },
   setup(props, context) {
-    const ops_ans = ref([])
-    const blank_ans = ref([])
-    const sub_dialog_open = ref([])
+    const ops_ans = ref((props.ques.content.type === '选择') ?
+                        props.ques.content.ans.split(',') : null)
+    const blank_ans = ref((props.ques.content.type === '填空') ?
+                        props.ques.content.ans.split(',') : null)
+    const sub_dialog_open = ref(new Array(props.ques.content.sub_problem.length).fill(false))
     const store = userStateStore()
 
     const form = ref(
         {
           qs_id: props.qs_id,
           creator_id: store.getUserId,
-          serial_number: 1,
-          score: 1.0,
+          serial_number: props.ques.serial_num,
+          score: props.ques.score,
           content: {
-            name: "",
-            ques_content: "",
-            type: "选择",
-            ops: [],
-            ans: '',
-            sub_problem: [],
+            name: props.ques.content.name,
+            ques_content: props.ques.content.ques_content,
+            type: props.ques.content.type,
+            ops: props.ques.content.ops,
+            ans: props.ques.content.ans,
+            sub_problem: props.ques.content.sub_problem,
           }
         }
     )
@@ -178,7 +178,8 @@ export default {
             subfield: true, // 单双栏模式
             preview: true, // 预览
           }
-        })
+        }
+    )
 
     const img_add = (pos, file) => {
       let form_data = new FormData
@@ -187,7 +188,6 @@ export default {
           (res) => {
             let content = form.value.content.ques_content
             let name = file.name
-            console.log(file.name)
             // 第二步.将返回的url替换到文本原位置![...](0) -> ![...](url)  这里是必须要有的
             if (content.includes(name)) {
               let oStr = `(${pos})`
@@ -222,13 +222,21 @@ export default {
       form.value.content.sub_problem.push(
           {
             ques_content: "",
-            type: "选择",
+            type: "None",
             ops: [],
             score: 1.0,
             ans: "",
           }
       )
       sub_dialog_open.value.push(true)
+    }
+
+    const add_blank = () => {
+      blank_ans.value.push("")
+    }
+
+    const delete_blank = (index) => {
+      blank_ans.value.splice(index, 1)
     }
 
     const upload_op = (data) => {
@@ -243,53 +251,56 @@ export default {
       form.value.content.ops.push('请填入选项')
     }
 
-    const add_blanks = () => {
-      blank_ans.value.push("")
-    }
-
-    const upload = () => {
-      if (form.value.content.type === '选择') {
-        form.value.content.ans = ops_ans.value.join(',')
-      } else if (form.value.content.type === '填空') {
-        form.value.content.ans = blank_ans.value.join(',')
-      } else if(form.value.content.type === '复合') {
-        form.value.score = 0.0
+    const update = (is_delete) => {
+      form.value.content.ans =
+          (form.value.content.type === '选择') ? ops_ans.value.join(',') :
+              ((form.value.content.type === '填空')? blank_ans.value.join(',') : form.value.content.ans);
+      let form1 = {
+        is_delete: is_delete,
+        qid: props.ques.id,
+        serial_num: form.value.serial_number,
+        content: form.value.content,
+        score: form.value.score
+      }
+      if(form1.content.type === '复合') {
+        form1.score = 0.0
         for(let sub_prob of form.value.content.sub_problem) {
-          form.value.score = form.value.score + sub_prob.score
+          form1.score = form1.score + sub_prob.score
         }
       }
-      upload_ques(form.value).then(
+      api_update_ques(form1).then(
           (res) => {
-            if (res.is_successful === 'true') {
+            console.log(res)
+            if (res.is_successful === "true") {
               ElMessage({
-                message: '题目上传成功',
-                showClose: true,
-                type: 'success',
-              })
-              context.emit("close")
+                message: "更新成功",
+                type: "success",
+              });
+            } else {
+              ElMessage({
+                message: "更新失败",
+                type: "error",
+              });
             }
           }
       )
+      context.emit("close_update_form")
     }
 
     const cancel = () => {
       form.value = {
-        serial_number: 1,
-        score: 1.0,
+        serial_number: props.ques.serial_num,
+        score: props.ques.score,
         content: {
-          name: "",
-          ques_content: "",
-          type: "选择",
-          ops: [],
-          ans: '',
-          sub_problem: [],
+          name: props.ques.content.name,
+          ques_content: props.ques.content.ques_content,
+          type: props.ques.content.type,
+          ops: props.ques.content.ops,
+          ans: props.ques.content.ans,
+          sub_problem: props.ques.content.ans,
         }
       }
-      context.emit("close")
-    }
-
-    const delete_blank = (index) => {
-      blank_ans.value.splice(index, 1)
+      context.emit("close_update_form")
     }
 
     return {
@@ -306,9 +317,9 @@ export default {
       blank_ans,
       sub_dialog_open,
       open_sub_dialog,
-      upload,
+      update,
       cancel,
-      add_blanks,
+      add_blank,
       delete_blank
     }
   }

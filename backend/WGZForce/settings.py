@@ -91,8 +91,8 @@ DATABASES = {
         'USER': '21373122',
         'PASSWORD': 'Aa108174',
         'HOST': '120.46.80.149',
-        'PORT': '',
-    }
+        'PORT': ''
+    },
 }
 
 # Password validation
@@ -118,11 +118,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Shanghai"
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
