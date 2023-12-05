@@ -131,12 +131,13 @@ user_id	    name_list
     request_dict = json.loads(request.body.decode('utf-8'))
     user_id = request_dict["user_id"]
     teamIds = list(ReUserTeam.objects.filter(uid=user_id))
+    teamIds=[_.tid for _ in teamIds]
     ques_sets = list(QuestionSet.objects.filter(is_public=True))
     for quesPerm in QuestionSetPerm.objects.all():
         if teamIds.__contains__(quesPerm.tid):
-            quesSet = QuestionSet.objects.get(qsid=quesPerm.qsid)
-            if not ques_sets.__contains__(quesSet):
-                ques_sets.append(quesSet)
+            # quesSet = QuestionSet.objects.get(qsid=quesPerm.qsid)
+            if not ques_sets.__contains__(quesPerm.qsid):
+                ques_sets.append(quesPerm.qsid)
     dict = {}
     id_list = []
     name_list = []
@@ -904,3 +905,60 @@ def judge_ans(request):
         else:
             hit_scores.append(judge_fussion(types[i], answers[i], standard_ans[i], all_scores[i]))
     return JsonResponse({"hit_scores": hit_scores})
+
+def get_recent_records(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    uid=request_dict['uid']
+    total=request_dict['total']
+    qs=list(SetHistory.objects.filter(uid=uid).order_by('-time'))[:total]
+    total_scores=[]
+    for _ in qs:
+        total=0
+        questions=Question.objects.filter(qsid=_.qsid)
+        for q in questions:
+            total+=q.score
+        total_scores.append(total)
+
+    return JsonResponse([{"question_set_name": qs[i].qsid.set_name,
+                          "user_score": qs[i].score,
+                          "total_score": total_scores[i],
+                          "time": qs[i].time.strftime("%Y-%m-%d %H:%M")
+                          } for i in range(len(qs))], safe=False)
+
+def get_recent_question_set(request):
+    request_dict = json.loads(request.body.decode('utf-8'))
+    total=request_dict['total']
+    user_id = request_dict["uid"]
+    teamIds = list(ReUserTeam.objects.filter(uid=user_id))
+    teamIds=[_.tid for _ in teamIds]
+    ques_sets = list(QuestionSet.objects.filter(is_public=True))
+    set_team_map={}
+    for quesPerm in QuestionSetPerm.objects.all():
+        if teamIds.__contains__(quesPerm.tid):
+            # quesSet = QuestionSet.objects.get(qsid=quesPerm.qsid)
+            if not ques_sets.__contains__(quesPerm.qsid):
+                set_team_map[quesPerm.qsid.qsid]=quesPerm.tid.team_name
+                ques_sets.append(quesPerm.qsid)
+    ques_sets=sorted(ques_sets,key=lambda x: x.create_time,reverse=True)[:total]
+    dic=[{"question_set_name": _.set_name,
+            "time":_.create_time.strftime("%Y-%m-%d %H:%M"),
+          "is_public":_.is_public,
+          "team_name": None if _.is_public else set_team_map[_.qsid]
+            } for _ in ques_sets]
+    return JsonResponse(dic,safe=False)
+
+def create_set_history(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    scores=request_dict['scores']
+    qids=request_dict['qids']
+    qsid=request_dict['qsid']
+    uid=request_dict['uid']
+    answers=request_dict['answers']
+    scores_sum=sum(scores)
+    set_history=SetHistory(uid=User.objects.get(uid=uid),
+                           qsid=QuestionSet.objects.get(qsid=qsid),
+                           score=scores_sum)
+    set_history.save()
+    for i in range(len(qids)):
+        QuestionHistory(shid=set_history,score=scores[i],answer=str(answers[i]),qid=Question.objects.get(qid=qids[i])).save()
+    return JsonResponse({"is_successful":"true"})
