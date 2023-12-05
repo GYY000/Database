@@ -79,7 +79,7 @@ export default {
     const option_ans = ref([])
     const blank_ans = ref((props.ques.content.type === '填空') ?
         new Array(string2Array(props.ques.content.ans).length).fill('') : [])
-    const sub_ans = ref(new Array(props.ques.content.sub_problem.length).fill(''))
+    const sub_ans = ref()
     const q_and_a_ans = ref('')
 
     const content = ref(
@@ -98,12 +98,26 @@ export default {
       update_ans()
     }
 
+    const init = () => {
+      if(props.ques.content.type === '复合') {
+        sub_ans.value = []
+        for(let ques1 of props.ques.content.sub_problem) {
+          if(ques1.type === '填空') {
+            sub_ans.value.push(new Array(string2Array(ques1.ans).length).fill(''))
+          } else {
+            sub_ans.value.push('')
+          }
+        }
+      }
+    }
+
+    init()
     const update_ans = () => {
       let ans = null
       if (props.ques.content.type === '选择') {
         ans = option_ans.value.join(',')
       } else if (props.ques.content.type === '填空') {
-        ans = array2String(blank_ans.value)
+        ans = blank_ans.value
       } else if (props.ques.content.type === '问答') {
         ans = q_and_a_ans.value
       } else {

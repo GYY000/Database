@@ -20,7 +20,7 @@ import '@kangc/v-md-editor/lib/style/preview.css';
 import '@kangc/v-md-editor/lib/theme/style/github.css'
 import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
 
-axios.defaults.timeout = 10000;
+axios.defaults.timeout = 100000;
 
 import hljs from 'highlight.js';
 

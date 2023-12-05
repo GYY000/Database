@@ -5,13 +5,20 @@
       <el-tag class="mx-1" size="large" v-if="content.type === '填空'">填空题</el-tag>
       <el-tag class="mx-1" size="large" v-if="content.type === '问答'">问答题</el-tag>
       <el-tag class="mx-1" size="large" v-if="content.type === '复合'">复合题型</el-tag>
-      <el-tag class="mx-1" size="large" :type="'success'" style="margin-left: 10px">{{ score }}分</el-tag>
+      <el-tag class="mx-1" size="large" v-if="Math.abs(sum_score - ques.score) < delta" :type="'success'" style="margin-left: 10px">
+        {{sum_score}}/{{ ques.score }}分
+      </el-tag>
+      <el-tag class="mx-1" size="large" v-else-if="sum_score > delta" type="info" style="margin-left: 10px">
+        {{sum_score}}/{{ ques.score }}分
+      </el-tag>
+      <el-tag class="mx-1" size="large" v-else type="danger" style="margin-left: 10px">
+        {{sum_score}}/{{ ques.score }}分
+      </el-tag>
     </el-col>
   </el-row>
   <el-row style="font-weight: bold">
-    <el-tag>{{ sum_score }}</el-tag>
     <div style="width: 32px;display: inline-block">
-      {{ id }}.
+      {{ id + 1 }}.
     </div>
     <span style="display:inline-block;">
       {{ content.name }}
@@ -25,19 +32,28 @@
   <div v-if="content.type === '选择'">
     <div v-for="(item,index) in content.ops">
       <el-row>
-        <el-button v-if="check_color(index) === 'red'" type="danger"
+        <el-button v-if="check_color(index) === 'red'"
+                   size="large" type="danger"
                    style="width: 90%; margin-bottom: 10px">
           <el-icon>
             <Close/>
           </el-icon>
           {{ String.fromCharCode(index + 65) + '.' + item }}
         </el-button>
-        <el-button v-if="check_color(index) === 'grey'"
+        <el-button v-if="check_color(index) === 'yellow'"
+                   size="large" type="warning"
                    style="width: 90%; margin-bottom: 10px">
+          <el-icon>
+            <Close/>
+          </el-icon>
+          {{ String.fromCharCode(index + 65) + '.' + item }}
+        </el-button>
+        <el-button v-if="check_color(index) === 'grey'" type="info"
+                   size="large" style="width: 90%; margin-bottom: 10px">
           <span style="width: 30px"></span> {{ String.fromCharCode(index + 65) + '.' + item }}
         </el-button>
         <el-button v-if="check_color(index) === 'green'" type="success"
-                   style="width: 90%; margin-bottom: 10px">
+                   size="large" style="width: 90%; margin-bottom: 10px">
           <el-icon>
             <Check/>
           </el-icon>
@@ -60,7 +76,7 @@
        style="display: flex;justify-content: left;width: 100%">
     <div style="width: 100%">
       <sub_problem_judge v-for="(item, index) in content.sub_problem"
-                         :sub_problem="item" :id="index" :ans="ques_ans[index]"
+                         :sub_problem="item" :id="index" :ans="ans[index]"
                          :score="cur_score[index]"
                          @update_sub_score="update_sub_score"/>
     </div>
@@ -98,6 +114,7 @@ export default {
   emits: ['update_score'],
 
   setup(props, context) {
+    const delta = ref(1e-7)
     const is_empty = ref()
     const sub_empty = ref([])
     const cur_score = ref(props.score)
@@ -113,10 +130,13 @@ export default {
       if ((props.ans.indexOf(String.fromCharCode(index + 65)) !== -1)
           && option_ans.value.indexOf(String.fromCharCode(index + 65)) !== -1) {
         return 'green'
-      } else if ((props.ans.indexOf(String.fromCharCode(index + 65)) !== -1)
+      } else if ((props.ans.indexOf(String.fromCharCode(index + 65)) === -1)
+          && option_ans.value.indexOf(String.fromCharCode(index + 65)) !== -1) {
+        return 'yellow'
+      } else if((props.ans.indexOf(String.fromCharCode(index + 65)) !== -1)
           && option_ans.value.indexOf(String.fromCharCode(index + 65)) === -1) {
         return 'red'
-      } else {
+      }else {
         return 'grey'
       }
     }
@@ -151,6 +171,7 @@ export default {
           sum_score.value = sum_score.value + cur_score.value[i];
         }
       } else {
+        sum_score.value = cur_score.value
         is_empty.value = true
       }
     }
@@ -196,7 +217,8 @@ export default {
       sum_score,
       cur_score,
       option_ans,
-      blank_ans
+      blank_ans,
+      delta
     }
   }
 }

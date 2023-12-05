@@ -15,7 +15,8 @@
   <div v-if="content.type === '选择'">
     <div v-for="(item,index) in content.ops">
       <el-row>
-        <el-button v-if="check_color(index) === 'red'" type="danger"
+        <el-button v-if="check_color(index) === 'red'"
+                   size="large" type="danger"
                    style="width: 90%; margin-bottom: 10px">
           <el-icon>
             <Close/>
@@ -23,13 +24,25 @@
           {{ String.fromCharCode(index + 65) + '.' + item }}
         </el-button>
         <el-button v-if="check_color(index) === 'grey'"
+                   size="large"
                    style="width: 90%; margin-bottom: 10px">
           <span style="width: 30px"></span> {{ String.fromCharCode(index + 65) + '.' + item }}
         </el-button>
-        <el-button v-if="check_color(index) === 'green'" type="success"
+        <el-button v-if="check_color(index) === 'green'"
+                   size="large"
+                   type="success"
                    style="width: 90%; margin-bottom: 10px">
           <el-icon>
             <Check/>
+          </el-icon>
+          {{ String.fromCharCode(index + 65) + '.' + item }}
+        </el-button>
+        <el-button v-if="check_color(index) === 'yellow'"
+                   size="large"
+                   type="warning"
+                   style="width: 90%; margin-bottom: 10px">
+          <el-icon>
+            <Close/>
           </el-icon>
           {{ String.fromCharCode(index + 65) + '.' + item }}
         </el-button>
@@ -109,12 +122,19 @@ export default {
     }
 
     const check_color = (index) => {
+      console.log(props.ans)
+      console.log(option_ans.value)
+      console.log(props.ans.indexOf(String.fromCharCode(index + 65)))
+      console.log(option_ans.value.indexOf(String.fromCharCode(index + 65)))
       if ((props.ans.indexOf(String.fromCharCode(index + 65)) !== -1)
           && option_ans.value.indexOf(String.fromCharCode(index + 65)) !== -1) {
         return 'green'
       } else if ((props.ans.indexOf(String.fromCharCode(index + 65)) !== -1)
           && option_ans.value.indexOf(String.fromCharCode(index + 65)) === -1) {
         return 'red'
+      } else if ((props.ans.indexOf(String.fromCharCode(index + 65)) === -1)
+          && option_ans.value.indexOf(String.fromCharCode(index + 65)) !== -1) {
+        return 'yellow'
       } else {
         return 'grey'
       }
