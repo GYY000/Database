@@ -10,7 +10,7 @@
   </el-row>
   <el-row style="font-weight: bold">
     <div style="width: 32px;display: inline-block">
-      {{ ques.serial_num }}.
+      {{ id + 1 }}.
     </div>
     <span style="display:inline-block;">
       {{ content.name }}
@@ -67,7 +67,7 @@ import {DeleteFilled, Edit} from "@element-plus/icons-vue";
 import Update_ques_form from "@/views/quesDoing/update_ques_form.vue";
 import Sub_problem_show from "@/views/quesDoing/sub_problem_show.vue";
 import Sub_problem_do from "@/views/quesDoing/sub_problem_do.vue";
-import {string2Array} from "@/views/main/api";
+import {array2String, string2Array} from "@/views/main/api";
 
 export default {
   name: "ques_do_display",
@@ -103,7 +103,7 @@ export default {
       if (props.ques.content.type === '选择') {
         ans = option_ans.value.join(',')
       } else if (props.ques.content.type === '填空') {
-        ans = blank_ans.value
+        ans = array2String(blank_ans.value)
       } else if (props.ques.content.type === '问答') {
         ans = q_and_a_ans.value
       } else {
@@ -130,34 +130,4 @@ export default {
 </script>
 
 <style scoped>
-
-.edit_title {
-  font-family: "Microsoft YaHei";
-  font-weight: bold;
-  font-size: 30px;
-}
-
-.blank_ans {
-  width: 85%
-}
-
-.circle {
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  background-color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s ease;
-  cursor: pointer;
-}
-
-.circle:hover {
-  background-color: lightblue;
-}
-
-.letter {
-  font-size: 15px;
-}
 </style>

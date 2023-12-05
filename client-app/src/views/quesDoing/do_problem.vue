@@ -14,7 +14,7 @@
       </el-col>
       <el-col :span="5">
         <el-button type="success" style="min-width: 80px;margin-right: 10px" plain round
-        @click="open_hand_in">
+                   @click="open_hand_in">
           提交
         </el-button>
         <el-button text :icon="Timer" @click="stopTimer">
@@ -25,7 +25,7 @@
   </div>
   <div class="secbackground"></div>
   <!-- TODO BackGround -->
-  <div class="center_class">
+  <div class="center_class" v-if="judge_mode === false">
     <div class="main_container" id="main_container">
       <div class="title center_class">
         <span style="height: 45px;margin-left: 10px;margin-top: 50px">
@@ -65,12 +65,18 @@
         />
         <div v-for="(ques, index) in display_ques" style="margin-bottom: 25px">
           <div v-if="index !== 0" class="dashed-divider"></div>
-          <ques_do_display :ques="ques" :id="index" @update_ans="update_ans"></ques_do_display>
+          <ques_do_display :ques="ques" :id="(currentPage - 1)* page_size + index"
+                           @update_ans="update_ans"></ques_do_display>
         </div>
       </div>
     </div>
   </div>
-
+  <div class="center_class" v-if="judge_mode === true">
+    <judge_ans_view v-if="judge_mode === true"
+                    :hit_scores="hit_scores" :introduction="introduction"
+                    :ans="hand_in_form.answers" :ques_set_name="ques_set_name"
+                    :questions="questions"/>
+  </div>
   <el-dialog
       v-model="exit_dialog"
       title="退出答题"
@@ -119,13 +125,12 @@
 import userStateStore from "@/store";
 import {ref} from "vue";
 import Ques_display from "@/views/quesDoing/ques_display.vue";
-import {fetch_ques_info, string2Array} from "@/views/main/api";
-import Upload_ques_form from "@/views/quesDoing/upload_ques_form.vue";
-import Update_ques_form from "@/views/quesDoing/update_ques_form.vue";
-import {DocumentChecked, Edit, Plus, Timer, Upload} from "@element-plus/icons-vue";
+import {fetch_ques_info, hand_in_ans, string2Array} from "@/views/main/api";
+import {ArrowLeft, DocumentChecked, Edit, Plus, Timer, Upload} from "@element-plus/icons-vue";
 import {useRouter} from "vue-router";
 import router from "@/router";
 import Ques_do_display from "@/views/quesDoing/ques_do_display.vue";
+import Judge_ans_view from "@/views/quesDoing/judge_ans_view.vue";
 
 window.addEventListener('scroll', function () {
   let lower_panel = document.getElementById('lower_panel');
@@ -202,8 +207,8 @@ export default {
     }
   },
   components: {
-    Ques_do_display,
-    Upload_ques_form, Ques_display, Update_ques_form
+    Judge_ans_view,
+    ArrowLeft, Ques_do_display, Ques_display
   },
   setup() {
     const statistic = ref([
@@ -229,8 +234,6 @@ export default {
     const show = ref(false)
     const currentPage = ref(1)
     const page_size = ref(10)
-    const edit_show = ref(false)
-    const edit_mode = ref(false)
     const profile_photo = ref('')
     const photo_flag = ref(true)
     const sum_score = ref(0.0)
@@ -238,6 +241,8 @@ export default {
     const introduction = ref()
     const exit_dialog = ref(false)
     const hand_in_dialog = ref(false)
+    const judge_mode = ref(false)
+    const hit_scores = ref([])
 
     const hand_in_form = ref(
         {
@@ -300,7 +305,7 @@ export default {
                 let temp_score = []
                 let temp_answers = []
                 let temp_standard_ans = []
-                for (let sub_ques in ques.content.sub_problem) {
+                for (let sub_ques of ques.content.sub_problem) {
                   temp_type.push(sub_ques.type)
                   temp_score.push(sub_ques.score)
                   if (sub_ques.type === '选择' || sub_ques.type === '问答') {
@@ -309,7 +314,7 @@ export default {
                   } else if (sub_ques.type === '填空') {
                     temp_standard_ans.push(string2Array(sub_ques.ans))
                     temp_answers.push(new Array(
-                        string2Array(sub_ques).length).fill('')
+                        string2Array(sub_ques.ans).length).fill('')
                     )
                   }
                 }
@@ -331,33 +336,10 @@ export default {
 
     const update_ans = (data) => {
       hand_in_form.value.answers[data.id] = data.ans
-    }
-
-    const close_form = () => {
-      edit_show.value = false
-    }
-
-    const open_form = () => {
-      edit_show.value = true
+      hand_in_dialog.value = false
     }
 
     init()
-
-    const open_edit = () => {
-      edit_mode.value = true
-    }
-
-    const close_edit = () => {
-      edit_mode.value = false
-    }
-
-    const change_info = (data) => {
-      sum_score.value = 0
-      questions.value[data.id].score = data.score
-      for (let i = 0; i < questions.value.length; i = i + 1) {
-        sum_score.value = sum_score.value + questions.value[i].score
-      }
-    }
 
     const open_exit = () => {
       exit_dialog.value = true
@@ -370,8 +352,15 @@ export default {
     const open_hand_in = () => {
       hand_in_dialog.value = true
     }
+
     const hand_in = () => {
-      console.log(hand_in_form.value)
+      hand_in_ans(hand_in_form.value).then(
+          (res) => {
+            hit_scores.value = res.hit_scores
+            judge_mode.value = true
+            hand_in_dialog.value = false
+          }
+      )
     }
 
     return {
@@ -382,16 +371,9 @@ export default {
       display_ques,
       show,
       currentPage,
-      edit_show,
-      open_form,
-      close_form,
       page_size,
-      edit_mode,
-      open_edit,
-      close_edit,
       profile_photo,
       photo_flag,
-      change_info,
       sum_score,
       introduction,
       ques_set_name,
@@ -402,7 +384,9 @@ export default {
       open_hand_in,
       exit,
       update_ans,
-      hand_in
+      hand_in,
+      judge_mode,
+      hit_scores
     }
   }
 }
@@ -455,11 +439,6 @@ export default {
   align-items: center;
 }
 
-.control_button {
-  width: 8%;
-  min-width: 90px;
-}
-
 .sub_title {
   font-size: 16px;
   margin-bottom: 10px;
@@ -488,7 +467,7 @@ export default {
   top: 60px;
   width: 100%;
   position: fixed;
-  z-index: 10;
+  z-index: 9999;
 }
 
 .vertical-align-center {

@@ -11,6 +11,7 @@ import post_hub from "@/views/main/post_hub.vue";
 import team_hub from "@/views/main/team_hub.vue";
 import question_hub from "@/views/main/question_hub.vue";
 import panel_del_index from "@/views/main/panel_del_index.vue";
+import manage_team from "@/views/main/team_component/manage_team.vue";
 
 const routes = [
     {
@@ -47,6 +48,11 @@ const routes = [
                 path: '/edit_ques_group/:qs_id',
                 name: "edit_ques_group",
                 component: edit_ques_group
+            },
+            {
+                path: '/manage_team/:tid',
+                name: "manage_team",
+                component: manage_team
             }
         ]
     },

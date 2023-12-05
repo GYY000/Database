@@ -1,4 +1,5 @@
 import axios from "axios";
+import {ref} from "vue";
 
 export function upload_ques_set(ques_set_data) {
     return axios.post('/upload_ques_set', ques_set_data,
@@ -268,6 +269,28 @@ export function api_update_ques(form) {
     )
 }
 
+export function hand_in_ans(form) {
+    return axios.request(
+        {
+            url: '/judge_ans',
+            method: "post",
+            data: JSON.stringify(
+                {
+                    qids: form.qids,
+                    types: form.types,
+                    answers: form.answers,
+                    standard_ans: form.standard_ans,
+                    all_scores: form.all_scores
+                }
+            )
+        }
+    ).then(
+        (response) => {
+            return response.data
+        }
+    )
+}
+
 export function string2Array(string) {
     return string.match(/'([^']+)'/g).map(item => item.slice(1, -1))
 }
@@ -275,3 +298,4 @@ export function string2Array(string) {
 export function array2String(array) {
     return "[" + array.map(item => "'" + item + "'").join(", ") + "]"
 }
+

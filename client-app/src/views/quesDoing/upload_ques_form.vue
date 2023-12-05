@@ -187,7 +187,6 @@ export default {
           (res) => {
             let content = form.value.content.ques_content
             let name = file.name
-            console.log(file.name)
             // 第二步.将返回的url替换到文本原位置![...](0) -> ![...](url)  这里是必须要有的
             if (content.includes(name)) {
               let oStr = `(${pos})`

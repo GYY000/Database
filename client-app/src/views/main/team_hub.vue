@@ -48,7 +48,7 @@ import userStateStore from "@/store";
 import {Search} from "@element-plus/icons-vue";
 import Create_team_form from "@/views/main/team_component/create_team_form.vue";
 import team_card from "@/views/main/team_component/team_card.vue";
-import Edit_team from "@/views/main/team_component/edit_team.vue";
+import Edit_team from "@/views/main/team_component/team_introduction.vue";
 import router from "@/router";
 
 export default {

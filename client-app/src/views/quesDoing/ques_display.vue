@@ -70,7 +70,8 @@
       <el-tag size="large" effect="dark">答案Demo</el-tag>
     </div>
     <mavon-editor :box-shadow="true" :default-open="'preview'" :editable="false"
-                  :toolbars-flag="false" :subfield="false" style="min-width: 0px; width:60%;min-height: 200px"
+                  :toolbars-flag="false" :subfield="false"
+                  style="min-width: 0px; width:60%;min-height: 200px"
                   :value="content.ans" v-model="content.ans">
     </mavon-editor>
   </div>
@@ -146,8 +147,6 @@ export default {
     )
 
     const init = () => {
-      console.log(content.value)
-      console.log(ans.value)
     }
 
     init()
@@ -162,7 +161,6 @@ export default {
       }
       api_update_ques(form1).then(
           (res) => {
-            console.log(res)
             if (res.is_successful === "true") {
               ElMessage({
                 message: "删除成功",

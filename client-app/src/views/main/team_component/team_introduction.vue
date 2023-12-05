@@ -47,7 +47,7 @@ import {ref, watch} from "vue";
 import User_show_card from "@/views/main/team_component/user_show_card.vue";
 
 export default {
-  name: "edit_team",
+  name: "team_introduction",
   components: {User_show_card},
   props: ['team_name', 'date', 'avatar', 'creator'],
   setup(props) {

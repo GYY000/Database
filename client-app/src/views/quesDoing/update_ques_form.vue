@@ -272,7 +272,6 @@ export default {
       }
       api_update_ques(form1).then(
           (res) => {
-            console.log(res)
             if (res.is_successful === "true") {
               ElMessage({
                 message: "更新成功",

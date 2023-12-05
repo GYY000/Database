@@ -49,7 +49,7 @@
           <div :id="titleId" class="edit_title">Team</div>
         </div>
       </template>
-      <edit_team :team_name="group_name" :date="date" :avatar="avatar_url" :creator="creator_name"></edit_team>
+      <team_introduction :team_name="group_name" :date="date" :avatar="avatar_url" :creator="creator_name"></team_introduction>
     </el-dialog>
   </el-card>
 </template>
@@ -61,11 +61,11 @@ import {ref} from "vue";
 import userStateStore from "@/store";
 import router from "@/router";
 import {ElMessage} from "element-plus";
-import Edit_team from "@/views/main/team_component/edit_team.vue";
+import Team_introduction from "@/views/main/team_component/team_introduction.vue";
 
 export default {
   name: "team_card",
-  components: {Edit_team},
+  components: {Team_introduction},
   props: ['creator_name', 'group_name', 'date', 'introduction'],
 
   setup(props, context) {

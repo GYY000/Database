@@ -30,11 +30,6 @@
         <div style="padding-bottom: 15px;display: flex;justify-content: center">
           加入于 {{ date }}
         </div>
-        <div>
-          <el-button type="danger" @click="del_mem">
-            删除
-          </el-button>
-        </div>
       </div>
     </div>
   </el-dialog>
