@@ -72,8 +72,7 @@
     </div>
   </div>
   <div class="center_class" v-if="judge_mode === true">
-    <judge_ans_view v-if="judge_mode === true"
-                    :hit_scores="hit_scores" :introduction="introduction"
+    <judge_ans_view :hit_scores="hit_scores" :introduction="introduction"
                     :ans="hand_in_form.answers" :ques_set_name="ques_set_name"
                     :questions="questions"/>
   </div>
@@ -289,7 +288,7 @@ export default {
                 hand_in_form.value.types.push('填空')
                 hand_in_form.value.standard_ans.push(string2Array(ques.content.ans))
                 hand_in_form.value.answers.push(new Array(
-                    string2Array(ques.content.ans).length).fill(''))
+                    (string2Array(ques.content.ans)).length).fill(''))
                 hand_in_form.value.all_scores.push(ques.score)
                 statistic.value[0].blank = statistic.value[0].blank + 1
                 statistic.value[1].blank = statistic.value[1].blank + ques.score
@@ -314,7 +313,7 @@ export default {
                   } else if (sub_ques.type === '填空') {
                     temp_standard_ans.push(string2Array(sub_ques.ans))
                     temp_answers.push(new Array(
-                        string2Array(sub_ques.ans).length).fill('')
+                        (string2Array(sub_ques.ans)).length).fill('')
                     )
                   }
                 }

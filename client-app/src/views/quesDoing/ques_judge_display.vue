@@ -5,13 +5,21 @@
       <el-tag class="mx-1" size="large" v-if="content.type === '填空'">填空题</el-tag>
       <el-tag class="mx-1" size="large" v-if="content.type === '问答'">问答题</el-tag>
       <el-tag class="mx-1" size="large" v-if="content.type === '复合'">复合题型</el-tag>
-      <el-tag class="mx-1" size="large" :type="'success'" style="margin-left: 10px">{{ score }}分</el-tag>
+      <el-tag class="mx-1" size="large" v-if="Math.abs(sum_score - ques.score) < delta" :type="'success'"
+              style="margin-left: 10px">
+        {{ sum_score }}/{{ ques.score }}分
+      </el-tag>
+      <el-tag class="mx-1" size="large" v-else-if="sum_score > delta" type="info" style="margin-left: 10px">
+        {{ sum_score }}/{{ ques.score }}分
+      </el-tag>
+      <el-tag class="mx-1" size="large" v-else type="danger" style="margin-left: 10px">
+        {{ sum_score }}/{{ ques.score }}分
+      </el-tag>
     </el-col>
   </el-row>
   <el-row style="font-weight: bold">
-    <el-tag>{{ sum_score }}</el-tag>
     <div style="width: 32px;display: inline-block">
-      {{ id }}.
+      {{ id + 1 }}.
     </div>
     <span style="display:inline-block;">
       {{ content.name }}
@@ -25,20 +33,29 @@
   <div v-if="content.type === '选择'">
     <div v-for="(item,index) in content.ops">
       <el-row>
-        <el-button v-if="check_color(index) === 'red'" type="danger"
+        <el-button v-if="check_color(index) === 'red'"
+                   size="large" type="danger"
                    style="width: 90%; margin-bottom: 10px">
-          <el-icon>
+          <el-icon style="margin-right: 20px;height: 25px">
             <Close/>
           </el-icon>
           {{ String.fromCharCode(index + 65) + '.' + item }}
         </el-button>
-        <el-button v-if="check_color(index) === 'grey'"
+        <el-button v-if="check_color(index) === 'yellow'"
+                   size="large" type="warning"
                    style="width: 90%; margin-bottom: 10px">
+          <el-icon style="margin-right: 20px;height: 25px">
+            <Close/>
+          </el-icon>
+          {{ String.fromCharCode(index + 65) + '.' + item }}
+        </el-button>
+        <el-button v-if="check_color(index) === 'grey'" type="info"
+                   size="large" style="width: 90%; margin-bottom: 10px">
           <span style="width: 30px"></span> {{ String.fromCharCode(index + 65) + '.' + item }}
         </el-button>
         <el-button v-if="check_color(index) === 'green'" type="success"
-                   style="width: 90%; margin-bottom: 10px">
-          <el-icon>
+                   size="large" style="width: 90%; margin-bottom: 10px">
+          <el-icon style="margin-right: 20px;height: 25px">
             <Check/>
           </el-icon>
           {{ String.fromCharCode(index + 65) + '.' + item }}
@@ -50,8 +67,24 @@
     <el-form style="margin-bottom: 10px;width: 80%" label-width="auto">
       <div v-for="(item,index) in ans">
         <el-form-item :label="`空格 ${index + 1}`">
-          <el-input v-model="ques_ans[index]" placeholder="您的答案"></el-input>
-          <el-input v-model="blank_ans[index]" placeholder="标准答案"></el-input>
+          <el-input v-model="ques_ans[index]" size="large"
+                    v-if="sum_score === ques.score" placeholder="您的答案">
+            <template #prefix>
+              <el-icon style="color: green;height: 20px">
+                <Select/>
+              </el-icon>
+            </template>
+          </el-input>
+          <el-input v-model="ques_ans[index]" size="large"
+                    v-else placeholder="您的答案">
+            <template #prefix>
+              <el-icon style="color: red;height: 20px">
+                <Close/>
+              </el-icon>
+            </template>
+          </el-input>
+          <el-input v-model="blank_ans[index]" size="large" placeholder="标准答案"
+                    style="margin-top: 10px"></el-input>
         </el-form-item>
       </div>
     </el-form>
@@ -60,7 +93,7 @@
        style="display: flex;justify-content: left;width: 100%">
     <div style="width: 100%">
       <sub_problem_judge v-for="(item, index) in content.sub_problem"
-                         :sub_problem="item" :id="index" :ans="ques_ans[index]"
+                         :sub_problem="item" :id="index" :ans="ans[index]"
                          :score="cur_score[index]"
                          @update_sub_score="update_sub_score"/>
     </div>
@@ -68,16 +101,20 @@
   <div v-if="content.type === '问答'" style="margin-bottom: 10px">
     <mavon-editor :box-shadow="true" default-open="preview" :editable="false"
                   :toolbars-flag="false" :subfield="false"
-                  style="min-width: 0px; width:70%;min-height: 400px"
+                  style="min-width: 0px; width:70%;min-height: 200px"
                   placeholder="您的答案为空"
-                  :value="ans">
+                  :value="qa_ans" v-model="qa_ans">
     </mavon-editor>
-    <el-input v-model="input_score" placeholder="请填入此题你的分数" @change="update_score"></el-input>
+    <el-row style="margin-top: 15px;margin-bottom: 15px;margin-left: 30px" align="center">
+      <span style="font-size: 18px">评分</span>
+      <el-input v-model="input_score" placeholder="评分"
+              @change="update_score" style="margin-left: 30px;width: 30%"/>
+    </el-row>
     <mavon-editor :box-shadow="true" default-open="preview" :editable="false"
                   :toolbars-flag="false" :subfield="false"
-                  style="min-width: 0px; width:70%;min-height: 400px"
+                  style="min-width: 0px; width:70%;min-height: 200px"
                   placeholder="标准答案"
-                  :value="ques.content.ans">
+                  :value="content.ans" v-model="content.ans">
     </mavon-editor>
   </div>
 </template>
@@ -98,14 +135,16 @@ export default {
   emits: ['update_score'],
 
   setup(props, context) {
+    const delta = ref(1e-7)
     const is_empty = ref()
     const sub_empty = ref([])
     const cur_score = ref(props.score)
     const input_score = ref('')
     const ques_ans = ref(props.ans)
     const sum_score = ref(0);
+    const qa_ans = ref(props.ans)
     const option_ans = ref((props.ques.content.type === '选择') ?
-          props.ques.content.ans.split(',') : [])
+        props.ques.content.ans.split(',') : [])
     const blank_ans = ref((props.ques.content.type === '填空') ?
         string2Array(props.ques.content.ans) : [])
 
@@ -113,6 +152,9 @@ export default {
       if ((props.ans.indexOf(String.fromCharCode(index + 65)) !== -1)
           && option_ans.value.indexOf(String.fromCharCode(index + 65)) !== -1) {
         return 'green'
+      } else if ((props.ans.indexOf(String.fromCharCode(index + 65)) === -1)
+          && option_ans.value.indexOf(String.fromCharCode(index + 65)) !== -1) {
+        return 'yellow'
       } else if ((props.ans.indexOf(String.fromCharCode(index + 65)) !== -1)
           && option_ans.value.indexOf(String.fromCharCode(index + 65)) === -1) {
         return 'red'
@@ -151,6 +193,7 @@ export default {
           sum_score.value = sum_score.value + cur_score.value[i];
         }
       } else {
+        sum_score.value = cur_score.value
         is_empty.value = true
       }
     }
@@ -172,9 +215,11 @@ export default {
         if (input_score.value !== '') {
           is_empty.value = true
           cur_score.value = parseFloat(input_score.value)
+          sum_score.value = cur_score.value
         } else {
           is_empty.value = false
           cur_score.value = 0
+          sum_score.value = 0
         }
       } else if (props.ques.content.type === '复合') {
         for (let temp of sub_empty.value) {
@@ -196,7 +241,9 @@ export default {
       sum_score,
       cur_score,
       option_ans,
-      blank_ans
+      blank_ans,
+      delta,
+      qa_ans
     }
   }
 }
