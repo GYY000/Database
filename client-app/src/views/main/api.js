@@ -183,12 +183,24 @@ export function respond(id, team_name, applier_name, agree) {
     })
 }
 
-export function fetch_all_member(team_name) {
+export function fetch_all_member(tid) {
     return axios.request({
         url: '/fetch_all_users_in_team',
         method: "post",
         data: JSON.stringify({
-            team_name: team_name,
+            tid: tid,
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
+export function fetch_all_team_ques_set(tid) {
+    return axios.request({
+        url: '/fetch_all_ques_set_in_team',
+        method: "post",
+        data: JSON.stringify({
+            tid: tid,
         })
     }).then(response => {
         return response.data

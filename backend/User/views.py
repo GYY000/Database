@@ -280,7 +280,9 @@ def merge_and_sort(serial_nums, scores, contents, ques_ids):
 
     return sorted_quarter_lets
 
+
 from User import sensi_filter
+
 
 def send_message(request):
     '''
@@ -455,13 +457,16 @@ def fetch_all_teams(request):
     introduction_list = []
     creator_list = []
     date_list = []
+    tid_list = []
     for _ in Team.objects.all():
+        tid_list.append(_.tid)
         group_name_list.append(_.team_name)
         introduction_list.append(_.introduction)
         creator_list.append(_.creator.user_name)
         date_list.append(_.create_date.strftime("%Y-%m-%d"))
     return JsonResponse({"group_name_list": group_name_list,
                          "introduction_list": introduction_list,
+                         "tid_list": tid_list,
                          "creator_list": creator_list,
                          "date_list": date_list})
 
@@ -482,6 +487,7 @@ def search_for_team(request):
                          "introduction_list": introduction_list,
                          "creator_list": creator_list,
                          "date_list": date_list})
+
 
 def get_profile_photo(request):
     request_dict = json.loads(request.body.decode('utf-8'))
@@ -646,18 +652,16 @@ url:/fetch_all_ques_set_in_team
     '''
 
     request_dict = json.loads(request.body.decode('utf-8'))
-    team_name = request_dict["team_name"]
+    tid = request_dict["tid"]
     name_list = []
     creator_list = []
     introduction_list = []
     date_list = []
-    team = Team.objects.get(team_name=team_name)
-    for _ in QuestionSetPerm.objects.all():
-        if _.tid.tid == team.tid:
-            name_list.append(_.qsid.set_name)
-            creator_list.append(_.qsid.creator.user_name)
-            date_list.append(_.qsid.create_.strftime("%Y-%m-%d"))
-            introduction_list.append(_.qsid.introduction)
+    for _ in QuestionSetPerm.objects.filter(tid=tid):
+        name_list.append(_.qsid.set_name)
+        creator_list.append(_.qsid.creator.user_name)
+        date_list.append(_.qsid.create_.strftime("%Y-%m-%d"))
+        introduction_list.append(_.qsid.introduction)
     return JsonResponse({"name_list": name_list, "creator_list": creator_list,
                          "introduction_list": introduction_list,
                          "date_list": date_list})
@@ -670,13 +674,12 @@ team_name	name_list
 	        register_date_list
 url:/fetch_all_users_in_team
     '''
-    team_name = json.loads(request.body.decode('utf-8'))['team_name']
+    tid = json.loads(request.body.decode('utf-8'))['tid']
     name_list = []
     register_date_list = []
-    for _ in ReUserTeam.objects.all():
-        if _.tid.team_name == team_name:
-            name_list.append(_.uid.user_name)
-            register_date_list.append(_.join_date)
+    for _ in ReUserTeam.objects.filter(tid=tid):
+        name_list.append(_.uid.user_name)
+        register_date_list.append(_.join_date)
     return JsonResponse({"name_list": name_list, "register_date_list": register_date_list})
 
 
@@ -835,11 +838,11 @@ def update_ques(request):
 import math
 
 
-def judge_select(ans,std,score):
-    assert type(ans)==str
-    assert type(std)==str
+def judge_select(ans, std, score):
+    assert type(ans) == str
+    assert type(std) == str
     if len(std) == 1:
-        return score if ans==std else 0
+        return score if ans == std else 0
     else:  # 多选
         selects = ans.split(',')
         standards = std.split(',')
@@ -847,12 +850,12 @@ def judge_select(ans,std,score):
             if not standards.__contains__(_):
                 return 0
         # 如果多选或者错选直接0昏
-        return score * len(selects) / len(standards) #分数是浮点
+        return score * len(selects) / len(standards)  # 分数是浮点
 
 
-def compute_text_score(ans,std,score):
-    assert type(ans)==str
-    assert type(std)==str
+def compute_text_score(ans, std, score):
+    assert type(ans) == str
+    assert type(std) == str
     len1, len2 = len(std), len(ans)
     max_len = max(len1, len2)
     if max_len == 0:
@@ -860,45 +863,44 @@ def compute_text_score(ans,std,score):
     similarity = 1 - distance(std, ans) / max_len
     return min(math.sqrt(similarity) / 0.8, 1) * score
 
-def judge_fill(ans,std,score):
-    assert type(ans)==list
-    assert type(std)==list
-    sum=0
+
+def judge_fill(ans, std, score):
+    assert type(ans) == list
+    assert type(std) == list
+    sum = 0
     for i in range(len(ans)):
-        sum+=compute_text_score(ans[i],std[i],score)
-    sum/=len(ans)
+        sum += compute_text_score(ans[i], std[i], score)
+    sum /= len(ans)
     return sum
 
 
-
-def judge_fussion(type_list,ans_list,std_list,score_list):
-    scores=[]
+def judge_fussion(type_list, ans_list, std_list, score_list):
+    scores = []
     for i in range(len(type_list)):
-        if type_list[i]=='选择':
-            scores.append(judge_select(ans_list[i],std_list[i],score_list[i]))
-        elif type_list[i]=='填空':
-            scores.append(judge_fill(ans_list[i],std_list[i],score_list[i]))
+        if type_list[i] == '选择':
+            scores.append(judge_select(ans_list[i], std_list[i], score_list[i]))
+        elif type_list[i] == '填空':
+            scores.append(judge_fill(ans_list[i], std_list[i], score_list[i]))
         else:
             scores.append(score_list[i])
     return scores
 
 
-
 def judge_ans(request):
     request_dict = json.loads(request.body.decode('utf-8'))
     qids = request_dict['qids']
-    types=request_dict['types']
+    types = request_dict['types']
     answers = request_dict['answers']
     standard_ans = request_dict['standard_ans']
     all_scores = request_dict['all_scores']
     hit_scores = []
     for i in range(len(types)):
-        if types[i]=='选择':
-            hit_scores.append(judge_select(answers[i],standard_ans[i],all_scores[i]))
-        elif types[i]=='填空':
-            hit_scores.append(judge_fill(answers[i],standard_ans[i],all_scores[i]))
-        elif types[i]=='问答':
+        if types[i] == '选择':
+            hit_scores.append(judge_select(answers[i], standard_ans[i], all_scores[i]))
+        elif types[i] == '填空':
+            hit_scores.append(judge_fill(answers[i], standard_ans[i], all_scores[i]))
+        elif types[i] == '问答':
             hit_scores.append(all_scores[i])
         else:
-            hit_scores.append(judge_fussion(types[i],answers[i],standard_ans[i],all_scores[i]))
+            hit_scores.append(judge_fussion(types[i], answers[i], standard_ans[i], all_scores[i]))
     return JsonResponse({"hit_scores": hit_scores})

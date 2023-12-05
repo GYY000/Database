@@ -30,6 +30,7 @@
     <team_card v-for="(item,index) in team_sets.creator_list" :creator_name="item"
                :group_name="team_sets.group_name_list[index]"
                :date="team_sets.date_list[index]"
+               :tid="team_sets.tid_list[index]"
                :introduction="team_sets.introduction_list[index]">
     </team_card>
   </el-row>
@@ -48,7 +49,6 @@ import userStateStore from "@/store";
 import {Search} from "@element-plus/icons-vue";
 import Create_team_form from "@/views/main/team_component/create_team_form.vue";
 import team_card from "@/views/main/team_component/team_card.vue";
-import Edit_team from "@/views/main/team_component/team_introduction.vue";
 import router from "@/router";
 
 export default {
@@ -58,7 +58,7 @@ export default {
       return Search
     }
   },
-  components: {Edit_team, Create_team_form, team_card},
+  components: {Create_team_form, team_card},
 
   setup() {
     const dialog_visible = ref(false)

@@ -1,5 +1,4 @@
 <template>
-  <!-- TODO:也许有时间可以做一个悬浮效果-->
   <div @click="show_info = true">
     <el-skeleton :loading="flag" animated>
       <template #template>
@@ -37,9 +36,8 @@
 
 <script>
 
-import {del_member, fetch_avatar} from "@/views/main/api";
+import {fetch_avatar} from "@/views/main/api";
 import {ref} from "vue";
-import {ElMessage} from "element-plus";
 
 export default {
   name: "user_show_card",
@@ -59,23 +57,9 @@ export default {
       )
     }
 
-    const del_mem = () => {
-      del_member(props.name, props.group_name).then(
-          (res) => {
-            if (res.is_successful === 'true') {
-              ElMessage({
-                message: '删除用户',
-                showClose: true,
-                type: 'error',
-              })
-            }
-          }
-      )
-    }
     init()
     return {
       avatar,
-      del_mem,
       show_info,
       flag
     }

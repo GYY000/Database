@@ -49,7 +49,8 @@
           <div :id="titleId" class="edit_title">Team</div>
         </div>
       </template>
-      <team_introduction :team_name="group_name" :date="date" :avatar="avatar_url" :creator="creator_name"></team_introduction>
+      <team_introduction :tid="tid" :team_name="group_name"
+                         :date="date" :avatar="avatar_url" :creator="creator_name"/>
     </el-dialog>
   </el-card>
 </template>
@@ -66,7 +67,7 @@ import Team_introduction from "@/views/main/team_component/team_introduction.vue
 export default {
   name: "team_card",
   components: {Team_introduction},
-  props: ['creator_name', 'group_name', 'date', 'introduction'],
+  props: ['creator_name', 'group_name', 'date', 'tid', 'group_name', 'introduction'],
 
   setup(props, context) {
     const avatar_url = ref(null)

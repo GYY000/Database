@@ -37,26 +37,25 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script>
 import {fetch_all_member} from "@/views/main/api";
-import {ref, watch} from "vue";
+import {ref} from "vue";
 import User_show_card from "@/views/main/team_component/user_show_card.vue";
 
 export default {
   name: "team_introduction",
   components: {User_show_card},
-  props: ['team_name', 'date', 'avatar', 'creator'],
+  props: ['tid', 'date', 'avatar', 'creator', 'team_name'],
   setup(props) {
     const user_name_list = ref(null)
     const register_date_list = ref(null)
     const introduction = ref('here is supposed to be introduction')
 
     const init = () => {
-      fetch_all_member(props.team_name).then(
+      fetch_all_member(props.tid).then(
           (data) => {
             user_name_list.value = data.name_list
             register_date_list.value = data.register_date_list
