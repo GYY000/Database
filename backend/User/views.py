@@ -658,13 +658,16 @@ url:/fetch_all_ques_set_in_team
     creator_list = []
     introduction_list = []
     date_list = []
+    qsid_list = []
     for _ in QuestionSetPerm.objects.filter(tid=tid):
+        qsid_list.append(_.qsid)
         name_list.append(_.qsid.set_name)
         creator_list.append(_.qsid.creator.user_name)
         date_list.append(_.qsid.create_.strftime("%Y-%m-%d"))
         introduction_list.append(_.qsid.introduction)
     return JsonResponse({"name_list": name_list, "creator_list": creator_list,
                          "introduction_list": introduction_list,
+                         "qsid_list": qsid_list,
                          "date_list": date_list})
 
 
@@ -678,10 +681,14 @@ url:/fetch_all_users_in_team
     tid = json.loads(request.body.decode('utf-8'))['tid']
     name_list = []
     register_date_list = []
+    uid_list = []
     for _ in ReUserTeam.objects.filter(tid=tid):
         name_list.append(_.uid.user_name)
         register_date_list.append(_.join_date)
-    return JsonResponse({"name_list": name_list, "register_date_list": register_date_list})
+        uid_list.append(_.uid)
+    return JsonResponse({"name_list": name_list,
+                         "register_date_list": register_date_list
+                         "uid_list": uid_list})
 
 
 def get_user_post(request):

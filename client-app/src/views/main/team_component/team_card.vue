@@ -26,24 +26,24 @@
         <div style="padding: 2px">{{ creator_name }} {{ date }}</div>
       </div>
       <div class="footer">
-        <el-button type="primary" :icon="Edit" @click="toEdit"
-                   v-if="creator_name === store.getUserName" class="button"
-                   style="width: 70%;"
-                   round>
-          管理用户组
-        </el-button>
-        <div v-else>
-          <el-button type='danger' v-if="inside" :icon="Remove" class="button" @click="exit" round>
-            退出
+        <el-col :span="9">
+          <el-button type="primary" :icon="Edit" @click="to_intro"
+                     class="button">
+            简介
           </el-button>
-          <el-button type="primary" v-else :icon="Plus" class="button" @click="joinReq" round>
+        </el-col>
+        <el-col :span="9" :offset="2">
+          <el-button type='success' v-if="inside" :icon="Menu" class="button" @click="enter_in">
+            详情
+          </el-button>
+          <el-button type="primary" v-else :icon="Plus" class="button" @click="joinReq">
             加入
           </el-button>
-        </div>
+        </el-col>
       </div>
     </div>
 
-    <el-dialog v-model="edit_available" :show-close="false" draggable>
+    <el-dialog v-model="intro_dialog_open" :show-close="false" draggable>
       <template #header="{ close, titleId}">
         <div class="my-header">
           <div :id="titleId" class="edit_title">Team</div>
@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import {Edit, MagicStick, Plus, Remove, TopRight} from "@element-plus/icons-vue";
+import {Edit, MagicStick, Menu, Plus, Remove, TopRight} from "@element-plus/icons-vue";
 import {apply_for_team, check_inside_group, fetch_team_avatar} from "@/views/main/api";
 import {ref} from "vue";
 import userStateStore from "@/store";
@@ -74,7 +74,11 @@ export default {
     const flag = ref(true)
     const store = userStateStore()
     const inside = ref(false)
-    const edit_available = ref(false)
+    const intro_dialog_open = ref(false)
+
+    const enter_in = () => {
+      router.push('/manage_team/' + props.tid)
+    }
 
     const func = () => {
       fetch_team_avatar(props.group_name).then(
@@ -85,17 +89,13 @@ export default {
           });
       check_inside_group(store.getUserId, props.group_name).then(
           (data) => {
-            inside.value = data.is_inside === 'true'
+            inside.value = data.is_inside === 'true' || props.creator_name === store.getUserName
           }
       );
     }
 
-    const toEdit = () => {
-      edit_available.value = true
-    }
-
-    const exit = () => {
-      //TODO:
+    const to_intro = () => {
+      intro_dialog_open.value = true
     }
 
     const joinReq = () => {
@@ -117,15 +117,18 @@ export default {
       avatar_url,
       flag,
       store,
-      toEdit,
+      to_intro,
       inside,
-      exit,
       joinReq,
-      edit_available
+      intro_dialog_open,
+      enter_in
     }
   },
 
   computed: {
+    Menu() {
+      return Menu
+    },
     Remove() {
       return Remove
     },
@@ -211,7 +214,6 @@ export default {
   margin-top: 8px;
   height: 70%;
   width: 100%;
-  padding-right: 5px;
 }
 
 .seperator {
