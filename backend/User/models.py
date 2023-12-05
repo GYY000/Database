@@ -76,6 +76,7 @@ class QuestionHistory(models.Model):
     shid = models.ForeignKey(SetHistory, on_delete=models.CASCADE)
     answer = models.CharField(max_length=400)
     score = models.FloatField()
+    qid=models.ForeignKey(Question,on_delete=models.CASCADE)
 
 
 class SensitiveWord(models.Model):

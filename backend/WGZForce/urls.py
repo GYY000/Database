@@ -70,4 +70,7 @@ urlpatterns = [
     re_path("editor_upload_pic", views.upload_pic),
     re_path("update_ques",views.update_ques),
     re_path("judge_ans",views.judge_ans),
+    re_path("get_recent_records",views.get_recent_records),
+    re_path("get_recent_question_set",views.get_recent_question_set),
+    re_path("create_set_history",views.create_set_history)
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
