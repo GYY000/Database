@@ -4,7 +4,10 @@
       <el-tag class="mx-1" size="default" v-if="content.type === '选择'">选择题</el-tag>
       <el-tag class="mx-1" size="default" v-if="content.type === '填空'">填空题</el-tag>
       <el-tag class="mx-1" size="default" v-if="content.type === '问答'">问答题</el-tag>
-      <el-tag class="mx-1" size="default" :type="'success'" style="margin-left: 10px">{{ sub_problem.score }}分</el-tag>
+      <el-tag class="mx-1" size="default" v-if="score < delta" :type="'danger'" style="margin-left: 10px">
+        {{score}}/{{ sub_problem.score }}分</el-tag>
+      <el-tag class="mx-1" size="default" v-else :type="'success'" style="margin-left: 10px">
+        {{score}}/{{ sub_problem.score }}分</el-tag>
     </el-col>
   </el-row>
   <el-row>
@@ -17,22 +20,22 @@
       <el-row>
         <el-button v-if="check_color(index) === 'red'"
                    size="large" type="danger"
-                   style="width: 90%; margin-bottom: 10px">
-          <el-icon>
+                   style="width: 90%; margin-bottom: 10px;margin-left: 30px">
+          <el-icon style="margin-right: 20px;height: 25px">
             <Close/>
           </el-icon>
           {{ String.fromCharCode(index + 65) + '.' + item }}
         </el-button>
         <el-button v-if="check_color(index) === 'grey'"
                    size="large"
-                   style="width: 90%; margin-bottom: 10px">
+                   style="width: 90%; margin-bottom: 10px;margin-left: 30px">
           <span style="width: 30px"></span> {{ String.fromCharCode(index + 65) + '.' + item }}
         </el-button>
         <el-button v-if="check_color(index) === 'green'"
                    size="large"
                    type="success"
-                   style="width: 90%; margin-bottom: 10px">
-          <el-icon>
+                   style="width: 90%; margin-bottom: 10px;margin-left: 30px">
+          <el-icon style="margin-right: 20px;height: 25px">
             <Check/>
           </el-icon>
           {{ String.fromCharCode(index + 65) + '.' + item }}
@@ -40,8 +43,8 @@
         <el-button v-if="check_color(index) === 'yellow'"
                    size="large"
                    type="warning"
-                   style="width: 90%; margin-bottom: 10px">
-          <el-icon>
+                   style="width: 90%; margin-bottom: 10px;margin-left: 30px">
+          <el-icon style="margin-right: 20px;height: 25px">
             <Close/>
           </el-icon>
           {{ String.fromCharCode(index + 65) + '.' + item }}
@@ -50,11 +53,27 @@
     </div>
   </div>
   <div v-if="content.type === '填空'">
-    <el-form style="margin-bottom: 10px;width: 80%" label-width="auto">
+    <el-form style="margin-bottom: 10px;width: 80%;margin-left: 30px" label-width="auto">
       <div v-for="(item,index) in ans">
         <el-form-item :label="`空格 ${index + 1}`">
-          <el-input v-model="ans[index]" placeholder="您的答案"></el-input>
-          <el-input v-model="blank_ans[index]" placeholder="标准答案"></el-input>
+          <el-input v-model="ans[index]" size="large"
+                    v-if="sub_problem.score === score" placeholder="您的答案">
+            <template #prefix>
+              <el-icon style="color: green;height: 20px">
+                <Select />
+              </el-icon>
+            </template>
+          </el-input>
+          <el-input v-model="ans[index]" size="large"
+                    v-else placeholder="您的答案">
+            <template #prefix>
+              <el-icon style="color: red;height: 20px">
+                <Close />
+              </el-icon>
+            </template>
+          </el-input>
+          <el-input v-model="blank_ans[index]" size="large" style="margin-top: 10px"
+                    placeholder="标准答案"/>
         </el-form-item>
       </div>
     </el-form>
@@ -62,16 +81,20 @@
   <div v-if="content.type === '问答'" style="margin-bottom: 10px">
     <mavon-editor :box-shadow="true" default-open="preview" :editable="false"
                   :toolbars-flag="false" :subfield="false"
-                  style="min-width: 0px; width:70%;min-height: 400px"
+                  style="min-width: 0px; width:70%;min-height: 200px;margin-left: 30px"
                   placeholder="您的答案为空"
-                  :value="ans">
+                  :value="qa_ans" v-model="qa_ans">
     </mavon-editor>
-    <el-input v-model="do_score" placeholder="请填入此题你的分数" @change="update_sub_score"></el-input>
+    <el-row style="margin-top: 15px;margin-bottom: 15px;margin-left: 30px" align="center">
+      <span style="font-size: 18px">评分</span>
+      <el-input v-model="do_score" placeholder="评分"
+              @change="update_sub_score" style="margin-left: 30px;width: 30%"/>
+    </el-row>
     <mavon-editor :box-shadow="true" default-open="preview" :editable="false"
                   :toolbars-flag="false" :subfield="false"
-                  style="min-width: 0px; width:70%;min-height: 400px"
+                  style="min-width: 0px; width:70%;min-height: 200px;margin-left: 30px"
                   placeholder="标准答案"
-                  :value="content.ans">
+                  :value="content.ans" v-model="content.ans">
     </mavon-editor>
   </div>
 </template>
@@ -82,19 +105,22 @@ import Ques_option from "@/views/quesDoing/ques_option.vue";
 import Update_ques_form from "@/views/quesDoing/update_ques_form.vue";
 import Sub_problem_show from "@/views/quesDoing/sub_problem_show.vue";
 import {string2Array} from "@/views/main/api";
+import {Checked, Close} from "@element-plus/icons-vue";
 
 export default {
   name: "sub_problem_judge",
-  components: {Sub_problem_show, Update_ques_form, Ques_option},
+  components: {Close, Checked, Sub_problem_show, Update_ques_form, Ques_option},
   props: ["sub_problem", "id", "ans", "score"],
   emits: ['update_sub_score'],
 
   setup(props, context) {
     const do_score = ref('')
     const option_ans = ref((props.sub_problem.type === '选择') ?
-          props.sub_problem.ans.split(',') : [])
+        props.sub_problem.ans.split(',') : [])
     const blank_ans = ref((props.sub_problem.type === '填空') ?
         string2Array(props.sub_problem.ans) : [])
+    const qa_ans = ref(props.ans)
+    const delta = ref(1e-6)
 
     const content = ref(
         {
@@ -146,7 +172,9 @@ export default {
       do_score,
       check_color,
       option_ans,
-      blank_ans
+      blank_ans,
+      qa_ans,
+      delta
     }
   }
 }

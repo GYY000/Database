@@ -72,8 +72,7 @@
     </div>
   </div>
   <div class="center_class" v-if="judge_mode === true">
-    <judge_ans_view v-if="judge_mode === true"
-                    :hit_scores="hit_scores" :introduction="introduction"
+    <judge_ans_view :hit_scores="hit_scores" :introduction="introduction"
                     :ans="hand_in_form.answers" :ques_set_name="ques_set_name"
                     :questions="questions"/>
   </div>

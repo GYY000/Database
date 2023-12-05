@@ -91,8 +91,6 @@ export default {
     const profile_photo = ref('')
     const photo_flag = ref(true)
     const sum_score = ref(0.0)
-    const ques_set_name = ref('')
-    const introduction = ref()
     const scores = ref([])
 
     const handlePageChange = (val) => {
@@ -227,8 +225,6 @@ export default {
       profile_photo,
       photo_flag,
       sum_score,
-      introduction,
-      ques_set_name,
       statistic,
       exit,
       scores,
