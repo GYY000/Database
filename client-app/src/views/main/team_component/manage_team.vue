@@ -2,7 +2,7 @@
   <img src="@/assets/image/background3.jpg" class="background">
   <div class="center_class">
     <div class="main_container">
-      <el-row>
+      <el-row style="margin-bottom: 20px">
         <el-col :span="4" v-if="creator_name === store.getUserName">
           <div style="font-size: 18px;color: dodgerblue;margin-bottom: 5px;font-weight: bold">
             {{ team_name }}
@@ -26,6 +26,107 @@
             编辑
           </el-button>
         </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="18">
+          <el-row>
+            <el-col :span="7">
+              <el-card>
+                <el-row>
+                  <el-col :span="10">
+                    <div style="width: 50px;height: 50px;
+                    background: dodgerblue;border-radius: 20%">
+                      <img src="@/assets/image/申请.png"
+                           style="width: 40px;height: 40px;margin-top: 5px;margin-left: 5px"/>
+                    </div>
+                  </el-col>
+                  <el-col :span="13">
+                    <div style="font-size: 18px;font-weight: bold;margin-bottom: 3px">
+                      近七天申请
+                    </div>
+                    <div>
+                      <!-- TODO-->
+                      {{ ques_set_list.length }}
+                    </div>
+                  </el-col>
+                </el-row>
+              </el-card>
+            </el-col>
+            <el-col :span="7" :offset="1">
+              <el-card>
+                <el-row>
+                  <el-col :span="10">
+                    <div style="width: 50px;height: 50px;
+                    background: dodgerblue;border-radius: 20%">
+                      <img src="@/assets/image/好友.png"
+                           style="width: 40px;height: 40px;margin-top: 5px;margin-left: 5px"/>
+                    </div>
+                  </el-col>
+                  <el-col :span="13">
+                    <div style="font-size: 18px;font-weight: bold;margin-bottom: 3px">
+                      团队成员数
+                    </div>
+                    <div>
+                      {{ user_list.length }}
+                    </div>
+                  </el-col>
+                </el-row>
+              </el-card>
+            </el-col>
+            <el-col :span="7" :offset="1">
+              <el-card>
+                <el-row>
+                  <el-col :span="10">
+                    <div style="width: 50px;height: 50px;
+                    background: dodgerblue;border-radius: 20%">
+                      <img src="@/assets/image/问卷.png"
+                           style="width: 40px;height: 40px;margin-top: 5px;margin-left: 5px"/>
+                    </div>
+                  </el-col>
+                  <el-col :span="13">
+                    <div style="font-size: 18px;font-weight: bold;margin-bottom: 3px">
+                      问题组数
+                    </div>
+                    <div>
+                      <!-- TODO-->
+                      {{ ques_set_list.length }}
+                    </div>
+                  </el-col>
+                </el-row>
+              </el-card>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-table :data="history_data" style="width: 96%;margin-top: 20px">
+              <el-table-column label="团队动态">
+                <template #default="scope">
+                  <el-button size="small">Edit</el-button>
+                  <el-button size="small" type="danger">Delete</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-row>
+        </el-col>
+        <el-col :span="6">
+          <el-card>
+            <div style="display: flex;
+            justify-content: center;margin-bottom: 10px;
+            font-family: Lobster; font-size: 28px">
+              Team Profile
+            </div>
+            <img :src="avatar" style="height: 300px;width: 100%;object-fit: cover;border-radius: 6%"/>
+            <div style="margin-left: 5px;margin-right: 5px;
+              margin-top: 10px;font-weight: bold">
+              团队介绍
+            </div>
+            <div style="margin-left: 5px;margin-right: 5px;margin-top: 10px;font-size: 13px;height: 100px">
+              {{ introduction }}
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+      <el-row>
+
       </el-row>
     </div>
   </div>
@@ -91,8 +192,8 @@ import {
   del_team,
   fetch_all_member,
   fetch_all_team_ques_set,
-  fetch_team_info, hand_in_ans, update_team,
-  upload_ques_set
+  fetch_team_info,
+  update_team,
 } from "@/views/main/api";
 import Judge_ans_view from "@/views/quesDoing/judge_ans_view.vue";
 import Ques_do_display from "@/views/quesDoing/ques_do_display.vue";
@@ -104,13 +205,8 @@ export default {
   components: {Ques_do_display, Judge_ans_view},
 
   setup() {
-    const qs_name_list = ref([])
-    const qs_id_list = ref([])
-    const qs_creator_list = ref([])
-    const qs_date_list = ref([])
-    const u_id_list = ref([])
-    const u_name_list = ref([])
-    const u_register_date_list = ref([])
+    const ques_set_list = ref([])
+    const user_list = ref([])
     const creator_name = ref()
     const team_name = ref()
     const introduction = ref()
@@ -122,22 +218,33 @@ export default {
     const change_avatar = ref('')
     const hand_in_avatar = ref('')
     const edit_introduction = ref('')
+    const history_data = ref([])
 
     const init = () => {
       let router = useRouter()
       fetch_all_member(router.currentRoute.value.params.tid).then(
           (res) => {
-            u_id_list.value = res.uid_list
-            u_name_list.value = res.name_list
-            u_register_date_list.value = res.register_date_list
+            for (let i = 0; i < res.uid_list.length; i++) {
+              user_list.value.push({
+                id: res.uid_list[i],
+                name: res.name_list[i],
+                date: res.register_date_list[i]
+              })
+            }
           }
       )
       fetch_all_team_ques_set(router.currentRoute.value.params.tid).then(
           (res) => {
-            qs_name_list.value = ref(res.name_list)
-            qs_id_list.value = ref(res.qsid_list)
-            qs_creator_list.value = ref(res.creator_list)
-            qs_date_list.value = ref(res.date_list)
+            for (let i = 0; i < res.qsid_list.length; i++) {
+              ques_set_list.value.push(
+                  {
+                    name: res.name_list[i],
+                    id: res.qsid_list[i],
+                    creator: res.creator_list[i],
+                    date: res.date_list[i]
+                  }
+              )
+            }
           }
       )
       fetch_team_info(router.currentRoute.value.params.tid).then(
@@ -256,13 +363,8 @@ export default {
     init()
 
     return {
-      qs_name_list,
-      qs_creator_list,
-      qs_date_list,
-      qs_id_list,
-      u_id_list,
-      u_name_list,
-      u_register_date_list,
+      ques_set_list,
+      user_list,
       avatar,
       change_avatar,
       introduction,
@@ -278,13 +380,20 @@ export default {
       exit,
       handle_avatar,
       hand_in_edit,
-      cancel_edit
+      cancel_edit,
+      history_data
     }
   }
 }
 </script>
 
 <style scoped>
+
+@font-face {
+  font-family: 'Lobster';
+  src: url('/src/assets/fonts/Lobster-1-4-1.otf') format('truetype');
+}
+
 .background {
   top: 0;
   left: 0;

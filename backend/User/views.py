@@ -660,10 +660,10 @@ url:/fetch_all_ques_set_in_team
     date_list = []
     qsid_list = []
     for _ in QuestionSetPerm.objects.filter(tid=tid):
-        qsid_list.append(_.qsid)
+        qsid_list.append(_.qsid.qsid)
         name_list.append(_.qsid.set_name)
         creator_list.append(_.qsid.creator.user_name)
-        date_list.append(_.qsid.create_date.strftime("%Y-%m-%d"))
+        date_list.append(_.qsid.create_time.strftime("%Y-%m-%d"))
         introduction_list.append(_.qsid.introduction)
     return JsonResponse({"name_list": name_list, "creator_list": creator_list,
                          "introduction_list": introduction_list,
