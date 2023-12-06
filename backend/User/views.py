@@ -11,6 +11,9 @@ from PIL import Image
 from django.db.models import Q
 from django.conf import settings
 import os
+from django.utils import timezone
+from datetime import timedelta
+
 
 
 # Create your views here.
@@ -447,6 +450,8 @@ url:/upload_team
         team = Team(team_name=group_name, creator=User.objects.get(uid=user_id), profile_photo=code,
                     introduction=introduction)
         team.save()
+        #通过GROUP_name+"_VIRTUAL"来获取虚拟
+        User(user_name=group_name+"_VIRTUAL",password="123456",profile_photo=code).save()
         return JsonResponse({"is_successful": "true"})
     except Exception as e:
         print(e)
@@ -998,3 +1003,49 @@ def create_set_history(request):
         QuestionHistory(shid=set_history, score=scores[i], answer=str(answers[i]),
                         qid=Question.objects.get(qid=qids[i])).save()
     return JsonResponse({"is_successful": "true"})
+
+
+#这里我需要返回最近的最多五条，组内成员做组内题集的记录
+def fetch_history_team(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    tid=request_dict['tid']
+    shs=list(SetHistory.objects.order_by('-time'))
+    question_sets=QuestionSetPerm.objects.filter(tid=tid)
+    question_sets=[_.qsid for _ in question_sets]
+    ans=[]
+    for _ in shs:
+        if question_sets.__contains__(_.qsid):
+            ans.append(_)
+    ans=ans[:5]
+    name_list=[_.uid.user_name  for _ in ans]
+    ques_set_list=[_.qsid.set_name for _ in ans]
+    date_list=[_.time.strftime("%Y-%m-%d %H:%M") for _ in ans]
+    return JsonResponse({"user_name_list":name_list,"ques_set_list":ques_set_list,
+                         "date_list":date_list})
+
+
+#返回最近七天的申请进入该组申请数
+def fetch_history_applications(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    tid=request_dict['tid']
+    now=timezone.now()
+    seven_days_ago=now-timedelta(days=7)
+    reqs=list(JoinRequest.objects.filter(tid=tid).filter(create_time__gte=seven_days_ago))
+    return JsonResponse({"application_sum":len(reqs)})
+
+
+def send_team_message(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    tid=request_dict['tid']
+    uid_list=request_dict['uid_list']
+    message=request_dict['message']
+    team=Team.objects.get(tid=tid)
+    try:
+        sender=User.objects.get(user_name=team.team_name+"_VIRTUAL")
+    except:
+        tmp=User(user_name=team.team_name+"_VIRTUAL",password="123456",profile_photo=team.profile_photo)
+        tmp.save()
+        sender=tmp
+    for uid in uid_list:
+        Message(sender=sender,receiver=User.objects.get(uid=uid),content=message).save()
+    return JsonResponse({"is_successful":"true"})
