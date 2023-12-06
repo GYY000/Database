@@ -564,19 +564,19 @@ url:/apply_for_team
     return JsonResponse({"is_successful": "true"})
 
 
-def del_member(request):
+def del_members(request):
     '''
     前->后	后->前
 del_user_id	is_successful(true,false)
 team_name
-url:/del_member
+url:/del_members
     '''
     request_dict = json.loads(request.body.decode('utf-8'))
-    del_user_id = request_dict["del_user_id"]
-    team_name = request_dict["team_name"]
+    del_user_ids = request_dict["del_user_ids"]
+    tid = request_dict["tid"]
     try:
-        ReUserTeam.objects.get(uid=del_user_id
-                               , tid=Team.objects.get(team_name=team_name).tid).delete()
+        for id in del_user_ids :
+            ReUserTeam.objects.get(uid=id, tid=tid).delete()
         return JsonResponse({"is_successful": "true"})
     except:
         return JsonResponse({"is_successful": "false"})
@@ -663,7 +663,7 @@ url:/fetch_all_ques_set_in_team
         qsid_list.append(_.qsid)
         name_list.append(_.qsid.set_name)
         creator_list.append(_.qsid.creator.user_name)
-        date_list.append(_.qsid.create_.strftime("%Y-%m-%d"))
+        date_list.append(_.qsid.create_date.strftime("%Y-%m-%d"))
         introduction_list.append(_.qsid.introduction)
     return JsonResponse({"name_list": name_list, "creator_list": creator_list,
                          "introduction_list": introduction_list,
@@ -852,6 +852,21 @@ def update_ques(request):
         ques.save()
         return JsonResponse({"is_successful": "true"})
 
+def update_team(request):
+    assert request.method == "POST"
+    tid = request.POST.get('tid')
+    introduction = request.POST.get('introduction')
+    try:
+        team = Team.objects.get(tid=tid)
+        team.introduction = introduction
+        if request.POST.get('change_avatar') != "false":
+            file = request.FILES.get('file').read()
+            code = base64.b64encode(file)
+            team.profile_photo = code
+        team.save()
+        return JsonResponse({"is_successful": "true"})
+    except QuestionSet.DoesNotExist:
+        return JsonResponse({"is_successful": "false"})
 
 import math
 

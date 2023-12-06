@@ -11,6 +11,16 @@ export function upload_ques_set(ques_set_data) {
         })
 }
 
+export function update_team(team_data) {
+    return axios.post('/update_team_info', team_data,
+        {
+            headers: {'Content-Type': 'multipart/form-data'}
+        })
+        .then(response => {
+            return response.data
+        })
+}
+
 export function fetch_all_visible_ques_set(user_id) {
     return axios.request({
         url: '/fetch_visible_ques_set',
@@ -219,13 +229,25 @@ export function fetch_team_info(tid) {
     })
 }
 
-export function del_member(name, team_name) {
+export function del_members(del_user_ids, tid) {
     return axios.request({
-        url: '/del_member',
+        url: '/del_members',
         method: "post",
         data: JSON.stringify({
-            del_user_name: name,
-            team_name: team_name
+            del_user_ids: del_user_ids,
+            tid: tid
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
+export function del_team(tid) {
+    return axios.request({
+        url: '/del_team',
+        method: "post",
+        data: JSON.stringify({
+            tid: tid
         })
     }).then(response => {
         return response.data

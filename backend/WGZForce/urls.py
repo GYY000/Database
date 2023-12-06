@@ -54,7 +54,7 @@ urlpatterns = [
     re_path("fetch_set_avatar", views.fetch_set_avatar),
     re_path("del_team", views.del_team),
     re_path("apply_for_team", views.apply_for_team),
-    re_path("del_member", views.del_member),
+    re_path("del_members", views.del_members),
     re_path("del_ques_set", views.del_ques_set),
     re_path("answer_to_req", views.answer_to_req),
     re_path("fetch_all_application", views.fetch_all_application),

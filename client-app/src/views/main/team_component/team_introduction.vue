@@ -22,8 +22,8 @@
       </div>
     </div>
     <div class="user_wrapper">
-      <div
-          style="padding-top: 20px;font-size: 25px;color: #409EFF;display: flex;font-family:'Lobster', cursive;justify-content: center">
+      <div style="padding-top: 20px;font-size: 25px;color: #409EFF;
+      display: flex;font-family:'Lobster', cursive;justify-content: center">
         Members
       </div>
       <div style="display: flex;justify-content: center;flex-wrap: wrap;padding-top: 5px">
