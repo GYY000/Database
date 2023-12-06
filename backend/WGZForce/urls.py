@@ -73,5 +73,8 @@ urlpatterns = [
     re_path("get_recent_records",views.get_recent_records),
     re_path("get_recent_question_set",views.get_recent_question_set),
     re_path("create_set_history",views.create_set_history),
-    re_path("fetch_team_info", views.fetch_team_info)
+    re_path("fetch_team_info", views.fetch_team_info),
+    re_path("fetch_history_team",views.fetch_history_team),
+    re_path("fetch_history_applications",views.fetch_history_applications),
+    re_path("send_team_message",views.send_team_message),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
