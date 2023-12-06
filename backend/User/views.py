@@ -687,7 +687,7 @@ url:/fetch_all_users_in_team
         register_date_list.append(_.join_date)
         uid_list.append(_.uid)
     return JsonResponse({"name_list": name_list,
-                         "register_date_list": register_date_list
+                         "register_date_list": register_date_list,
                          "uid_list": uid_list})
 
 

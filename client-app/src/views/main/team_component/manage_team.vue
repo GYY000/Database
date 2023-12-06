@@ -1,5 +1,6 @@
 <template>
-  11111
+  <img src="@/assets/image/background3.jpg" class="background">
+
 </template>
 
 <script>
@@ -53,5 +54,13 @@ export default {
 </script>
 
 <style scoped>
-
+.background {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  z-index: -1;
+  opacity: 30%;
+}
 </style>
