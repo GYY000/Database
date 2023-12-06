@@ -58,7 +58,7 @@ urlpatterns = [
     re_path("del_ques_set", views.del_ques_set),
     re_path("answer_to_req", views.answer_to_req),
     re_path("fetch_all_application", views.fetch_all_application),
-    re_path("fetch_all_ques_set_in_team", views.fetch_all_ques_set_in_team),
+    re_path("fetch_all_team_ques_set", views.fetch_all_ques_set_in_team),
     re_path("fetch_all_users_in_team", views.fetch_all_users_in_team),
     re_path("get_user_post",views.get_user_post),
     re_path("search_post",views.search_post),
@@ -72,5 +72,6 @@ urlpatterns = [
     re_path("judge_ans",views.judge_ans),
     re_path("get_recent_records",views.get_recent_records),
     re_path("get_recent_question_set",views.get_recent_question_set),
-    re_path("create_set_history",views.create_set_history)
+    re_path("create_set_history",views.create_set_history),
+    re_path("fetch_team_info", views.fetch_team_info)
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

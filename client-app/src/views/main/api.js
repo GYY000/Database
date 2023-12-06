@@ -197,7 +197,19 @@ export function fetch_all_member(tid) {
 
 export function fetch_all_team_ques_set(tid) {
     return axios.request({
-        url: '/fetch_all_ques_set_in_team',
+        url: '/fetch_all_team_ques_set',
+        method: "post",
+        data: JSON.stringify({
+            tid: tid,
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
+export function fetch_team_info(tid) {
+    return axios.request({
+        url: '/fetch_team_info',
         method: "post",
         data: JSON.stringify({
             tid: tid,
