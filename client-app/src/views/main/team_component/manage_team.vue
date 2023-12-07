@@ -45,8 +45,7 @@
                       近七天申请
                     </div>
                     <div>
-                      <!-- TODO-->
-                      {{ ques_set_list.length }}
+                      {{ history_applications }}
                     </div>
                   </el-col>
                 </el-row>
@@ -88,7 +87,6 @@
                       问题组数
                     </div>
                     <div>
-                      <!-- TODO-->
                       {{ ques_set_list.length }}
                     </div>
                   </el-col>
@@ -97,11 +95,10 @@
             </el-col>
           </el-row>
           <el-row>
-            <el-table :data="history_data" style="width: 96%;margin-top: 20px">
+            <el-table :data="history_display" style="width: 96%;margin-top: 20px;height: 420px">
               <el-table-column label="团队动态">
                 <template #default="scope">
-                  <el-button size="small">Edit</el-button>
-                  <el-button size="small" type="danger">Delete</el-button>
+                  <history_entry :info="scope.row"></history_entry>
                 </template>
               </el-table-column>
             </el-table>
@@ -126,7 +123,9 @@
         </el-col>
       </el-row>
       <el-row>
+        <el-table>
 
+        </el-table>
       </el-row>
     </div>
   </div>
@@ -191,7 +190,7 @@ import {
   del_members,
   del_team,
   fetch_all_member,
-  fetch_all_team_ques_set,
+  fetch_all_team_ques_set, fetch_history_application, fetch_history_team,
   fetch_team_info,
   update_team,
 } from "@/views/main/api";
@@ -199,12 +198,25 @@ import Judge_ans_view from "@/views/quesDoing/judge_ans_view.vue";
 import Ques_do_display from "@/views/quesDoing/ques_do_display.vue";
 import userStateStore from "@/store";
 import {ElMessage} from "element-plus";
+import History_entry from "@/views/main/team_component/history_entry.vue";
+
+function compareFn(a, b) {
+  if (a.date > b.date) {
+    return -1;
+  }
+  if (a.date < b.date) {
+    return 1;
+  }
+  return 0;
+}
 
 export default {
   name: "manage_team",
-  components: {Ques_do_display, Judge_ans_view},
+  components: {History_entry, Ques_do_display, Judge_ans_view},
 
   setup() {
+    const history_display = ref([])
+    const history_applications = ref(0)
     const ques_set_list = ref([])
     const user_list = ref([])
     const creator_name = ref()
@@ -218,7 +230,6 @@ export default {
     const change_avatar = ref('')
     const hand_in_avatar = ref('')
     const edit_introduction = ref('')
-    const history_data = ref([])
 
     const init = () => {
       let router = useRouter()
@@ -230,21 +241,56 @@ export default {
                 name: res.name_list[i],
                 date: res.register_date_list[i]
               })
+              history_display.value.push({
+                name: res.name_list[i],
+                date: res.register_date_list[i],
+                type: 'enter'
+              })
             }
+            fetch_history_team(router.currentRoute.value.params.tid).then(
+                (res) => {
+                  for (let i = 0; i < res.user_name_list.length; i++) {
+                    history_display.value.push(
+                        {
+                          name: res.user_name_list[i],
+                          date: res.date_list[i],
+                          type: 'do_prob',
+                          ques_set_name: res.ques_set_list[i]
+                        }
+                    )
+                  }
+                  fetch_all_team_ques_set(router.currentRoute.value.params.tid).then(
+                      (res) => {
+                        for (let i = 0; i < res.qsid_list.length; i++) {
+                          ques_set_list.value.push(
+                              {
+                                name: res.name_list[i],
+                                id: res.qsid_list[i],
+                                creator: res.creator_list[i],
+                                date: res.date_list[i]
+                              }
+                          )
+                          history_display.value.push(
+                              {
+                                ques_set_name: res.name_list[i],
+                                name: res.creator_list[i],
+                                date: res.date_list[i],
+                                type: "new_set"
+                              }
+                          )
+                        }
+                        history_display.value.sort(compareFn)
+                        history_display.value.slice(0, 10)
+                      }
+                  )
+
+                }
+            )
           }
       )
-      fetch_all_team_ques_set(router.currentRoute.value.params.tid).then(
+      fetch_history_application(router.currentRoute.value.params.tid).then(
           (res) => {
-            for (let i = 0; i < res.qsid_list.length; i++) {
-              ques_set_list.value.push(
-                  {
-                    name: res.name_list[i],
-                    id: res.qsid_list[i],
-                    creator: res.creator_list[i],
-                    date: res.date_list[i]
-                  }
-              )
-            }
+            history_applications.value = res.application_sum
           }
       )
       fetch_team_info(router.currentRoute.value.params.tid).then(
@@ -381,7 +427,8 @@ export default {
       handle_avatar,
       hand_in_edit,
       cancel_edit,
-      history_data
+      history_display,
+      history_applications
     }
   }
 }

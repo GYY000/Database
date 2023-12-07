@@ -229,6 +229,31 @@ export function fetch_team_info(tid) {
     })
 }
 
+export function fetch_history_application(tid) {
+    return axios.request({
+        url: '/fetch_history_applications',
+        method: "post",
+        data: JSON.stringify({
+            tid: tid,
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
+export function fetch_history_team(tid) {
+    return axios.request({
+        url: '/fetch_history_team',
+        method: "post",
+        data: JSON.stringify({
+            tid: tid,
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
+
 export function del_members(del_user_ids, tid) {
     return axios.request({
         url: '/del_members',
