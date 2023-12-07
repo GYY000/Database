@@ -122,11 +122,25 @@
           </el-card>
         </el-col>
       </el-row>
-      <el-row>
-        <el-table>
+      <el-row style="margin-top: 20px">
+        <el-col :span="12">
+          <el-row>
 
-        </el-table>
+          </el-row>
+          <el-row>
+            <el-table>
+
+            </el-table>
+          </el-row>
+
+        </el-col>
+        <el-col :span="11" :offset="1">
+          <el-table>
+
+          </el-table>
+        </el-col>
       </el-row>
+      <div style="height: 150px"/>
     </div>
   </div>
   <el-dialog
