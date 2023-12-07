@@ -131,18 +131,6 @@ import router from "@/router";
 import Ques_do_display from "@/views/quesDoing/ques_do_display.vue";
 import Judge_ans_view from "@/views/quesDoing/judge_ans_view.vue";
 
-window.addEventListener('scroll', function () {
-  let lower_panel = document.getElementById('lower_panel');
-  let scrollDistance = window.pageYOffset || document.documentElement.scrollTop;
-  let threshold = 20;
-
-  if (scrollDistance < threshold || scrollDistance === 0) {
-    lower_panel.style.top = '60px';
-  } else {
-    lower_panel.style.top = '0px';
-  }
-});
-
 export default {
   name: 'do_problem',
   data() {
@@ -210,6 +198,17 @@ export default {
     ArrowLeft, Ques_do_display, Ques_display
   },
   setup() {
+    window.addEventListener('scroll', function () {
+      let lower_panel = document.getElementById('lower_panel');
+      let scrollDistance = window.pageYOffset || document.documentElement.scrollTop;
+      let threshold = 20;
+
+      if (scrollDistance < threshold || scrollDistance === 0) {
+        lower_panel.style.top = '60px';
+      } else {
+        lower_panel.style.top = '0px';
+      }
+    });
     const statistic = ref([
       {
         sum: 0,

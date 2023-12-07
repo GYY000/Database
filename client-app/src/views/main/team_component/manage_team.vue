@@ -125,14 +125,31 @@
       <el-row style="margin-top: 20px">
         <el-col :span="12">
           <el-row>
-
+            <el-button type="primary" :icon="ChatSquare">
+              群发消息
+            </el-button>
+            <el-button type="danger" :icon="Close">
+              删除成员
+            </el-button>
+            <el-button type="primary" :icon="Document">
+              发起考试
+            </el-button>
           </el-row>
           <el-row>
-            <el-table>
-
+            <el-table
+                ref="multipleTableRef"
+                :data="user_list"
+                style="width: 100%"
+                height="90%"
+                stripe
+                @selection-change="handleSelectionChange"
+            >
+              <el-table-column type="selection"/>
+              <el-table-column property="id" label="id" sortable/>
+              <el-table-column property="name" label="用户名" sortable/>
+              <el-table-column property="date" label="加入时间" sortable/>
             </el-table>
           </el-row>
-
         </el-col>
         <el-col :span="11" :offset="1">
           <el-table>
@@ -195,6 +212,9 @@
       </span>
     </template>
   </el-dialog>
+  <el-dialog v-model="group_message_dialog">
+
+  </el-dialog>
 </template>
 
 <script>
@@ -213,6 +233,7 @@ import Ques_do_display from "@/views/quesDoing/ques_do_display.vue";
 import userStateStore from "@/store";
 import {ElMessage} from "element-plus";
 import History_entry from "@/views/main/team_component/history_entry.vue";
+import {ChatSquare, Close} from "@element-plus/icons-vue";
 
 function compareFn(a, b) {
   if (a.date > b.date) {
@@ -226,6 +247,14 @@ function compareFn(a, b) {
 
 export default {
   name: "manage_team",
+  computed: {
+    Close() {
+      return Close
+    },
+    ChatSquare() {
+      return ChatSquare
+    }
+  },
   components: {History_entry, Ques_do_display, Judge_ans_view},
 
   setup() {
@@ -241,9 +270,17 @@ export default {
     const store = userStateStore()
     const exit_confirm_dialog = ref(false)
     const edit_dialog = ref(false)
+    const group_message_dialog = ref(false)
     const change_avatar = ref('')
     const hand_in_avatar = ref('')
     const edit_introduction = ref('')
+    const multipleTableRef = ref(null);
+    const multipleSelection = ref([]);
+
+    const handleSelectionChange = (val) => {
+      multipleSelection.value = val;
+      console.log(multipleSelection.value)
+    }
 
     const init = () => {
       let router = useRouter()
@@ -442,7 +479,11 @@ export default {
       hand_in_edit,
       cancel_edit,
       history_display,
-      history_applications
+      history_applications,
+      group_message_dialog,
+      handleSelectionChange,
+      multipleTableRef,
+      multipleSelection
     }
   }
 }
