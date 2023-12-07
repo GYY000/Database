@@ -122,65 +122,77 @@
           </el-card>
         </el-col>
       </el-row>
+
       <el-row style="margin-top: 20px">
-        <el-col :span="24">
-          <el-row style="margin-bottom: 10px;">
-            <el-button type="primary" :icon="ChatSquare" @click="open_group_message">
-              群发消息
-            </el-button>
-            <el-button type="primary" :icon="EditPen">
-              发起考试
-            </el-button>
-            <el-button type="danger" :icon="Close" @click="open_del_member">
-              删除成员
-            </el-button>
+        <el-card style="width: 100%;">
+          <el-row style="margin-bottom: 15px;color: grey;font-weight: bold">
+            成员管理
           </el-row>
-          <el-row>
+
+          <el-col :span="24">
+            <el-row style="margin-bottom: 10px;">
+              <el-button type="primary" :icon="ChatSquare" @click="open_group_message">
+                群发消息
+              </el-button>
+              <el-button type="primary" :icon="EditPen">
+                发起考试
+              </el-button>
+              <el-button type="danger" :icon="Close" @click="open_del_member">
+                删除成员
+              </el-button>
+            </el-row>
+            <el-row>
+              <el-table
+                  ref="multipleTableRef"
+                  :data="user_list"
+                  style="width: 100%"
+                  height="400px"
+                  stripe
+                  @selection-change="handleSelectionChange"
+              >
+                <el-table-column type="selection"/>
+                <el-table-column property="id" label="id" sortable/>
+                <el-table-column property="name" label="用户名" sortable/>
+                <el-table-column property="date" label="加入时间" sortable/>
+                <el-table-column property="do_prob_sum" label="做题数" sortable/>
+                <el-table-column property="accuracy" label="正确率" sortable/>
+                <el-table-column label="">
+                  <template #default="scope">
+                    <el-button type="primary" @click="member_show(scope.row)">查看详情</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-row>
+          </el-col>
+        </el-card>
+      </el-row>
+      <el-row style="margin-top: 20px">
+        <el-card style="width: 100%;">
+          <el-row style="margin-bottom: 15px;color: grey;font-weight: bold">
+            问题组管理
+          </el-row>
+          <el-col :span="24">
             <el-table
-                ref="multipleTableRef"
-                :data="user_list"
+                :data="ques_set_list"
                 style="width: 100%"
                 height="400px"
                 stripe
-                @selection-change="handleSelectionChange"
             >
-              <el-table-column type="selection"/>
-              <el-table-column property="id" label="id" sortable/>
-              <el-table-column property="name" label="用户名" sortable/>
-              <el-table-column property="date" label="加入时间" sortable/>
-              <el-table-column property="do_prob_sum" label="做题数" sortable/>
-              <el-table-column property="accuracy" label="正确率" sortable/>
+              <el-table-column property="id" label="id" width="70px" sortable/>
+              <el-table-column property="name" label="问题组名" sortable/>
+              <el-table-column property="date" label="创建时间" sortable/>
+              <el-table-column property="creator" label="创建者" sortable/>
+              <el-table-column property="ques_sum" label="题目数" width="90px" sortable/>
+              <el-table-column property="do_time" label="完成次数" width="110px" sortable/>
+              <el-table-column property="average_score" label="平均分" sortable/>
               <el-table-column label="">
                 <template #default="scope">
-                  <el-button type="primary" @click="member_show(scope.row)">查看详情</el-button>
+                  <el-button type="primary" @click="ques_set_show(scope.row)">查看详情</el-button>
                 </template>
               </el-table-column>
             </el-table>
-          </el-row>
-        </el-col>
-      </el-row>
-      <el-row style="margin-top: 30px">
-        <el-col :span="24">
-          <el-table
-              :data="ques_set_list"
-              style="width: 100%"
-              height="400px"
-              stripe
-          >
-            <el-table-column property="id" label="id" width="70px" sortable/>
-            <el-table-column property="name" label="问题组名" sortable/>
-            <el-table-column property="date" label="创建时间" sortable/>
-            <el-table-column property="creator" label="创建者" sortable/>
-            <el-table-column property="ques_sum" label="题目数" width="90px" sortable/>
-            <el-table-column property="do_time" label="完成次数"  width="110px" sortable/>
-            <el-table-column property="average_score" label="平均分" sortable/>
-            <el-table-column label="">
-              <template #default="scope">
-                <el-button type="primary">查看详情</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-col>
+          </el-col>
+        </el-card>
       </el-row>
       <div style="height: 150px"/>
     </div>
@@ -316,6 +328,11 @@
     </template>
   </el-dialog>
   <el-dialog v-model="member_info_dialog" style="width:400px" draggable>
+    <template #header>
+      <div style="display: flex;justify-content: center">
+        <span style="font-size: 35px;color:dodgerblue;font-family: Lobster;font-weight: bold">Member</span>
+      </div>
+    </template>
     <div style="display: flex;justify-content: center">
       <div>
         <el-skeleton :loading="member_avatar_flag" animated>
@@ -343,6 +360,53 @@
       </div>
     </div>
   </el-dialog>
+  <el-dialog v-model="ques_set_info_dialog" style="width: 500px">
+    <template #header>
+      <div style="display: flex;justify-content: center">
+        <span style="font-size: 35px;color:dodgerblue;font-weight: bold;font-family: Lobster">QuesSet</span>
+      </div>
+    </template>
+    <el-row>
+      <el-col :span="11" :offset="1">
+        <el-skeleton :loading="ques_set_avatar_flag" animated>
+          <template #template>
+            <el-skeleton-item variant="image" style="width: 100%; height: 180px"/>
+          </template>
+          <template #default>
+            <img :src="ques_set_info.avatar"
+                 style="width: 100%; height: 180px;object-fit: cover">
+          </template>
+        </el-skeleton>
+      </el-col>
+      <el-col :span="11" style="margin-left: 10px">
+        <div style="margin-bottom: 8px;font-weight: bold;
+        color: dodgerblue;margin-right: 10px;margin-left: 5px;font-size: 20px">
+          {{ques_set_info.name}}
+        </div>
+        <div style="margin-bottom: 8px;color:grey;
+        margin-right: 10px;margin-left: 5px">
+          {{ques_set_info.date}}
+        </div>
+        <div style="margin-bottom: 8px;color:grey;
+        margin-right: 10px;margin-left: 5px">
+          由{{ques_set_info.creator}}创建
+        </div>
+        <div style="margin-bottom: 8px;color:grey;
+        margin-right: 10px;margin-left: 5px">
+          <el-tag style="width: 70px">完成次数</el-tag>&nbsp{{ques_set_info.do_time}}
+        </div>
+        <div style="margin-bottom: 8px;color:grey;
+        margin-right: 10px;margin-left: 5px">
+          <el-tag style="width: 70px">平均分</el-tag>&nbsp{{ques_set_info.average_score}}
+        </div>
+        <div>
+          <el-button type="primary" style="margin-left: 3px" @click="goto_ques_set(ques_set_info.id)">
+            详情
+          </el-button>
+        </div>
+      </el-col>
+    </el-row>
+  </el-dialog>
 </template>
 
 <script>
@@ -352,8 +416,13 @@ import {
   del_members,
   del_team,
   fetch_all_member,
-  fetch_all_team_ques_set, fetch_avatar, fetch_history_application, fetch_history_team,
-  fetch_team_info, send_team_message,
+  fetch_all_team_ques_set,
+  fetch_avatar,
+  fetch_history_application,
+  fetch_history_team,
+  fetch_set_avatar,
+  fetch_team_info,
+  send_team_message,
   update_team,
 } from "@/views/main/api";
 import Judge_ans_view from "@/views/quesDoing/judge_ans_view.vue";
@@ -363,6 +432,7 @@ import {ElMessage} from "element-plus";
 import History_entry from "@/views/main/team_component/history_entry.vue";
 import {ChatSquare, Close, CloseBold, EditPen} from "@element-plus/icons-vue";
 import User_show_card from "@/views/main/team_component/user_show_card.vue";
+import router from "@/router";
 
 function compareFn(a, b) {
   if (a.date > b.date) {
@@ -414,6 +484,13 @@ export default {
     const member_info_dialog = ref(false)
     const member_info = ref(null)
     const member_avatar_flag = ref(true)
+    const ques_set_info_dialog = ref(false)
+    const ques_set_avatar_flag = ref(true)
+    const ques_set_info = ref(null)
+
+    const goto_ques_set = (id) => {
+      router.push('/edit_ques_group/' + id)
+    }
 
     const handleSelectionChange = (val) => {
       user_selection.value = val;
@@ -421,6 +498,37 @@ export default {
       for (let i = 0; i < val.length; i++) {
         option_user.value.push(val[i].name)
       }
+    }
+
+    const ques_set_show = (info) => {
+      ques_set_info.value = {
+        avatar: '',
+        name: info.name,
+        id: info.id,
+        date: info.date,
+        creator: info.creator,
+        ques_sum: info.ques_sum,
+        do_time: info.do_time,
+        average_score: info.average_score,
+      }
+      ques_set_avatar_flag.value = true
+      ques_set_info_dialog.value = true
+      fetch_set_avatar(info.name).then(
+          (res) => {
+            ques_set_info.value = {
+              avatar: res.avatar.startsWith('/9j')
+                ? 'data:image/jpg;base64,' + res.avatar : 'data:image/png;base64,' + res.avatar,
+              name: info.name,
+              id: info.id,
+              date: info.date,
+              creator: info.creator,
+              ques_sum: info.ques_sum,
+              do_time: info.do_time,
+              average_score: info.average_score,
+            }
+            ques_set_avatar_flag.value = false
+          }
+      )
     }
 
     const member_show = (info) => {
@@ -449,8 +557,8 @@ export default {
     }
 
     const init = () => {
-      let router = useRouter()
-      fetch_all_member(router.currentRoute.value.params.tid).then(
+      let router1 = useRouter()
+      fetch_all_member(router1.currentRoute.value.params.tid).then(
           (res) => {
             console.log(res)
             for (let i = 0; i < res.uid_list.length; i++) {
@@ -469,7 +577,7 @@ export default {
                 type: 'enter'
               })
             }
-            fetch_history_team(router.currentRoute.value.params.tid).then(
+            fetch_history_team(router1.currentRoute.value.params.tid).then(
                 (res) => {
                   for (let i = 0; i < res.user_name_list.length; i++) {
                     history_display.value.push(
@@ -481,7 +589,7 @@ export default {
                         }
                     )
                   }
-                  fetch_all_team_ques_set(router.currentRoute.value.params.tid).then(
+                  fetch_all_team_ques_set(router1.currentRoute.value.params.tid).then(
                       (res) => {
                         for (let i = 0; i < res.qsid_list.length; i++) {
                           ques_set_list.value.push(
@@ -513,12 +621,12 @@ export default {
             )
           }
       )
-      fetch_history_application(router.currentRoute.value.params.tid).then(
+      fetch_history_application(router1.currentRoute.value.params.tid).then(
           (res) => {
             history_applications.value = res.application_sum
           }
       )
-      fetch_team_info(router.currentRoute.value.params.tid).then(
+      fetch_team_info(router1.currentRoute.value.params.tid).then(
           (res) => {
             creator_name.value = res.creator_name
             team_name.value = res.team_name
@@ -551,9 +659,9 @@ export default {
     }
 
     const hand_in_edit = () => {
-      let router = useRouter()
+      let router1 = useRouter()
       let form = new FormData
-      form.append("tid", router.currentRoute.value.params.tid)
+      form.append("tid", router1.currentRoute.value.params.tid)
       form.append('introduction', introduction.value)
       form.append('file', hand_in_avatar.value)
       form.append('change_avatar', hand_in_avatar.value !== '')
@@ -590,11 +698,11 @@ export default {
 
     const send_message = () => {
       let uids = []
-      let router = useRouter()
+      let router1 = useRouter()
       for (let user of user_selection.value) {
         uids.push(user.id)
       }
-      send_team_message(uids, router.currentRoute.value.params.tid,
+      send_team_message(uids, router1.currentRoute.value.params.tid,
           message_content.value).then(
           (res) => {
             if (res.is_successful === 'true') {
@@ -612,9 +720,9 @@ export default {
     }
 
     const exit = () => {
-      let router = useRouter()
+      let router1 = useRouter()
       if (creator_name.value === store.getUserName) {
-        del_team(router.currentRoute.value.params.tid).then(
+        del_team(router1.currentRoute.value.params.tid).then(
             (res) => {
               if (res.is_successful === 'true') {
                 ElMessage({
@@ -675,8 +783,8 @@ export default {
       for (let user in user_selection.value) {
         select_uids.push(user.id)
       }
-      let router = useRouter()
-      del_members(select_uids, router.currentRoute.value.params.tid).then(
+      let router1 = useRouter()
+      del_members(select_uids, router1.currentRoute.value.params.tid).then(
           (res) => {
             if (res.is_successful === 'true') {
               ElMessage.success('删除成功')
@@ -731,7 +839,12 @@ export default {
       member_info_dialog,
       member_info,
       member_show,
-      member_avatar_flag
+      member_avatar_flag,
+      ques_set_show,
+      ques_set_info_dialog,
+      ques_set_avatar_flag,
+      ques_set_info,
+      goto_ques_set
     }
   }
 }
@@ -755,8 +868,8 @@ export default {
 }
 
 .main_container {
-  left: 5%;
-  width: 90%;
+  left: 2%;
+  width: 96%;
 }
 
 .center_class {
