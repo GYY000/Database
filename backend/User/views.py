@@ -662,18 +662,33 @@ url:/fetch_all_ques_set_in_team
     name_list = []
     creator_list = []
     introduction_list = []
-    date_list = []
+    ques_sum_list=[] #内含题目数量
+    do_time_list=[]
     qsid_list = []
+    date_list=[]
+    avg_scores=[]
     for _ in QuestionSetPerm.objects.filter(tid=tid):
         qsid_list.append(_.qsid.qsid)
         name_list.append(_.qsid.set_name)
         creator_list.append(_.qsid.creator.user_name)
         date_list.append(_.qsid.create_time.strftime("%Y-%m-%d %H:%M"))
         introduction_list.append(_.qsid.introduction)
+        ques_sum_list.append(len(list(Question.objects.filter(qsid=_.qsid.qsid))))
+        shs=list(SetHistory.objects.filter(qsid=_.qsid.qsid))
+        do_time_list.append(len(shs))
+        sum_score=0
+        for sh in shs:
+            sum_score+=sh.score
+        sum_score=0 if len(shs)==0 else sum_score/len(shs)
+        avg_scores.append(sum_score)
     return JsonResponse({"name_list": name_list, "creator_list": creator_list,
                          "introduction_list": introduction_list,
                          "qsid_list": qsid_list,
-                         "date_list": date_list})
+                         "date_list": date_list,
+                         "ques_sum_list": ques_sum_list,
+                         "do_time_list": do_time_list,
+                         "average_score_list":avg_scores
+                         })
 
 
 def fetch_all_users_in_team(request):
@@ -683,17 +698,34 @@ team_name	name_list
 	        register_date_list
 url:/fetch_all_users_in_team
     '''
+    #fixme 加个过题总数和正确率
     tid = json.loads(request.body.decode('utf-8'))['tid']
     name_list = []
     register_date_list = []
     uid_list = []
+    do_prob_sum_list=[]
+    accuracy_list=[]
     for _ in ReUserTeam.objects.filter(tid=tid):
         name_list.append(_.uid.user_name)
         register_date_list.append(_.join_date.strftime("%Y-%m-%d %H:%M"))
         uid_list.append(_.uid.uid)
+        try:
+            qhs=QuestionHistory.objects.filter(uid=_.uid.uid)
+        except:
+            qhs=[]
+        do_prob_sum_list.append(len(list(qhs)))
+        sum_scores=0
+        get_scores=0
+        for _ in qhs:
+            sum_scores+=Question.objects.get(qid=_.qid.qid).score
+            get_scores+=_.score
+        accuracy_list.append(get_scores/sum_scores if len(qhs)!=0 and sum_scores!=0 else 0)
     return JsonResponse({"name_list": name_list,
                          "register_date_list": register_date_list,
-                         "uid_list": uid_list})
+                         "uid_list": uid_list,
+                         "do_prob_sum_list":do_prob_sum_list,
+                         "accuracy_list":accuracy_list
+                         })
 
 
 def fetch_team_info(request):
@@ -1001,7 +1033,7 @@ def create_set_history(request):
     set_history.save()
     for i in range(len(qids)):
         QuestionHistory(shid=set_history, score=scores[i], answer=str(answers[i]),
-                        qid=Question.objects.get(qid=qids[i])).save()
+                        qid=Question.objects.get(qid=qids[i]),uid=User.objects.get(uid=uid)).save()
     return JsonResponse({"is_successful": "true"})
 
 
