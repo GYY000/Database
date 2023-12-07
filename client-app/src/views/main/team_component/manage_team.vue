@@ -125,12 +125,14 @@
 
       <el-row style="margin-top: 20px">
         <el-card style="width: 100%;">
-          <el-row style="margin-bottom: 15px;color: grey;font-weight: bold">
+          <el-row v-if="creator_name === store.getUserName" style="margin-bottom: 15px;color: grey;font-weight: bold">
             成员管理
           </el-row>
-
+          <el-row v-else style="margin-bottom: 15px;color: grey;font-weight: bold">
+            成员信息
+          </el-row>
           <el-col :span="24">
-            <el-row style="margin-bottom: 10px;">
+            <el-row v-if="creator_name === store.getUserName" style="margin-bottom: 10px;">
               <el-button type="primary" :icon="ChatSquare" @click="open_group_message">
                 群发消息
               </el-button>
@@ -150,7 +152,7 @@
                   stripe
                   @selection-change="handleSelectionChange"
               >
-                <el-table-column type="selection"/>
+                <el-table-column v-if="creator_name === store.getUserName" type="selection"/>
                 <el-table-column property="id" label="id" sortable/>
                 <el-table-column property="name" label="用户名" sortable/>
                 <el-table-column property="date" label="加入时间" sortable/>
@@ -168,8 +170,11 @@
       </el-row>
       <el-row style="margin-top: 20px">
         <el-card style="width: 100%;">
-          <el-row style="margin-bottom: 15px;color: grey;font-weight: bold">
+          <el-row v-if="creator_name === store.getUserName" style="margin-bottom: 15px;color: grey;font-weight: bold">
             问题组管理
+          </el-row>
+          <el-row v-else style="margin-bottom: 15px;color: grey;font-weight: bold">
+            问题组汇总
           </el-row>
           <el-col :span="24">
             <el-table
@@ -249,7 +254,7 @@
       </span>
     </template>
   </el-dialog>
-  <el-dialog v-model="group_message_dialog">
+  <el-dialog v-if="creator_name === store.getUserName" v-model="group_message_dialog">
     <template #header>
       <div style="display: flex;justify-content: center">
         <el-icon style="color: dodgerblue;height: 25px;width: 25px;margin-right: 5px">
@@ -293,7 +298,7 @@
       </span>
     </template>
   </el-dialog>
-  <el-dialog v-model="del_member_dialog">
+  <el-dialog v-if="creator_name === store.getUserName" v-model="del_member_dialog">
     <template #header>
       <div style="display: flex;justify-content: center">
         <el-icon style="color:indianred;height: 25px;width: 25px;margin-right: 5px">
@@ -400,8 +405,11 @@
           <el-tag style="width: 70px">平均分</el-tag>&nbsp{{ques_set_info.average_score}}
         </div>
         <div>
-          <el-button type="primary" style="margin-left: 3px" @click="goto_ques_set(ques_set_info.id)">
+          <el-button v-if="creator_name === store.getUserName" type="primary" style="margin-left: 3px" @click="goto_ques_set(ques_set_info.id)">
             详情
+          </el-button>
+          <el-button v-else type="primary" style="margin-left: 3px" @click="goto_ques_set(ques_set_info.id)">
+            做题
           </el-button>
         </div>
       </el-col>
@@ -489,7 +497,11 @@ export default {
     const ques_set_info = ref(null)
 
     const goto_ques_set = (id) => {
-      router.push('/edit_ques_group/' + id)
+      if(creator_name.value === store.getUserName) {
+        router.push('/edit_ques_group/' + id)
+      } else {
+        router.push('panel_del_index/do_prob/' + id)
+      }
     }
 
     const handleSelectionChange = (val) => {
