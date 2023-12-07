@@ -30,6 +30,7 @@
         <user_show_card v-if="user_name_list !== null && user_name_list.length !== 0"
                         v-for="(item,index) in user_name_list"
                         :name="item"
+                        :mode="'avatar'"
                         :date="register_date_list[index]"
                         :group_name="team_name"></user_show_card>
         <div v-else style="color: #6b778c;font-size: 15px;display: flex;justify-content:center;padding-top: 5px">

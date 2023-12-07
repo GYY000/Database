@@ -720,6 +720,7 @@ url:/fetch_all_users_in_team
             sum_scores+=Question.objects.get(qid=_.qid.qid).score
             get_scores+=_.score
         accuracy_list.append(get_scores/sum_scores if len(qhs)!=0 and sum_scores!=0 else 0)
+    print(uid_list)
     return JsonResponse({"name_list": name_list,
                          "register_date_list": register_date_list,
                          "uid_list": uid_list,

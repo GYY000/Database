@@ -123,16 +123,16 @@
         </el-col>
       </el-row>
       <el-row style="margin-top: 20px">
-        <el-col :span="12">
+        <el-col :span="24">
           <el-row style="margin-bottom: 10px;">
             <el-button type="primary" :icon="ChatSquare" @click="open_group_message">
               群发消息
             </el-button>
-            <el-button type="danger" :icon="Close" @click="open_del_member">
-              删除成员
-            </el-button>
             <el-button type="primary" :icon="EditPen">
               发起考试
+            </el-button>
+            <el-button type="danger" :icon="Close" @click="open_del_member">
+              删除成员
             </el-button>
           </el-row>
           <el-row>
@@ -140,7 +140,7 @@
                 ref="multipleTableRef"
                 :data="user_list"
                 style="width: 100%"
-                height="90%"
+                height="400px"
                 stripe
                 @selection-change="handleSelectionChange"
             >
@@ -148,12 +148,37 @@
               <el-table-column property="id" label="id" sortable/>
               <el-table-column property="name" label="用户名" sortable/>
               <el-table-column property="date" label="加入时间" sortable/>
+              <el-table-column property="do_prob_sum" label="做题数" sortable/>
+              <el-table-column property="accuracy" label="正确率" sortable/>
+              <el-table-column label="">
+                <template #default="scope">
+                  <el-button type="primary" @click="member_show(scope.row)">查看详情</el-button>
+                </template>
+              </el-table-column>
             </el-table>
           </el-row>
         </el-col>
-        <el-col :span="11" :offset="1">
-          <el-table>
-
+      </el-row>
+      <el-row style="margin-top: 30px">
+        <el-col :span="24">
+          <el-table
+              :data="ques_set_list"
+              style="width: 100%"
+              height="400px"
+              stripe
+          >
+            <el-table-column property="id" label="id" width="70px" sortable/>
+            <el-table-column property="name" label="问题组名" sortable/>
+            <el-table-column property="date" label="创建时间" sortable/>
+            <el-table-column property="creator" label="创建者" sortable/>
+            <el-table-column property="ques_sum" label="题目数" width="90px" sortable/>
+            <el-table-column property="do_time" label="完成次数"  width="110px" sortable/>
+            <el-table-column property="average_score" label="平均分" sortable/>
+            <el-table-column label="">
+              <template #default="scope">
+                <el-button type="primary">查看详情</el-button>
+              </template>
+            </el-table-column>
           </el-table>
         </el-col>
       </el-row>
@@ -290,6 +315,34 @@
       </span>
     </template>
   </el-dialog>
+  <el-dialog v-model="member_info_dialog" style="width:400px" draggable>
+    <div style="display: flex;justify-content: center">
+      <div>
+        <el-skeleton :loading="member_avatar_flag" animated>
+          <template #template>
+            <el-skeleton-item variant="image" style="width: 100px; height: 100px; border-radius: 50%"/>
+          </template>
+          <template #default>
+            <img :src="member_info.avatar" style="width: 100px; height: 100px;border-radius: 50%">
+          </template>
+        </el-skeleton>
+      </div>
+      <div style="display: flex; flex-direction: column;padding-left: 20px">
+        <div style="font-size:17px; padding-bottom: 5px;display: flex;justify-content: left">
+          <span style="font-weight: bold;color: #409EFF">{{ member_info.name }}</span>
+        </div>
+        <div style="padding-bottom: 5px;">
+          加入于 {{ member_info.date }}
+        </div>
+        <div style="padding-bottom: 5px;">
+          共完成 {{ member_info.do_prob_sum }} 道题目
+        </div>
+        <div style="padding-bottom: 5px;">
+          正确率 {{ member_info.accuracy }}
+        </div>
+      </div>
+    </div>
+  </el-dialog>
 </template>
 
 <script>
@@ -299,7 +352,7 @@ import {
   del_members,
   del_team,
   fetch_all_member,
-  fetch_all_team_ques_set, fetch_history_application, fetch_history_team,
+  fetch_all_team_ques_set, fetch_avatar, fetch_history_application, fetch_history_team,
   fetch_team_info, send_team_message,
   update_team,
 } from "@/views/main/api";
@@ -309,6 +362,7 @@ import userStateStore from "@/store";
 import {ElMessage} from "element-plus";
 import History_entry from "@/views/main/team_component/history_entry.vue";
 import {ChatSquare, Close, CloseBold, EditPen} from "@element-plus/icons-vue";
+import User_show_card from "@/views/main/team_component/user_show_card.vue";
 
 function compareFn(a, b) {
   if (a.date > b.date) {
@@ -333,7 +387,7 @@ export default {
       return ChatSquare
     }
   },
-  components: {CloseBold, History_entry, Ques_do_display, Judge_ans_view},
+  components: {User_show_card, CloseBold, History_entry, Ques_do_display, Judge_ans_view},
 
   setup() {
     const history_display = ref([])
@@ -357,6 +411,9 @@ export default {
     const message_content = ref('')
     const option_user = ref([])
     const del_member_dialog = ref(false)
+    const member_info_dialog = ref(false)
+    const member_info = ref(null)
+    const member_avatar_flag = ref(true)
 
     const handleSelectionChange = (val) => {
       user_selection.value = val;
@@ -366,16 +423,44 @@ export default {
       }
     }
 
+    const member_show = (info) => {
+      member_info.value = {
+        avatar: '',
+        name: info.name,
+        date: info.date,
+        accuracy: info.accuracy,
+        do_prob_sum: info.do_prob_sum
+      }
+      member_avatar_flag.value = true
+      member_info_dialog.value = true
+      fetch_avatar(info.name).then(
+          (res) => {
+            member_info.value = {
+              avatar: res.profile_photo.startsWith('/9j')
+                  ? 'data:image/jpg;base64,' + res.profile_photo : 'data:image/png;base64,' + res.profile_photo,
+              name: info.name,
+              date: info.date,
+              accuracy: info.accuracy,
+              do_prob_sum: info.do_prob_sum
+            }
+            member_avatar_flag.value = false
+          }
+      )
+    }
+
     const init = () => {
       let router = useRouter()
       fetch_all_member(router.currentRoute.value.params.tid).then(
           (res) => {
+            console.log(res)
             for (let i = 0; i < res.uid_list.length; i++) {
               user_list.value.push(
                   {
                     id: res.uid_list[i],
                     name: res.name_list[i],
-                    date: res.register_date_list[i]
+                    date: res.register_date_list[i],
+                    do_prob_sum: res.do_prob_sum_list[i],
+                    accuracy: (res.accuracy_list[i] * 100).toFixed(1) + '%'
                   }
               )
               history_display.value.push({
@@ -392,7 +477,7 @@ export default {
                           name: res.user_name_list[i],
                           date: res.date_list[i],
                           type: 'do_prob',
-                          ques_set_name: res.ques_set_list[i]
+                          ques_set_name: res.ques_set_list[i],
                         }
                     )
                   }
@@ -404,7 +489,10 @@ export default {
                                 name: res.name_list[i],
                                 id: res.qsid_list[i],
                                 creator: res.creator_list[i],
-                                date: res.date_list[i]
+                                date: res.date_list[i],
+                                ques_sum: res.ques_sum_list[i],
+                                do_time: res.do_time_list[i],
+                                average_score: res.average_score_list[i].toFixed(1)
                               }
                           )
                           history_display.value.push(
@@ -639,7 +727,11 @@ export default {
       open_del_member,
       del_member_dialog,
       confirm_del_members,
-      cancel_del_members
+      cancel_del_members,
+      member_info_dialog,
+      member_info,
+      member_show,
+      member_avatar_flag
     }
   }
 }

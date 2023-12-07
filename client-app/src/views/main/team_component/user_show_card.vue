@@ -1,5 +1,5 @@
 <template>
-  <div @click="show_info = true">
+  <div @click="show_info = true" v-if="mode === 'avatar'">
     <el-skeleton :loading="flag" animated>
       <template #template>
         <el-skeleton-item variant="image" style="height: 60px;width: 60px;border-radius: 50%"/>
@@ -8,6 +8,10 @@
         <img :src="avatar" style="height: 60px;width: 60px;border-radius: 50%"/>
       </template>
     </el-skeleton>
+  </div>
+
+  <div @click="show_info = true" v-else>
+    <el-button type="primary">查看详情</el-button>
   </div>
 
   <el-dialog v-model="show_info" style="width:400px" draggable>
@@ -41,7 +45,7 @@ import {ref} from "vue";
 
 export default {
   name: "user_show_card",
-  props: ['name', 'date', 'group_name'],
+  props: ['name', 'date', 'group_name', 'mode'],
   setup(props) {
     const avatar = ref('')
     const show_info = ref(false)
