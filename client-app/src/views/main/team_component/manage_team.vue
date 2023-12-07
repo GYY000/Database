@@ -124,14 +124,14 @@
       </el-row>
       <el-row style="margin-top: 20px">
         <el-col :span="12">
-          <el-row>
+          <el-row style="margin-bottom: 10px;">
             <el-button type="primary" :icon="ChatSquare">
               群发消息
             </el-button>
             <el-button type="danger" :icon="Close">
               删除成员
             </el-button>
-            <el-button type="primary" :icon="Document">
+            <el-button type="primary" :icon="EditPen">
               发起考试
             </el-button>
           </el-row>
@@ -233,7 +233,7 @@ import Ques_do_display from "@/views/quesDoing/ques_do_display.vue";
 import userStateStore from "@/store";
 import {ElMessage} from "element-plus";
 import History_entry from "@/views/main/team_component/history_entry.vue";
-import {ChatSquare, Close} from "@element-plus/icons-vue";
+import {ChatSquare, Close, EditPen} from "@element-plus/icons-vue";
 
 function compareFn(a, b) {
   if (a.date > b.date) {
@@ -248,6 +248,9 @@ function compareFn(a, b) {
 export default {
   name: "manage_team",
   computed: {
+    EditPen() {
+      return EditPen
+    },
     Close() {
       return Close
     },

@@ -122,7 +122,7 @@
 
 <script>
 import userStateStore from "@/store";
-import {ref} from "vue";
+import {onBeforeUnmount, ref} from "vue";
 import Ques_display from "@/views/quesDoing/ques_display.vue";
 import {fetch_ques_info, hand_in_ans, string2Array} from "@/views/main/api";
 import {ArrowLeft, DocumentChecked, Edit, Plus, Timer, Upload} from "@element-plus/icons-vue";
@@ -165,6 +165,24 @@ export default {
     }
   },
   mounted() {
+    const handleScroll = () => {
+      let lower_panel = document.getElementById('lower_panel');
+      let scrollDistance = window.pageYOffset || document.documentElement.scrollTop;
+      let threshold = 20;
+
+      if (scrollDistance < threshold || scrollDistance === 0) {
+        lower_panel.style.top = '60px';
+      } else {
+        lower_panel.style.top = '0px';
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    // 监听器添加后会在组件销毁时自动取消
+    onBeforeUnmount(() => {
+      window.removeEventListener('scroll', handleScroll);
+    });
     this.startTimer();
   },
   beforeDestroy() {
@@ -198,17 +216,6 @@ export default {
     ArrowLeft, Ques_do_display, Ques_display
   },
   setup() {
-    window.addEventListener('scroll', function () {
-      let lower_panel = document.getElementById('lower_panel');
-      let scrollDistance = window.pageYOffset || document.documentElement.scrollTop;
-      let threshold = 20;
-
-      if (scrollDistance < threshold || scrollDistance === 0) {
-        lower_panel.style.top = '60px';
-      } else {
-        lower_panel.style.top = '0px';
-      }
-    });
     const statistic = ref([
       {
         sum: 0,

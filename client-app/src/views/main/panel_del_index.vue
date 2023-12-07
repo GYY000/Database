@@ -154,7 +154,7 @@
 
 <script>
 import {Message, SortDown, SortUp, User, Plus} from '@element-plus/icons-vue'
-import {ref, watch} from "vue";
+import {ref, watch, onMounted, onBeforeUnmount} from "vue";
 import router from "@/router";
 import {userStateStore} from "@/store";
 import Question_hub from "@/views/main/question_hub.vue";
@@ -164,21 +164,30 @@ import {fetch_all_application} from "@/views/main/api";
 import Message_box from "@/views/main/message_box.vue";
 import message_container from '@/views/main/site_message_component/message_container.vue';
 
-window.addEventListener('scroll', function () {
-  var upperPanel = document.getElementById('upperPanel');
-  var scrollDistance = window.pageYOffset || document.documentElement.scrollTop;
-  var threshold = 20;
-
-  if (scrollDistance < threshold || scrollDistance === 0) {
-    upperPanel.removeAttribute("style");
-  } else {
-    upperPanel.style.display = 'none';
-  }
-});
-
 export default {
   name: "panel_del_index",
   components: {Message_box, Message, Team_hub, Post_hub, Question_hub, message_container},
+
+  mounted() {
+    const handleScroll = () => {
+      let upperPanel = document.getElementById('upperPanel');
+      let scrollDistance = window.pageYOffset || document.documentElement.scrollTop;
+      let threshold = 20;
+
+      if (scrollDistance < threshold || scrollDistance === 0) {
+        upperPanel.removeAttribute("style");
+      } else {
+        upperPanel.style.display = 'none';
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    onBeforeUnmount(() => {
+      window.removeEventListener('scroll', handleScroll);
+    });
+  },
+
   setup() {
     const store = userStateStore()
     const is_login = ref(store.getIsAuthentic);
