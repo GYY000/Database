@@ -370,3 +370,23 @@ export function array2String(array) {
     return "[" + array.map(item => "'" + item + "'").join(", ") + "]"
 }
 
+export function send_team_message(uids, tid, message) {
+    return axios.request(
+        {
+            url: '/send_team_message',
+            method: "post",
+            data: JSON.stringify(
+                {
+                    uid_list: uids,
+                    tid: tid,
+                    message: message
+                }
+            )
+        }
+    ).then(
+        (response) => {
+            return response.data
+        }
+    )
+}
+

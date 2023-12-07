@@ -5,6 +5,9 @@
 <script>
 </script>
 
-<style scoped>
+<style>
+.el-message {
+  z-index: 9999999 !important;
+}
 </style>
 

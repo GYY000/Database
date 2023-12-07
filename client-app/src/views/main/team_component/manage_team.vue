@@ -125,10 +125,10 @@
       <el-row style="margin-top: 20px">
         <el-col :span="12">
           <el-row style="margin-bottom: 10px;">
-            <el-button type="primary" :icon="ChatSquare">
+            <el-button type="primary" :icon="ChatSquare" @click="open_group_message">
               群发消息
             </el-button>
-            <el-button type="danger" :icon="Close">
+            <el-button type="danger" :icon="Close" @click="open_del_member">
               删除成员
             </el-button>
             <el-button type="primary" :icon="EditPen">
@@ -213,7 +213,82 @@
     </template>
   </el-dialog>
   <el-dialog v-model="group_message_dialog">
-
+    <template #header>
+      <div style="display: flex;justify-content: center">
+        <el-icon style="color: dodgerblue;height: 25px;width: 25px;margin-right: 5px">
+          <ChatSquare/>
+        </el-icon>
+        <span style="font-size: 18px;color:dodgerblue">群发消息</span>
+      </div>
+    </template>
+    <el-row>
+      <el-col :offset="1" :span="22" style="font-size: 15px;color:grey;margin-bottom: 10px">
+        消息内容
+      </el-col>
+    </el-row>
+    <el-row>
+      <el-col :offset="1" :span="22">
+        <el-input type="textarea" v-model="message_content"
+                  :autosize="{ minRows: 3}" placeholder="请输入消息内容"
+                  style=""/>
+      </el-col>
+    </el-row>
+    <el-row style="margin-top: 15px" align="center">
+      <el-col :offset="1" :span="2" style="font-size: 15px;margin-top: 3px;color: grey">接收人</el-col>
+      <el-col :offset="1" :span="10">
+        <el-select
+            v-model="option_user"
+            placeholder="Please select"
+            style="width: 240px"
+            multiple
+            disabled
+        />
+      </el-col>
+    </el-row>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button type="primary" @click="send_message">
+          发送
+        </el-button>
+        <el-button type="danger" @click="exit_message_send">
+          取消
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
+  <el-dialog v-model="del_member_dialog">
+    <template #header>
+      <div style="display: flex;justify-content: center">
+        <el-icon style="color:indianred;height: 25px;width: 25px;margin-right: 5px">
+          <CloseBold/>
+        </el-icon>
+        <span style="font-size: 18px;color:indianred;font-weight: bold">删除成员</span>
+      </div>
+    </template>
+    <el-row style="margin-top: 15px" align="center">
+      <el-col :offset="1" :span="3" style="font-size: 15px;margin-top: 3px;color: grey">
+        所选成员
+      </el-col>
+      <el-col :offset="1" :span="13">
+        <el-select
+            v-model="option_user"
+            placeholder="Please select"
+            style="width: 240px"
+            multiple
+            disabled
+        />
+      </el-col>
+    </el-row>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button type="primary" @click="confirm_del_members">
+          确定
+        </el-button>
+        <el-button type="danger" @click="cancel_del_members">
+          取消
+        </el-button>
+      </span>
+    </template>
   </el-dialog>
 </template>
 
@@ -225,7 +300,7 @@ import {
   del_team,
   fetch_all_member,
   fetch_all_team_ques_set, fetch_history_application, fetch_history_team,
-  fetch_team_info,
+  fetch_team_info, send_team_message,
   update_team,
 } from "@/views/main/api";
 import Judge_ans_view from "@/views/quesDoing/judge_ans_view.vue";
@@ -233,7 +308,7 @@ import Ques_do_display from "@/views/quesDoing/ques_do_display.vue";
 import userStateStore from "@/store";
 import {ElMessage} from "element-plus";
 import History_entry from "@/views/main/team_component/history_entry.vue";
-import {ChatSquare, Close, EditPen} from "@element-plus/icons-vue";
+import {ChatSquare, Close, CloseBold, EditPen} from "@element-plus/icons-vue";
 
 function compareFn(a, b) {
   if (a.date > b.date) {
@@ -258,7 +333,7 @@ export default {
       return ChatSquare
     }
   },
-  components: {History_entry, Ques_do_display, Judge_ans_view},
+  components: {CloseBold, History_entry, Ques_do_display, Judge_ans_view},
 
   setup() {
     const history_display = ref([])
@@ -278,11 +353,17 @@ export default {
     const hand_in_avatar = ref('')
     const edit_introduction = ref('')
     const multipleTableRef = ref(null);
-    const multipleSelection = ref([]);
+    const user_selection = ref([]);
+    const message_content = ref('')
+    const option_user = ref([])
+    const del_member_dialog = ref(false)
 
     const handleSelectionChange = (val) => {
-      multipleSelection.value = val;
-      console.log(multipleSelection.value)
+      user_selection.value = val;
+      option_user.value = []
+      for (let i = 0; i < val.length; i++) {
+        option_user.value.push(val[i].name)
+      }
     }
 
     const init = () => {
@@ -290,11 +371,13 @@ export default {
       fetch_all_member(router.currentRoute.value.params.tid).then(
           (res) => {
             for (let i = 0; i < res.uid_list.length; i++) {
-              user_list.value.push({
-                id: res.uid_list[i],
-                name: res.name_list[i],
-                date: res.register_date_list[i]
-              })
+              user_list.value.push(
+                  {
+                    id: res.uid_list[i],
+                    name: res.name_list[i],
+                    date: res.register_date_list[i]
+                  }
+              )
               history_display.value.push({
                 name: res.name_list[i],
                 date: res.register_date_list[i],
@@ -417,6 +500,29 @@ export default {
       exit_confirm_dialog.value = true
     }
 
+    const send_message = () => {
+      let uids = []
+      let router = useRouter()
+      for (let user of user_selection.value) {
+        uids.push(user.id)
+      }
+      send_team_message(uids, router.currentRoute.value.params.tid,
+          message_content.value).then(
+          (res) => {
+            if (res.is_successful === 'true') {
+              ElMessage.success("发送成功")
+            } else {
+              ElMessage.error("发送失败")
+            }
+          }
+      )
+    }
+
+    const exit_message_send = () => {
+      group_message_dialog.value = false
+      message_content.value = ''
+    }
+
     const exit = () => {
       let router = useRouter()
       if (creator_name.value === store.getUserName) {
@@ -460,6 +566,44 @@ export default {
       }
     }
 
+    const open_group_message = () => {
+      if (user_selection.value.length === 0) {
+        ElMessage.error("请先选择消息发送给的用户")
+      } else {
+        group_message_dialog.value = true
+      }
+    }
+
+    const open_del_member = () => {
+      if (user_selection.value.length === 0) {
+        ElMessage.error("请先选择要删除的成员")
+      } else {
+        del_member_dialog.value = true
+      }
+    }
+
+    const confirm_del_members = () => {
+      let select_uids = []
+      for (let user in user_selection.value) {
+        select_uids.push(user.id)
+      }
+      let router = useRouter()
+      del_members(select_uids, router.currentRoute.value.params.tid).then(
+          (res) => {
+            if (res.is_successful === 'true') {
+              ElMessage.success('删除成功')
+            } else {
+              ElMessage.error("删除失败")
+            }
+            del_member_dialog.value = false
+          }
+      )
+    }
+
+    const cancel_del_members = () => {
+      del_member_dialog.value = false
+    }
+
     init()
 
     return {
@@ -486,7 +630,16 @@ export default {
       group_message_dialog,
       handleSelectionChange,
       multipleTableRef,
-      multipleSelection
+      user_selection,
+      open_group_message,
+      send_message,
+      message_content,
+      exit_message_send,
+      option_user,
+      open_del_member,
+      del_member_dialog,
+      confirm_del_members,
+      cancel_del_members
     }
   }
 }
