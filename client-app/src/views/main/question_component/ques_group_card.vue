@@ -56,7 +56,7 @@ export default {
     }
   },
 
-  props: ['creator_name', 'set_name', 'date', 'introduction',"qs_id"],
+  props: ['creator_name', 'set_name', 'date', 'introduction', "qs_id"],
 
   setup(props) {
     const avatar_url = ref(null)
