@@ -76,7 +76,7 @@
   <div v-if="judge_mode === true">
     <judge_ans_view :hit_scores="hit_scores" :introduction="introduction"
                     :ans="hand_in_form.answers" :ques_set_name="ques_set_name"
-                    :questions="questions"/>
+                    :questions="questions" :qids="hand_in_form.qids" :qsid="qsid"/>
   </div>
   <el-dialog
       v-model="exit_dialog"
@@ -281,6 +281,7 @@ export default {
     const filled_ques = ref([])
     const empty_ques = ref(0)
     const panel_switch = ref(true)
+    const qsid = ref()
 
     const hand_in_form = ref(
         {
@@ -299,6 +300,7 @@ export default {
 
     const init = () => {
       let router = useRouter()
+      qsid.value = router.currentRoute.value.params.qs_id
       fetch_ques_info(router.currentRoute.value.params.qs_id).then(
           (res) => {
             ques_set_name.value = res.ques_set_name
@@ -440,7 +442,8 @@ export default {
       switch_panel,
       panel_switch,
       filled_ques,
-      empty_ques
+      empty_ques,
+      qsid
     }
   }
 }

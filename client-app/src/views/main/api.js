@@ -371,7 +371,6 @@ export function array2String(array) {
 }
 
 export function send_team_message(uids, tid, message) {
-    console.log("send")
     return axios.request(
         {
             url: '/send_team_message',
@@ -381,6 +380,28 @@ export function send_team_message(uids, tid, message) {
                     uid_list: uids,
                     tid: tid,
                     message: message
+                }
+            )
+        }
+    ).then(
+        (response) => {
+            return response.data
+        }
+    )
+}
+
+export function hand_in_score(qids, scores, qsid, uid, answers) {
+    return axios.request(
+        {
+            url: '/create_set_history',
+            method: "post",
+            data: JSON.stringify(
+                {
+                    qids: qids,
+                    scores: scores,
+                    qsid: qsid,
+                    uid: uid,
+                    answers: answers
                 }
             )
         }
