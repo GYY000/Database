@@ -81,6 +81,7 @@ export default {
         new Array(string2Array(props.ques.content.ans).length).fill('') : [])
     const sub_ans = ref()
     const q_and_a_ans = ref('')
+    const filled_sub = ref([])
 
     const content = ref(
         {
@@ -95,6 +96,7 @@ export default {
 
     const update_sub_ans = (data) => {
       sub_ans.value[data.id] = data.ans
+      filled_sub.value[data.id] = data.filled
       update_ans()
     }
 
@@ -102,6 +104,7 @@ export default {
       if(props.ques.content.type === '复合') {
         sub_ans.value = []
         for(let ques1 of props.ques.content.sub_problem) {
+          filled_sub.value.push(false)
           if(ques1.type === '填空') {
             sub_ans.value.push(new Array(string2Array(ques1.ans).length).fill(''))
           } else {
@@ -112,18 +115,32 @@ export default {
     }
 
     init()
+
     const update_ans = () => {
       let ans = null
+      let filled = true
       if (props.ques.content.type === '选择') {
         ans = option_ans.value.join(',')
+        filled = option_ans.value.length !== 0
       } else if (props.ques.content.type === '填空') {
         ans = blank_ans.value
+        for(let i = 0;i < blank_ans.value.length;i++) {
+          if(blank_ans.value[i] === '') {
+            filled = false
+          }
+        }
       } else if (props.ques.content.type === '问答') {
         ans = q_and_a_ans.value
+        filled = q_and_a_ans.value !== ''
       } else {
         ans = sub_ans.value
+        for(let i = 0;i < filled_sub.value.length;i++) {
+          if(filled_sub.value[i] === false) {
+            filled = false
+          }
+        }
       }
-      context.emit("update_ans", {id: props.id, ans: ans})
+      context.emit("update_ans", {id: props.id, ans: ans, filled: filled})
     }
 
     const serial_num = ref(props.ques.serial_num)
