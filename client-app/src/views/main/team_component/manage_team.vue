@@ -500,7 +500,7 @@ export default {
       if(creator_name.value === store.getUserName) {
         router.push('/edit_ques_group/' + id)
       } else {
-        router.push('panel_del_index/do_prob/' + id)
+        router.push('/panel_del_index/do_prob/' + id)
       }
     }
 
