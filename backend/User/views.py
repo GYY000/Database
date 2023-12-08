@@ -562,11 +562,15 @@ url:/apply_for_team
     creator_name = request_dict["creator_name"]
     team_name = request_dict["team_name"]
     applier_id = request_dict["applier_id"]
-    joinReq = JoinRequest(uid=User.objects.get(uid=applier_id),
+    try:
+        JoinRequest.objects.get(uid=applier_id,tid=Team.objects.get(team_name=team_name).tid)
+        return JsonResponse({"is_successful":"false","have_applied":"true"})
+    except:
+        joinReq = JoinRequest(uid=User.objects.get(uid=applier_id),
                           tid=Team.objects.get(team_name=team_name),
                           status="未审理,请耐心等待！")
-    joinReq.save()
-    return JsonResponse({"is_successful": "true"})
+        joinReq.save()
+        return JsonResponse({"is_successful": "true","have_applied":"false"})
 
 
 def del_members(request):
