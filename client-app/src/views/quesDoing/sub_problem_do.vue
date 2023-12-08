@@ -74,14 +74,22 @@ export default {
 
     const update_sub_ans = () => {
       let ans = null
+      let filled = true
       if(props.sub_problem.type === '选择') {
         ans = option_ans.value.join(',')
+        filled = option_ans.value.length !== 0
       } else if(props.sub_problem.type === '填空') {
         ans = blank_ans.value
+        for(let i = 0;i < blank_ans.value.length;i++) {
+          if(blank_ans.value[i] === '') {
+            filled = false
+          }
+        }
       } else if(props.sub_problem.type === '问答') {
         ans = q_and_a_ans.value
+        filled = q_and_a_ans.value !== ''
       }
-      context.emit("update_sub_ans", {id: props.id, ans: ans})
+      context.emit("update_sub_ans", {id: props.id, ans: ans, filled: filled})
     }
 
     const score = ref(props.sub_problem.score)

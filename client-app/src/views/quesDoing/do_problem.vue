@@ -109,7 +109,15 @@
       title="上交答案"
       width="30%"
   >
-    <span>您确定上传答案吗，上传答案之后将不能更改</span>
+    <div>
+      <span v-if="empty_ques === 0">您已全部完成，确定上传答案吗，上传答案之后将不能更改</span>
+      <span v-else>您还有{{ empty_ques }}道题目没有完成，确定上传答案吗，上传答案之后将不能更改</span>
+    </div>
+    <div style="display: flex;justify-content: center;margin-top: 20px">
+      <img src="@/assets/image/优秀.png" style="width: 200px;height: 200px;" v-if="empty_ques === 0"/>
+      <img src="@/assets/image/再考虑一下.png" style="width: 200px;height: 200px;" v-else/>
+    </div>
+
     <template #footer>
       <span class="dialog-footer">
         <el-button type="danger" @click="hand_in">
@@ -118,6 +126,23 @@
       </span>
     </template>
   </el-dialog>
+
+  <div class="right-panel1" v-if="panel_switch">
+    <div style="display: flex;justify-content: right;margin-right: 10px">
+      <el-button size="small" :icon="Minus" @click="switch_panel" round/>
+    </div>
+    <div style="display: flex; flex-wrap: wrap;margin-left: 10px;margin-right: 10px;margin-top: 10px">
+      <div v-for="(item,index) in filled_ques" :class="item === false ? 'circle_show2' : 'circle_show1'">
+        {{ index + 1 }}
+      </div>
+    </div>
+  </div>
+  <div class="right-panel2" v-else>
+    <el-button size="small" :icon="Plus"
+               style="display:flex;justify-content: right;margin-right: 10px"
+               @click="switch_panel" round>
+    </el-button>
+  </div>
 </template>
 
 <script>
@@ -125,7 +150,7 @@ import userStateStore from "@/store";
 import {onBeforeUnmount, ref} from "vue";
 import Ques_display from "@/views/quesDoing/ques_display.vue";
 import {fetch_ques_info, hand_in_ans, string2Array} from "@/views/main/api";
-import {ArrowLeft, DocumentChecked, Edit, Plus, Timer, Upload} from "@element-plus/icons-vue";
+import {ArrowLeft, DocumentChecked, Edit, Minus, Plus, Timer, Upload} from "@element-plus/icons-vue";
 import {useRouter} from "vue-router";
 import router from "@/router";
 import Ques_do_display from "@/views/quesDoing/ques_do_display.vue";
@@ -189,6 +214,9 @@ export default {
     clearInterval(this.timerInterval);
   },
   computed: {
+    Minus() {
+      return Minus
+    },
     Timer() {
       return Timer
     },
@@ -248,6 +276,9 @@ export default {
     const hand_in_dialog = ref(false)
     const judge_mode = ref(false)
     const hit_scores = ref([])
+    const filled_ques = ref([])
+    const empty_ques = ref(0)
+    const panel_switch = ref(true)
 
     const hand_in_form = ref(
         {
@@ -278,10 +309,12 @@ export default {
             photo_flag.value = false
             display_ques.value = questions.value.slice((page.value - 1) * page_size.value,
                 (page.value - 1) * page_size.value + page_size.value)
+            empty_ques.value = questions.value.length
             for (let i = 0; i < questions.value.length; i = i + 1) {
               sum_score.value = sum_score.value + questions.value[i].score
             }
             for (let ques of Object.values(questions.value)) {
+              filled_ques.value.push(false)
               hand_in_form.value.qids.push(ques.id)
               if (ques.content.type === '选择') {
                 hand_in_form.value.types.push('选择')
@@ -342,9 +375,19 @@ export default {
     const update_ans = (data) => {
       hand_in_form.value.answers[data.id] = data.ans
       hand_in_dialog.value = false
+      if (filled_ques.value[data.id] === true && data.filled === false) {
+        empty_ques.value++
+      } else if (filled_ques.value[data.id] === false && data.filled === true) {
+        empty_ques.value--
+      }
+      filled_ques.value[data.id] = data.filled
     }
 
     init()
+
+    const switch_panel = () => {
+      panel_switch.value = !panel_switch.value
+    }
 
     const open_exit = () => {
       exit_dialog.value = true
@@ -391,7 +434,11 @@ export default {
       update_ans,
       hand_in,
       judge_mode,
-      hit_scores
+      hit_scores,
+      switch_panel,
+      panel_switch,
+      filled_ques,
+      empty_ques
     }
   }
 }
@@ -489,4 +536,56 @@ export default {
   color: #545455;
 }
 
+.right-panel1 {
+  position: fixed;
+  top: 50%;
+  right: 1%;
+  transform: translateY(-50%);
+  height: 300px;
+  width: 200px;
+  background: white;
+  box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.3);
+  border-radius: 5%;
+  overflow-y: scroll;
+}
+
+.right-panel2 {
+  position: fixed;
+  top: 27.4%;
+  right: 1%;
+}
+
+.circle_show1 {
+  border-radius: 50%;
+  margin: 6px;
+  height: 30px;
+  width: 30px;
+  background: #409EFF;
+  color: white;
+  display: flex;
+  font-size: 12px;
+  font-weight: bold;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
+}
+
+.circle_show2 {
+  border-radius: 50%;
+  margin: 6px;
+  height: 30px;
+  width: 30px;
+  background: white;
+  color: #409EFF;
+  display: flex;
+  font-size: 12px;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+.right-panel1::-webkit-scrollbar {
+  width: 0;
+}
 </style>
