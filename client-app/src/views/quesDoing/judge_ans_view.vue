@@ -190,14 +190,14 @@ export default {
           let temp_array = []
           for (let j = 0; j < props.questions[i].content.sub_problem.length; j++) {
             if (props.questions[i].content.sub_problem[j].type !== '问答') {
-              temp_array.push(props.hit_scores[i][j])
+              temp_array.push(props.hit_scores[i][j].toFixed(1))
             } else {
               temp_array.push(0.0)
             }
           }
           scores.value.push(temp_array)
         } else {
-          scores.value.push(props.hit_scores[i])
+          scores.value.push(props.hit_scores[i].toFixed(1))
         }
       }
       display_ques.value = props.questions.slice((page.value - 1) * page_size.value,
@@ -208,7 +208,7 @@ export default {
     init()
 
     const update_score = (data) => {
-      scores.value[data.id] = data.score
+      scores.value[data.id] = data.score.toFixed(1)
       gen_statistic()
     }
 

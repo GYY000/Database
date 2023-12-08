@@ -106,6 +106,7 @@ import Update_ques_form from "@/views/quesDoing/update_ques_form.vue";
 import Sub_problem_show from "@/views/quesDoing/sub_problem_show.vue";
 import {string2Array} from "@/views/main/api";
 import {Checked, Close} from "@element-plus/icons-vue";
+import {ElMessage} from "element-plus";
 
 export default {
   name: "sub_problem_judge",
@@ -139,7 +140,12 @@ export default {
           score1 = 0
           is_empty = false
         } else {
-          score1 = parseFloat(do_score.value)
+          if(score1 > props.sub_problem.score) {
+            ElMessage.error("输入分数异常，请立即更正")
+            score1 = 0
+          } else {
+            score1 = parseFloat(do_score.value)
+          }
         }
       } else {
         score1 = props.score

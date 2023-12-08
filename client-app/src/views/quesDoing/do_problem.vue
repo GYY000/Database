@@ -138,7 +138,7 @@
     </div>
   </div>
   <div class="right-panel2" v-else>
-    <el-button size="small" :icon="Plus"
+    <el-button size="small" type="primary" :icon="Plus"
                style="display:flex;justify-content: right;margin-right: 10px"
                @click="switch_panel" round>
     </el-button>

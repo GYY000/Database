@@ -127,6 +127,7 @@ import Sub_problem_do from "@/views/quesDoing/sub_problem_do.vue";
 import Sub_problem_judge from "@/views/quesDoing/sub_problem_judge.vue";
 import {Check, Close} from "@element-plus/icons-vue";
 import {string2Array} from "@/views/main/api";
+import {ElMessage} from "element-plus";
 
 export default {
   name: "ques_judge_display",
@@ -215,7 +216,13 @@ export default {
         if (input_score.value !== '') {
           is_empty.value = true
           cur_score.value = parseFloat(input_score.value)
-          sum_score.value = cur_score.value
+          if(cur_score.value > props.ques.score) {
+            ElMessage.error("输入分数异常，请立即更正")
+            cur_score.value = 0
+            sum_score.value = 0
+          } else {
+            sum_score.value = cur_score.value
+          }
         } else {
           is_empty.value = false
           cur_score.value = 0
