@@ -23,8 +23,8 @@ local_db_config = {
     },
 }
 
-
-option = 'download'
+import sys
+option = sys.argv[1]
 
 if option == 'upload':
     os.system("python manage.py dumpdata > data.json")
@@ -62,4 +62,6 @@ now_database = {
     os.system("python.exe manage.py makemigrations")
     os.system("python manage.py migrate")
     os.system("manage.py loaddata data.json")
-    print("数据已经下载到云端！")
+    print("数据已经下载到本地！")
+else:
+    print("非法命令")
