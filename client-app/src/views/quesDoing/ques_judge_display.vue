@@ -7,13 +7,13 @@
       <el-tag class="mx-1" size="large" v-if="content.type === '复合'">复合题型</el-tag>
       <el-tag class="mx-1" size="large" v-if="Math.abs(sum_score - ques.score) < delta" :type="'success'"
               style="margin-left: 10px">
-        {{ sum_score }}/{{ ques.score }}分
+        {{ sum_score.toFixed(1) }}/{{ ques.score.toFixed(1) }}分
       </el-tag>
       <el-tag class="mx-1" size="large" v-else-if="sum_score > delta" type="info" style="margin-left: 10px">
-        {{ sum_score }}/{{ ques.score }}分
+        {{ sum_score.toFixed(1) }}/{{ ques.score.toFixed(1) }}分
       </el-tag>
       <el-tag class="mx-1" size="large" v-else type="danger" style="margin-left: 10px">
-        {{ sum_score }}/{{ ques.score }}分
+        {{ sum_score.toFixed(1) }}/{{ ques.score.toFixed(1) }}分
       </el-tag>
     </el-col>
   </el-row>
@@ -84,7 +84,7 @@
             </template>
           </el-input>
           <el-input v-model="blank_ans[index]" size="large" placeholder="标准答案"
-                    style="margin-top: 10px"></el-input>
+                    style="margin-top: 10px" disabled></el-input>
         </el-form-item>
       </div>
     </el-form>

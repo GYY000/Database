@@ -1,77 +1,79 @@
 <template>
   <img src="@/assets/image/background3.jpg" class="background">
-  <div class="lower_panel" id="lower_panel">
-    <el-row style="width: 100%" class="vertical-align-center">
-      <el-col :span="3" style="height: 100%; margin-left: 30px;display: flex;align-items: center"
-              @click="open_exit" class="hover_class">
-        <el-icon style="width: 40px; height: 45px;margin-top: 12px">
-          <ArrowLeft/>
-        </el-icon>
-        <div style="font-size: 16px;margin-top: 12px;display: inline-block">退出答题</div>
-      </el-col>
-      <el-col :span="8" :offset="7" style="height: 100%;font-size: 16px;color: #545455">
-        {{ ques_set_name }}
-      </el-col>
-      <el-col :span="5">
-        <el-button type="success" style="min-width: 80px;margin-right: 10px" plain round
-                   @click="open_hand_in">
-          提交
-        </el-button>
-        <el-button text :icon="Timer" @click="stopTimer">
-          <span style="font-size: 16px">{{ formattedTime }}</span>
-        </el-button>
-      </el-col>
-    </el-row>
-  </div>
-  <div class="secbackground"></div>
-  <!-- TODO BackGround -->
-  <div class="center_class" v-if="judge_mode === false">
-    <div class="main_container" id="main_container">
-      <div class="title center_class">
+  <div v-if="judge_mode === false">
+    <div class="lower_panel" id="lower_panel">
+      <el-row style="width: 100%" class="vertical-align-center">
+        <el-col :span="3" style="height: 100%; margin-left: 30px;display: flex;align-items: center"
+                @click="open_exit" class="hover_class">
+          <el-icon style="width: 40px; height: 45px;margin-top: 12px">
+            <ArrowLeft/>
+          </el-icon>
+          <div style="font-size: 16px;margin-top: 12px;display: inline-block">退出答题</div>
+        </el-col>
+        <el-col :span="8" :offset="7" style="height: 100%;font-size: 16px;color: #545455">
+          {{ ques_set_name }}
+        </el-col>
+        <el-col :span="5">
+          <el-button type="success" style="min-width: 80px;margin-right: 10px" plain round
+                     @click="open_hand_in">
+            提交
+          </el-button>
+          <el-button text :icon="Timer" @click="stopTimer">
+            <span style="font-size: 16px">{{ formattedTime }}</span>
+          </el-button>
+        </el-col>
+      </el-row>
+    </div>
+    <div class="secbackground"></div>
+    <div class="center_class">
+      <div class="main_container" id="main_container">
+        <div class="title center_class">
         <span style="height: 45px;margin-left: 10px;margin-top: 50px">
           {{ ques_set_name }}
         </span>
-      </div>
-      <div class="row_margin">
-        <el-col :offset="6" class="sub_title">
-          问题组简介
-        </el-col>
-        <el-col :offset="6" :span="12" class="sub_content">
-          {{ introduction }}
-        </el-col>
-      </div>
-      <div class="row_margin">
-        <el-col :offset="6" class="sub_title">
-          题型情况
-        </el-col>
-        <el-col :offset="6" :span="12">
-          <el-table :data="statistic" style="width: 100%">
-            <el-table-column prop="sum" label="汇总"/>
-            <el-table-column v-if="statistic[0].choice > 0" prop="choice" label="选择"/>
-            <el-table-column v-if="statistic[0].blank > 0" prop="blank" label="填空"/>
-            <el-table-column v-if="statistic[0].quesAndAns > 0" prop="quesAndAns" label="问答"/>
-            <el-table-column v-if="statistic[0].mixture > 0" prop="mixture" label="复合"/>
-          </el-table>
-        </el-col>
-      </div>
-      <div v-if="show" style="margin-top: 15px">
-        <el-pagination
-            v-model:current-page="currentPage"
-            :page-size="page_size"
-            :hide-on-single-page="true"
-            layout="prev, pager, next, jumper"
-            :total="questions.length"
-            @current-change="handleCurrentChange"
-        />
-        <div v-for="(ques, index) in display_ques" style="margin-bottom: 25px">
-          <div v-if="index !== 0" class="dashed-divider"></div>
-          <ques_do_display :ques="ques" :id="(currentPage - 1)* page_size + index"
-                           @update_ans="update_ans"></ques_do_display>
+        </div>
+        <div class="row_margin">
+          <el-col :offset="6" class="sub_title">
+            问题组简介
+          </el-col>
+          <el-col :offset="6" :span="12" class="sub_content">
+            {{ introduction }}
+          </el-col>
+        </div>
+        <div class="row_margin">
+          <el-col :offset="6" class="sub_title">
+            题型情况
+          </el-col>
+          <el-col :offset="6" :span="12">
+            <el-table :data="statistic" style="width: 100%">
+              <el-table-column prop="sum" label="汇总"/>
+              <el-table-column v-if="statistic[0].choice > 0" prop="choice" label="选择"/>
+              <el-table-column v-if="statistic[0].blank > 0" prop="blank" label="填空"/>
+              <el-table-column v-if="statistic[0].quesAndAns > 0" prop="quesAndAns" label="问答"/>
+              <el-table-column v-if="statistic[0].mixture > 0" prop="mixture" label="复合"/>
+            </el-table>
+          </el-col>
+        </div>
+        <div v-if="show" style="margin-top: 15px">
+          <el-pagination
+              v-model:current-page="currentPage"
+              :page-size="page_size"
+              :hide-on-single-page="true"
+              layout="prev, pager, next, jumper"
+              :total="questions.length"
+              @current-change="handleCurrentChange"
+          />
+          <div v-for="(ques, index) in display_ques" style="margin-bottom: 25px">
+            <div v-if="index !== 0" class="dashed-divider"></div>
+            <ques_do_display :ques="ques" :id="(currentPage - 1)* page_size + index"
+                             @update_ans="update_ans"></ques_do_display>
+          </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="center_class" v-if="judge_mode === true">
+
+  <div v-if="judge_mode === true">
     <judge_ans_view :hit_scores="hit_scores" :introduction="introduction"
                     :ans="hand_in_form.answers" :ques_set_name="ques_set_name"
                     :questions="questions"/>
@@ -127,7 +129,7 @@
     </template>
   </el-dialog>
 
-  <div class="right-panel1" v-if="panel_switch">
+  <div class="right-panel1" v-if="panel_switch && judge_mode === false">
     <div style="display: flex;justify-content: right;margin-right: 10px">
       <el-button size="small" :icon="Minus" @click="switch_panel" round/>
     </div>
@@ -137,7 +139,7 @@
       </div>
     </div>
   </div>
-  <div class="right-panel2" v-else>
+  <div class="right-panel2" v-if="panel_switch === false && judge_mode === false">
     <el-button size="small" type="primary" :icon="Plus"
                style="display:flex;justify-content: right;margin-right: 10px"
                @click="switch_panel" round>

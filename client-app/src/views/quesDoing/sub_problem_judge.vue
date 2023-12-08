@@ -5,9 +5,9 @@
       <el-tag class="mx-1" size="default" v-if="content.type === '填空'">填空题</el-tag>
       <el-tag class="mx-1" size="default" v-if="content.type === '问答'">问答题</el-tag>
       <el-tag class="mx-1" size="default" v-if="score < delta" :type="'danger'" style="margin-left: 10px">
-        {{score}}/{{ sub_problem.score }}分</el-tag>
+        {{score.toFixed(1)}}/{{ sub_problem.score.toFixed(1) }}分</el-tag>
       <el-tag class="mx-1" size="default" v-else :type="'success'" style="margin-left: 10px">
-        {{score}}/{{ sub_problem.score }}分</el-tag>
+        {{score.toFixed(1)}}/{{ sub_problem.score.toFixed(1) }}分</el-tag>
     </el-col>
   </el-row>
   <el-row>
@@ -73,7 +73,7 @@
             </template>
           </el-input>
           <el-input v-model="blank_ans[index]" size="large" style="margin-top: 10px"
-                    placeholder="标准答案"/>
+                    placeholder="标准答案" disabled/>
         </el-form-item>
       </div>
     </el-form>

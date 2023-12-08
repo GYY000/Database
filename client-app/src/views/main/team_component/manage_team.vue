@@ -98,7 +98,7 @@
             <el-table :data="history_display" style="width: 96%;margin-top: 20px;height: 420px">
               <el-table-column label="团队动态">
                 <template #default="scope">
-                  <history_entry :info="scope.row"></history_entry>
+                  <history_entry v-if="history_show" :info="scope.row"></history_entry>
                 </template>
               </el-table-column>
             </el-table>
@@ -468,6 +468,7 @@ export default {
   components: {User_show_card, CloseBold, History_entry, Ques_do_display, Judge_ans_view},
 
   setup() {
+    const team_id = ref()
     const history_display = ref([])
     const history_applications = ref(0)
     const ques_set_list = ref([])
@@ -495,6 +496,7 @@ export default {
     const ques_set_info_dialog = ref(false)
     const ques_set_avatar_flag = ref(true)
     const ques_set_info = ref(null)
+    const history_show = ref(false)
 
     const goto_ques_set = (id) => {
       if(creator_name.value === store.getUserName) {
@@ -570,7 +572,8 @@ export default {
 
     const init = () => {
       let router1 = useRouter()
-      fetch_all_member(router1.currentRoute.value.params.tid).then(
+      team_id.value = router1.currentRoute.value.params.tid
+      fetch_all_member(team_id.value).then(
           (res) => {
             console.log(res)
             for (let i = 0; i < res.uid_list.length; i++) {
@@ -589,7 +592,7 @@ export default {
                 type: 'enter'
               })
             }
-            fetch_history_team(router1.currentRoute.value.params.tid).then(
+            fetch_history_team(team_id.value).then(
                 (res) => {
                   for (let i = 0; i < res.user_name_list.length; i++) {
                     history_display.value.push(
@@ -601,7 +604,7 @@ export default {
                         }
                     )
                   }
-                  fetch_all_team_ques_set(router1.currentRoute.value.params.tid).then(
+                  fetch_all_team_ques_set(team_id.value).then(
                       (res) => {
                         for (let i = 0; i < res.qsid_list.length; i++) {
                           ques_set_list.value.push(
@@ -626,19 +629,19 @@ export default {
                         }
                         history_display.value.sort(compareFn)
                         history_display.value.slice(0, 10)
+                        history_show.value = true
                       }
                   )
-
                 }
             )
           }
       )
-      fetch_history_application(router1.currentRoute.value.params.tid).then(
+      fetch_history_application(team_id.value).then(
           (res) => {
             history_applications.value = res.application_sum
           }
       )
-      fetch_team_info(router1.currentRoute.value.params.tid).then(
+      fetch_team_info(team_id.value).then(
           (res) => {
             creator_name.value = res.creator_name
             team_name.value = res.team_name
@@ -671,9 +674,8 @@ export default {
     }
 
     const hand_in_edit = () => {
-      let router1 = useRouter()
       let form = new FormData
-      form.append("tid", router1.currentRoute.value.params.tid)
+      form.append("tid", team_id.value)
       form.append('introduction', introduction.value)
       form.append('file', hand_in_avatar.value)
       form.append('change_avatar', hand_in_avatar.value !== '')
@@ -710,12 +712,10 @@ export default {
 
     const send_message = () => {
       let uids = []
-      let router1 = useRouter()
       for (let user of user_selection.value) {
         uids.push(user.id)
       }
-      send_team_message(uids, router1.currentRoute.value.params.tid,
-          message_content.value).then(
+      send_team_message(uids, team_id.value, message_content.value).then(
           (res) => {
             if (res.is_successful === 'true') {
               ElMessage.success("发送成功")
@@ -732,9 +732,8 @@ export default {
     }
 
     const exit = () => {
-      let router1 = useRouter()
       if (creator_name.value === store.getUserName) {
-        del_team(router1.currentRoute.value.params.tid).then(
+        del_team(team_id.value).then(
             (res) => {
               if (res.is_successful === 'true') {
                 ElMessage({
@@ -795,8 +794,7 @@ export default {
       for (let user in user_selection.value) {
         select_uids.push(user.id)
       }
-      let router1 = useRouter()
-      del_members(select_uids, router1.currentRoute.value.params.tid).then(
+      del_members(select_uids, team_id.value).then(
           (res) => {
             if (res.is_successful === 'true') {
               ElMessage.success('删除成功')
@@ -856,7 +854,8 @@ export default {
       ques_set_info_dialog,
       ques_set_avatar_flag,
       ques_set_info,
-      goto_ques_set
+      goto_ques_set,
+      history_show
     }
   }
 }
