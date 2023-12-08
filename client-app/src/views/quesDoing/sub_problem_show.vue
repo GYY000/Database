@@ -38,7 +38,7 @@
       </el-select>
     </el-form-item>
   </div>
-  <div v-if="content.type === '填空'" >
+  <div v-if="content.type === '填空'" style="margin-left: 30px">
     <div style="margin-bottom: 10px">
       <el-tag size="large" effect="dark">答案Demo</el-tag>
     </div>

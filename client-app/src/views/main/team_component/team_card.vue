@@ -101,11 +101,23 @@ export default {
     const joinReq = () => {
       apply_for_team(props.creator_name, props.group_name, store.getUserId).then(
           (response) => {
-            if (response.is_successful === 'true') {
+            if(response.have_applied === 'true') {
+              ElMessage({
+                message: '您已申请过，请等待创建者批准',
+                showClose: true,
+                type: 'error',
+              })
+            } else if (response.is_successful === 'true') {
               ElMessage({
                 message: '发送成功',
                 showClose: true,
                 type: 'success',
+              })
+            } else {
+              ElMessage({
+                message: '申请失败',
+                showClose: true,
+                type: 'error',
               })
             }
           }

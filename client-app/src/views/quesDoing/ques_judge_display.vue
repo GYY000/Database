@@ -7,13 +7,13 @@
       <el-tag class="mx-1" size="large" v-if="content.type === '复合'">复合题型</el-tag>
       <el-tag class="mx-1" size="large" v-if="Math.abs(sum_score - ques.score) < delta" :type="'success'"
               style="margin-left: 10px">
-        {{ sum_score }}/{{ ques.score }}分
+        {{ sum_score.toFixed(1) }}/{{ ques.score.toFixed(1) }}分
       </el-tag>
       <el-tag class="mx-1" size="large" v-else-if="sum_score > delta" type="info" style="margin-left: 10px">
-        {{ sum_score }}/{{ ques.score }}分
+        {{ sum_score.toFixed(1) }}/{{ ques.score.toFixed(1) }}分
       </el-tag>
       <el-tag class="mx-1" size="large" v-else type="danger" style="margin-left: 10px">
-        {{ sum_score }}/{{ ques.score }}分
+        {{ sum_score.toFixed(1) }}/{{ ques.score.toFixed(1) }}分
       </el-tag>
     </el-col>
   </el-row>
@@ -84,7 +84,7 @@
             </template>
           </el-input>
           <el-input v-model="blank_ans[index]" size="large" placeholder="标准答案"
-                    style="margin-top: 10px"></el-input>
+                    style="margin-top: 10px" disabled></el-input>
         </el-form-item>
       </div>
     </el-form>
@@ -127,6 +127,7 @@ import Sub_problem_do from "@/views/quesDoing/sub_problem_do.vue";
 import Sub_problem_judge from "@/views/quesDoing/sub_problem_judge.vue";
 import {Check, Close} from "@element-plus/icons-vue";
 import {string2Array} from "@/views/main/api";
+import {ElMessage} from "element-plus";
 
 export default {
   name: "ques_judge_display",
@@ -215,7 +216,13 @@ export default {
         if (input_score.value !== '') {
           is_empty.value = true
           cur_score.value = parseFloat(input_score.value)
-          sum_score.value = cur_score.value
+          if(cur_score.value > props.ques.score) {
+            ElMessage.error("输入分数异常，请立即更正")
+            cur_score.value = 0
+            sum_score.value = 0
+          } else {
+            sum_score.value = cur_score.value
+          }
         } else {
           is_empty.value = false
           cur_score.value = 0

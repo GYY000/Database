@@ -371,6 +371,7 @@ export function array2String(array) {
 }
 
 export function send_team_message(uids, tid, message) {
+    console.log("send")
     return axios.request(
         {
             url: '/send_team_message',

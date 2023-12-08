@@ -1,5 +1,20 @@
 <template>
-  <div class="main_container" id="main_container">
+  <div class="lower_panel" id="lower_panel">
+      <el-row style="width: 100%" class="vertical-align-center">
+        <el-col :span="8" :offset="10" style="height: 100%;font-size: 16px;color: #545455">
+          {{ ques_set_name }}
+        </el-col>
+        <el-col :span="5">
+          <el-button type="success" style="min-width: 80px;margin-right: 10px" plain round
+                     @click="hand_in_score">
+            上传分数
+          </el-button>
+        </el-col>
+      </el-row>
+    </div>
+  <div class="secbackground"></div>
+  <div class="center_class">
+    <div class="main_container" id="main_container">
     <div class="title center_class">
         <span style="height: 45px;margin-left: 10px;margin-top: 50px">
           {{ ques_set_name }}
@@ -44,6 +59,7 @@
                             @update_score="update_score"/>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
@@ -92,6 +108,10 @@ export default {
     const photo_flag = ref(true)
     const sum_score = ref(0.0)
     const scores = ref([])
+
+    const hand_in_score = () => {
+
+    }
 
     const handlePageChange = (val) => {
       page.value = val;
@@ -167,19 +187,19 @@ export default {
       }
       statistic.value[0].sum = all_sum
       statistic.value[1].sum = true_sum + "/" + all_sum
-      statistic.value[2].sum = true_score + "/" + all_score
+      statistic.value[2].sum = true_score.toFixed(1) + "/" + all_score.toFixed(1)
       statistic.value[0].op = op_all_sum
       statistic.value[1].op = op_true_sum + "/" + op_all_sum
-      statistic.value[2].op = op_true_score + "/" + op_all_score
+      statistic.value[2].op = op_true_score.toFixed(1) + "/" + op_all_score.toFixed(1)
       statistic.value[0].blank = blank_all_sum
       statistic.value[1].blank = blank_true_sum + "/" + blank_all_sum
-      statistic.value[2].blank = blank_true_score + "/" + blank_all_score
+      statistic.value[2].blank = blank_true_score.toFixed(1) + "/" + blank_all_score.toFixed(1)
       statistic.value[0].qa = qa_all_sum
       statistic.value[1].qa = qa_true_sum + "/" + qa_all_sum
-      statistic.value[2].qa = qa_true_score + "/" + qa_all_score
+      statistic.value[2].qa = qa_true_score.toFixed(1) + "/" + qa_all_score.toFixed(1)
       statistic.value[0].mix = mix_all_sum
       statistic.value[1].mix = mix_true_sum + "/" + mix_all_sum
-      statistic.value[2].mix = mix_true_score + "/" + mix_all_score
+      statistic.value[2].mix = mix_true_score.toFixed(1) + "/" + mix_all_score.toFixed(1)
     }
 
     const init = () => {
@@ -228,7 +248,8 @@ export default {
       statistic,
       exit,
       scores,
-      update_score
+      update_score,
+      hand_in_score
     }
   }
 }
@@ -279,5 +300,16 @@ export default {
   opacity: 50%;
   margin-bottom: 25px;
   width: 100%;
+}
+
+.secbackground {
+  top: 0;
+  left: 2%;
+  width: 96%;
+  height: 100vh;
+  position: fixed;
+  z-index: -1;
+  opacity: 100%;
+  background-color: white;
 }
 </style>
