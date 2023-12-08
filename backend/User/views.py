@@ -1086,3 +1086,53 @@ def send_team_message(request):
     for uid in uid_list:
         Message(sender=sender,receiver=User.objects.get(uid=uid),content=message).save()
     return JsonResponse({"is_successful":"true"})
+
+def add_collection(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    qsid=request_dict['qsid']
+    uid=request_dict['uid']
+    try:
+        Favorite(uid=User.objects.get(uid=uid),qsid=QuestionSet.objects.get(qsid=qsid)).save()
+        return JsonResponse({"is_successful":"true"})
+    except:
+        return JsonResponse({"is_successful":"false"})
+
+def remove_collection(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    qsid=request_dict['qsid']
+    uid=request_dict['uid']
+    try:
+        Favorite.objects.get(uid=uid,qsid=qsid).delete()
+        return JsonResponse({"is_successful":"true"})
+    except:
+        return JsonResponse({"is_successful":"false"})
+def get_collections(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    uid=request_dict['user_id']
+    name_list=[]
+    creator_list=[]
+    introduction_list=[]
+    date_list=[]
+    id_list=[]
+    cols=Favorite.objects.filter(uid=uid)
+    for _ in cols:
+        name_list.append(_.qsid.set_name)
+        creator_list.append(_.qsid.creator.user_name)
+        introduction_list.append(_.qsid.introduction)
+        date_list.append(_.qsid.create_time.strftime("%Y-%m-%d %H:%M"))
+        id_list.append(_.qsid.qsid)
+    return JsonResponse({"name_list":name_list,"creator_list":creator_list,
+                         "introduction_list":introduction_list,"date_list":date_list,
+                         "id_list":id_list
+                         })
+
+
+def in_collection(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    qsid=request_dict['qsid']
+    uid=request_dict['uid']
+    try:
+        Favorite.objects.get(uid=uid,qsid=qsid)
+        return JsonResponse({"value":"true"})
+    except:
+        return JsonResponse({"value":"false"})
