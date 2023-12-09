@@ -77,4 +77,8 @@ urlpatterns = [
     re_path("fetch_history_team",views.fetch_history_team),
     re_path("fetch_history_applications",views.fetch_history_applications),
     re_path("send_team_message",views.send_team_message),
+    re_path("add_collection",views.add_collection),
+    re_path("remove_collection",views.remove_collection),
+    re_path("get_collections",views.get_collections),
+    re_path("in_collection",views.in_collection),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
