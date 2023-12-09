@@ -177,9 +177,11 @@ user_id	    name_list
     date_list = [_.create_time.strftime("%Y-%m-%d") for _ in create_qs_list]
     creator_list = [_.creator.user_name for _ in create_qs_list]
     introduction_list = [_.introduction for _ in create_qs_list]
+    id_list = [_.qsid for _ in create_qs_list]
     return JsonResponse({"name_list": name_list,
                          "creator_list": creator_list,
                          "date_list": date_list,
+                         "id_list": id_list,
                          "introduction_list": introduction_list})
 
 
@@ -218,10 +220,12 @@ search_content	avatar_list
     date_list = []
     creator_list = [qs.creator.user_name for qs in ques_sets]
     introduction_list = []
+    id_list = []
     for qs in ques_sets:
         name_list.append(qs.set_name)
         date_list.append(qs.create_time.strftime("%Y-%m-%d"))
         introduction_list.append(qs.introduction)
+        id_list.append(qs.qsid)
     i = 0
     while i < len(name_list):
         if not fuzzy_match(name_list[i], search_content):
@@ -229,12 +233,14 @@ search_content	avatar_list
             creator_list.pop(i)
             date_list.pop(i)
             introduction_list.pop(i)
+            id_list.pop(i)
             i -= 1
         i += 1
     dict["name_list"] = name_list
     dict["creator_list"] = creator_list
     dict["date_list"] = date_list
     dict["introduction_list"] = introduction_list
+    dict["id_list"] = id_list
     return JsonResponse(dict)
 
 
