@@ -37,7 +37,8 @@
                      :qs_id="ques_sets.id_list[index]"
                      :set_name="ques_sets.name_list[index]"
                      :date="ques_sets.date_list[index]"
-                     :introduction="ques_sets.introduction_list[index]">
+                     :introduction="ques_sets.introduction_list[index]"
+                     :key="ques_sets.id_list[index]">
     </ques_group_card>
   </el-row>
 </template>

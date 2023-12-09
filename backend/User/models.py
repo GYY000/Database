@@ -122,3 +122,5 @@ class Favorite(models.Model):
     id = models.AutoField(primary_key=True)
     uid = models.ForeignKey(User, on_delete=models.CASCADE)
     qsid = models.ForeignKey(QuestionSet, on_delete=models.CASCADE)
+    class Meta:
+        unique_together = ('uid', 'qsid')
