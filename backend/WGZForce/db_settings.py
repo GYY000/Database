@@ -1,9 +1,9 @@
 
 now_database = {
     'ENGINE': 'django.db.backends.mysql',
-    'NAME': 'db21373122',
-    'USER': '21373122',
-    'PASSWORD': 'Aa108174',
-    'HOST': '120.46.80.149',
-    'PORT': '',
+    'NAME': 'db_homework',
+    'USER': 'root',
+    'PASSWORD': '123456',
+    'HOST': 'localhost',
+    'PORT': '3306'
 }

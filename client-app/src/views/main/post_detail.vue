@@ -30,8 +30,14 @@
     <div class="comment-list">
       <comment v-for="comment in comments" :key="comment.cid" :comment="comment" />
     </div>
-    <el-button ref="fixedButton" @click="() => { dialogVisible = true }" style="position: fixed;right: calc(50% - 580px); bottom: 5%; width: 55px;height: 55px;">
+    <el-button @click="() => { dialogVisible = true }" style="position: fixed;right: calc(50% - 580px); bottom: 5%; width: 55px;height: 55px;">
       <el-icon :size="30"><Comment /></el-icon>
+    </el-button>
+    <el-button @click="() => { $router.go(-1) }" style="position: fixed;right: calc(50% - 650px); bottom: 5%; width: 60px;height: 55px;">
+      <div>
+        <el-icon :size="25"><Back /></el-icon>
+        <div style="font-size: 12px;">返回</div>
+      </div>
     </el-button>
   </div>
 </template>

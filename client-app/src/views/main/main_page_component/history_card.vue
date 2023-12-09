@@ -2,19 +2,19 @@
     <div class="set-container">
         <img :src="avatar" alt="封面" class="avatar" />
         <div class="content">
-            <router-link :to="'panel_del_index/do_prob/' + question_set.qsid" style="text-decoration: none; color: black;">
+            <router-link :to="'panel_del_index/do_prob/' + record.qsid" style="text-decoration: none; color: black;">
                 <div style="font-weight: 600;font-size: large;">
-                    {{ question_set.question_set_name }}
+                    {{ record.question_set_name }}
                 </div>
             </router-link>
-            <router-link v-if="!question_set.is_public" class="team_name" :to="'/manage_team/' + question_set.tid">
-                {{ question_set.team_name }}
-            </router-link>
-            <div v-else class="team_name">公开题组</div>
+            <div class="time">
+                {{ record.time }}
+            </div>
         </div>
         <div style="flex-grow: 1;" />
-        <div class="time">
-            {{ question_set.time }}
+        <div style="font-size: 20px;font-weight: 800;">
+            {{ Number.isInteger(record.user_score) ? record.user_score : record.user_score.toFixed(2) }} 
+            / {{ Number.isInteger(record.total_score) ? record.total_score : record.total_score.toFixed(2) }}
         </div>
     </div>
 </template>
@@ -23,7 +23,7 @@
 import axios from 'axios';
 export default {
     props: {
-        question_set: {
+        record: {
             type: Object,
             required: true,
         },
@@ -38,7 +38,7 @@ export default {
     },
     methods: {
         getAvatar() {
-            axios.post('/fetch_set_avatar', { set_name: this.question_set.question_set_name })
+            axios.post('/fetch_set_avatar', { set_name: this.record.question_set_name })
                 .then(response => {
                     this.avatar = response.data.avatar;
                     this.avatar = this.avatar.startsWith('/9j') ? 'data:image/jpg;base64,' + this.avatar
@@ -89,9 +89,8 @@ export default {
 }
 
 .time {
-    float: right;
-    font-size: 12px;
+    font-size: 14px;
     color: #999;
-    padding-top: 20px;
+    margin-top: 5px;
 }</style>
   

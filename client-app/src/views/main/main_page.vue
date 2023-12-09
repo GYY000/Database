@@ -2,7 +2,7 @@
   <div class="container">
     <el-row>
       <el-col :span="1"></el-col>
-      <el-col :span="12">
+      <el-col :span="13">
         <el-card class="vertical">
           <!-- 左边的竖直排列的卡片内容 -->
           <template #header>
@@ -14,16 +14,21 @@
         </el-card>
       </el-col>
       <el-col :span="1"></el-col>
-      <el-col :span="8">
+      <el-col :span="7">
         <div class="horizontal-card-container">
-          <el-card class="horizontal-card" style="height: 230px;">
+          <el-card class="horizontal-card" style="height: auto;">
             <!-- 右边上方的水平排列的卡片内容 -->
             <template #header>
               <div class="card-header">
                 <h2>我的记录</h2>
               </div>
             </template>
-
+            <history_card
+              v-for="record in recent_history"
+              :key="record.question_set_name"
+              :record="record"
+            >
+            </history_card>
           </el-card>
           <el-card class="horizontal-card">
             <!-- 右边下方的水平排列的卡片内容 -->
@@ -32,11 +37,6 @@
                 <h2>最新题集</h2>
               </div>
             </template>
-            <div v-for="question_set in recent_question_set" 
-              :key="question_set.question_set_name"
-              class="question-set"
-            >
-            </div>
             <question_set_card 
               v-for="question_set in recent_question_set" 
               :key="question_set.question_set_name"
@@ -53,9 +53,8 @@
 <script>
 import axios from 'axios';
 import userStateStore from "@/store";
-import {fetch_set_avatar} from "@/views/main/api";
 import question_set_card from './main_page_component/question_set_card.vue';
-import Question_set_card from './main_page_component/question_set_card.vue';
+import history_card from './main_page_component/history_card.vue';
 
 export default {
     name: "main_page",
@@ -66,7 +65,7 @@ export default {
         };
     },
     mounted() {
-        //this.fetch_recent_history();
+        this.fetch_recent_history();
         this.fetch_recent_question_set();
     },
     methods: {
@@ -99,7 +98,7 @@ export default {
             });
         },
     },
-    components: { Question_set_card }
+    components: { question_set_card, history_card }
 }
 </script>
 

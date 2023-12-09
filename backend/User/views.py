@@ -997,7 +997,8 @@ def get_recent_records(request):
     return JsonResponse([{"question_set_name": qs[i].qsid.set_name,
                           "user_score": qs[i].score,
                           "total_score": total_scores[i],
-                          "time": qs[i].time.strftime("%Y-%m-%d %H:%M")
+                          "time": qs[i].time.strftime("%Y-%m-%d %H:%M"),
+                          "qsid": qs[i].qsid.qsid,
                           } for i in range(len(qs))], safe=False)
 
 
@@ -1013,13 +1014,15 @@ def get_recent_question_set(request):
         if teamIds.__contains__(quesPerm.tid):
             # quesSet = QuestionSet.objects.get(qsid=quesPerm.qsid)
             if not ques_sets.__contains__(quesPerm.qsid):
-                set_team_map[quesPerm.qsid.qsid] = quesPerm.tid.team_name
+                set_team_map[quesPerm.qsid.qsid] = (quesPerm.tid.team_name, quesPerm.tid.tid)
                 ques_sets.append(quesPerm.qsid)
     ques_sets = sorted(ques_sets, key=lambda x: x.create_time, reverse=True)[:total]
     dic = [{"question_set_name": _.set_name,
+            "qsid": _.qsid,
             "time": _.create_time.strftime("%Y-%m-%d %H:%M"),
             "is_public": _.is_public,
-            "team_name": None if _.is_public else set_team_map[_.qsid]
+            "team_name": '公开题组' if _.is_public else set_team_map[_.qsid][0],
+            "tid": 0 if _.is_public else set_team_map[_.qsid][1]
             } for _ in ques_sets]
     return JsonResponse(dic, safe=False)
 
