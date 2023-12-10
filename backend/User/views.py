@@ -419,6 +419,9 @@ def post_hub_param(request, pid):
         content = sensi_filter.filter(request_dict["content"])
         comment = Comment(creator=User.objects.get(uid=uid), content=content, pid=Post.objects.get(pid=pid))
         comment.save()
+        post=Post.objects.get(pid=pid)
+        post.update_time=timezone.now()
+        post.save()
         return JsonResponse({"cid": comment.id, "user_name": comment.creator.user_name,
                              "uid": comment.creator.uid,
                              "content": comment.content,
