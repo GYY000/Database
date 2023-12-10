@@ -393,7 +393,11 @@ def post_hub(request):
                    posts]
     arr = [{"pid": posts[i].pid, "title": posts[i].title, "creator_name": name_photos[i][0],
             "update_time": posts[i].update_time.strftime("%Y-%m-%d %H:%M"), "content": posts[i].content,
-            "uid": posts[i].creator.uid} for i in range(len(posts))]
+            "uid": posts[i].creator.uid,"comment_contents":[_.content  for _ in list(Comment.objects.filter(pid=posts[i].pid))],
+            "comment_creator_names": [_.creator.user_name for _ in list(Comment.objects.filter(pid=posts[i].pid))],
+            "comment_creator_ids": [_.creator.uid for _ in list(Comment.objects.filter(pid=posts[i].pid))],
+            "comment_times": [_.create_time.strftime("%Y-%m-%d %H:%M") for _ in list(Comment.objects.filter(pid=posts[i].pid))]
+            } for i in range(len(posts))]
     return JsonResponse({"posts": arr[start:end], "total": len(posts)}, safe=False)
 
 
@@ -414,7 +418,6 @@ def post_hub_param(request, pid):
 
     elif request.method == "POST":
         request_dict = json.loads(request.body.decode('utf-8'))
-        print(request_dict)
         uid = request_dict["uid"]
         content = sensi_filter.filter(request_dict["content"])
         comment = Comment(creator=User.objects.get(uid=uid), content=content, pid=Post.objects.get(pid=pid))
@@ -460,7 +463,7 @@ url:/upload_team
         team.save()
         ReUserTeam(uid=User.objects.get(uid=user_id),tid=team,is_admin=True).save()
         # 通过GROUP_name+"_VIRTUAL"来获取虚拟
-        User(user_name=group_name + "_VIRTUAL", password="123456", profile_photo=code).save()
+        User(user_name=group_name + "@TEAM", password="123456", profile_photo=code).save()
         return JsonResponse({"is_successful": "true"})
     except Exception as e:
         print(e)
@@ -1092,9 +1095,9 @@ def send_team_message(request):
     message = request_dict['message']
     team = Team.objects.get(tid=tid)
     try:
-        sender = User.objects.get(user_name=team.team_name + "_VIRTUAL")
+        sender = User.objects.get(user_name=team.team_name + "@TEAM")
     except:
-        tmp = User(user_name=team.team_name + "_VIRTUAL", password="123456", profile_photo=team.profile_photo)
+        tmp = User(user_name=team.team_name + "@TEAM", password="123456", profile_photo=team.profile_photo)
         tmp.save()
         sender = tmp
     for uid in uid_list:
@@ -1154,3 +1157,19 @@ def in_collection(request):
         return JsonResponse({"value": "true"})
     except:
         return JsonResponse({"value": "false"})
+
+def delete_comment(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    try:
+        Comment.objects.get(id=request_dict['cid']).delete()
+    except:
+        print("No such comment!")
+    return JsonResponse({"is_successful":"true"})
+
+def delete_post(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    try:
+        Post.objects.get(pid=request_dict['pid']).delete()
+    except:
+        print("No such post")
+    return JsonResponse({"is_successful":"true"})

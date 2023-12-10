@@ -80,5 +80,7 @@ urlpatterns = [
     re_path("remove_collection",views.remove_collection),
     re_path("get_collections",views.get_collections),
     re_path("in_collection",views.in_collection),
-    re_path("update_team_info", views.update_team)
+    re_path("update_team_info", views.update_team),
+    re_path("delete_comment",views.delete_comment),
+    re_path("delete_post",views.delete_post),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
