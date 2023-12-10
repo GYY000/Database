@@ -83,4 +83,9 @@ urlpatterns = [
     re_path("update_team_info", views.update_team),
     re_path("delete_comment",views.delete_comment),
     re_path("delete_post",views.delete_post),
+    re_path("fetch_all_future_intime_tests",views.fetch_all_future_intime_tests),
+    re_path("create_exam",views.create_exam),
+    re_path("participate_exam",views.participate_exam),
+    re_path("fetch_exam_info",views.fetch_exam_info),
+    re_path("inside_exam",views.inside_exam)
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1173,3 +1173,69 @@ def delete_post(request):
     except:
         print("No such post")
     return JsonResponse({"is_successful":"true"})
+
+def fetch_all_future_intime_tests(request):
+    exams=[]
+    for _ in Exam.objects.all():
+        if _.start_time+_.duration>timezone.now():
+            exams.append(_)
+    return JsonResponse(
+        {
+            "eid_list":[_.eid for _ in exams],
+            "start_time_list":[_.start_time.strftime("%Y-%m-%d %H:%M") for _ in exams],
+            "duration_list":[_.duration for _ in exams],
+            "creator_name_list":[_.creator.user_name for _ in exams]
+        }
+
+    )
+
+
+
+def create_exam(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    creator_id=request_dict['creator_id']
+    start_time=request_dict['start_time']
+    duration=request_dict['duration']
+    ques_set_name=request_dict['ques_set_name']
+    exam_name=request_dict['exam_name']
+    qs=QuestionSet.objects.get(set_name=ques_set_name)
+    if not qs.is_public:
+        permits=list(QuestionSetPerm.objects.filter(qsid=qs.qsid))
+        permits=[_.tid.creator.uid for _ in permits]
+        if not permits.__contains__(creator_id):
+            return JsonResponse({"is_successful": "false", "has_no_perm": "true"})
+        else:
+            Exam(creator=User.objects.get(uid=creator_id), qsid=qs, exam_name=exam_name,
+                 start_time=start_time, duration=duration).save()
+    else:
+        Exam(creator=User.objects.get(uid=creator_id),qsid=qs,exam_name=exam_name,
+             start_time=start_time,duration=duration).save()
+    return JsonResponse({"is_successful":"true","has_no_perm":"false"})
+
+
+def participate_exam(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    uid=request_dict['uid']
+    eid=request_dict['eid']
+    Entry(uid=User.objects.get(uid=uid),eid=Exam.objects.get(eid=eid)).save()
+    return JsonResponse({"is_successful":"true"})
+
+def fetch_exam_info(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    eid=request_dict['eid']
+    exam=Exam.objects.get(eid=eid)
+    return JsonResponse({
+        "qsid":exam.qsid.qsid,
+        "start_time":exam.start_time.strftime("%Y-%m-%d %H:%M"),
+        "duration":exam.duration
+    })
+
+def inside_exam(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    uid=request_dict['uid']
+    eid=request_dict['eid']
+    try:
+        Entry.objects.get(uid=uid,eid=eid)
+        return JsonResponse({"is_inside":"true"})
+    except:
+        return JsonResponse({"is_inside":"false"})
