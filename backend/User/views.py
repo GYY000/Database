@@ -15,7 +15,6 @@ from django.utils import timezone
 from datetime import timedelta
 
 
-
 # Create your views here.
 def login(request):
     assert request.method == "POST"
@@ -456,8 +455,8 @@ url:/upload_team
         team = Team(team_name=group_name, creator=User.objects.get(uid=user_id), profile_photo=code,
                     introduction=introduction)
         team.save()
-        #通过GROUP_name+"_VIRTUAL"来获取虚拟
-        User(user_name=group_name+"_VIRTUAL",password="123456",profile_photo=code).save()
+        # 通过GROUP_name+"_VIRTUAL"来获取虚拟
+        User(user_name=group_name + "_VIRTUAL", password="123456", profile_photo=code).save()
         return JsonResponse({"is_successful": "true"})
     except Exception as e:
         print(e)
@@ -569,14 +568,14 @@ url:/apply_for_team
     team_name = request_dict["team_name"]
     applier_id = request_dict["applier_id"]
     try:
-        JoinRequest.objects.get(uid=applier_id,tid=Team.objects.get(team_name=team_name).tid)
-        return JsonResponse({"is_successful":"false","have_applied":"true"})
+        JoinRequest.objects.get(uid=applier_id, tid=Team.objects.get(team_name=team_name).tid)
+        return JsonResponse({"is_successful": "false", "have_applied": "true"})
     except:
         joinReq = JoinRequest(uid=User.objects.get(uid=applier_id),
-                          tid=Team.objects.get(team_name=team_name),
-                          status="未审理,请耐心等待！")
+                              tid=Team.objects.get(team_name=team_name),
+                              status="未审理,请耐心等待！")
         joinReq.save()
-        return JsonResponse({"is_successful": "true","have_applied":"false"})
+        return JsonResponse({"is_successful": "true", "have_applied": "false"})
 
 
 def del_members(request):
@@ -590,7 +589,7 @@ url:/del_members
     del_user_ids = request_dict["del_user_ids"]
     tid = request_dict["tid"]
     try:
-        for id in del_user_ids :
+        for id in del_user_ids:
             ReUserTeam.objects.get(uid=id, tid=tid).delete()
         return JsonResponse({"is_successful": "true"})
     except:
@@ -672,11 +671,11 @@ url:/fetch_all_ques_set_in_team
     name_list = []
     creator_list = []
     introduction_list = []
-    ques_sum_list=[] #内含题目数量
-    do_time_list=[]
+    ques_sum_list = []  # 内含题目数量
+    do_time_list = []
     qsid_list = []
-    date_list=[]
-    avg_scores=[]
+    date_list = []
+    avg_scores = []
     for _ in QuestionSetPerm.objects.filter(tid=tid):
         qsid_list.append(_.qsid.qsid)
         name_list.append(_.qsid.set_name)
@@ -684,12 +683,12 @@ url:/fetch_all_ques_set_in_team
         date_list.append(_.qsid.create_time.strftime("%Y-%m-%d %H:%M"))
         introduction_list.append(_.qsid.introduction)
         ques_sum_list.append(len(list(Question.objects.filter(qsid=_.qsid.qsid))))
-        shs=list(SetHistory.objects.filter(qsid=_.qsid.qsid))
+        shs = list(SetHistory.objects.filter(qsid=_.qsid.qsid))
         do_time_list.append(len(shs))
-        sum_score=0
+        sum_score = 0
         for sh in shs:
-            sum_score+=sh.score
-        sum_score=0 if len(shs)==0 else sum_score/len(shs)
+            sum_score += sh.score
+        sum_score = 0 if len(shs) == 0 else sum_score / len(shs)
         avg_scores.append(sum_score)
     return JsonResponse({"name_list": name_list, "creator_list": creator_list,
                          "introduction_list": introduction_list,
@@ -697,7 +696,7 @@ url:/fetch_all_ques_set_in_team
                          "date_list": date_list,
                          "ques_sum_list": ques_sum_list,
                          "do_time_list": do_time_list,
-                         "average_score_list":avg_scores
+                         "average_score_list": avg_scores
                          })
 
 
@@ -708,34 +707,34 @@ team_name	name_list
 	        register_date_list
 url:/fetch_all_users_in_team
     '''
-    #fixme 加个过题总数和正确率
+    # fixme 加个过题总数和正确率
     tid = json.loads(request.body.decode('utf-8'))['tid']
     name_list = []
     register_date_list = []
     uid_list = []
-    do_prob_sum_list=[]
-    accuracy_list=[]
+    do_prob_sum_list = []
+    accuracy_list = []
     for _ in ReUserTeam.objects.filter(tid=tid):
         name_list.append(_.uid.user_name)
         register_date_list.append(_.join_date.strftime("%Y-%m-%d %H:%M"))
         uid_list.append(_.uid.uid)
         try:
-            qhs=QuestionHistory.objects.filter(uid=_.uid.uid)
+            qhs = QuestionHistory.objects.filter(uid=_.uid.uid)
         except:
-            qhs=[]
+            qhs = []
         do_prob_sum_list.append(len(list(qhs)))
-        sum_scores=0
-        get_scores=0
+        sum_scores = 0
+        get_scores = 0
         for _ in qhs:
-            sum_scores+=Question.objects.get(qid=_.qid.qid).score
-            get_scores+=_.score
-        accuracy_list.append(get_scores/sum_scores if len(qhs)!=0 and sum_scores!=0 else 0)
+            sum_scores += Question.objects.get(qid=_.qid.qid).score
+            get_scores += _.score
+        accuracy_list.append(get_scores / sum_scores if len(qhs) != 0 and sum_scores != 0 else 0)
     print(uid_list)
     return JsonResponse({"name_list": name_list,
                          "register_date_list": register_date_list,
                          "uid_list": uid_list,
-                         "do_prob_sum_list":do_prob_sum_list,
-                         "accuracy_list":accuracy_list
+                         "do_prob_sum_list": do_prob_sum_list,
+                         "accuracy_list": accuracy_list
                          })
 
 
@@ -746,7 +745,7 @@ def fetch_team_info(request):
                          "team_name": team.team_name,
                          "introduction": team.introduction,
                          "date": team.create_date,
-                         "avatar":bytes.decode(team.profile_photo)})
+                         "avatar": bytes.decode(team.profile_photo)})
 
 
 def get_user_post(request):
@@ -900,6 +899,7 @@ def update_ques(request):
         ques.save()
         return JsonResponse({"is_successful": "true"})
 
+
 def update_team(request):
     assert request.method == "POST"
     tid = request.POST.get('tid')
@@ -915,6 +915,7 @@ def update_team(request):
         return JsonResponse({"is_successful": "true"})
     except QuestionSet.DoesNotExist:
         return JsonResponse({"is_successful": "false"})
+
 
 import math
 
@@ -1047,101 +1048,105 @@ def create_set_history(request):
     set_history.save()
     for i in range(len(qids)):
         QuestionHistory(shid=set_history, score=scores[i], answer=str(answers[i]),
-                        qid=Question.objects.get(qid=qids[i]),uid=User.objects.get(uid=uid)).save()
+                        qid=Question.objects.get(qid=qids[i]), uid=User.objects.get(uid=uid)).save()
     return JsonResponse({"is_successful": "true"})
 
 
-#这里我需要返回最近的最多五条，组内成员做组内题集的记录
+# 这里我需要返回最近的最多五条，组内成员做组内题集的记录
 def fetch_history_team(request):
-    request_dict=json.loads(request.body.decode('utf-8'))
-    tid=request_dict['tid']
-    shs=list(SetHistory.objects.order_by('-time'))
-    question_sets=QuestionSetPerm.objects.filter(tid=tid)
-    question_sets=[_.qsid for _ in question_sets]
-    ans=[]
+    request_dict = json.loads(request.body.decode('utf-8'))
+    tid = request_dict['tid']
+    shs = list(SetHistory.objects.order_by('-time'))
+    question_sets = QuestionSetPerm.objects.filter(tid=tid)
+    question_sets = [_.qsid for _ in question_sets]
+    ans = []
     for _ in shs:
         if question_sets.__contains__(_.qsid):
             ans.append(_)
-    ans=ans[:5]
-    name_list=[_.uid.user_name  for _ in ans]
-    ques_set_list=[_.qsid.set_name for _ in ans]
-    date_list=[_.time.strftime("%Y-%m-%d %H:%M") for _ in ans]
-    return JsonResponse({"user_name_list":name_list,"ques_set_list":ques_set_list,
-                         "date_list":date_list})
+    ans = ans[:5]
+    name_list = [_.uid.user_name for _ in ans]
+    ques_set_list = [_.qsid.set_name for _ in ans]
+    date_list = [_.time.strftime("%Y-%m-%d %H:%M") for _ in ans]
+    return JsonResponse({"user_name_list": name_list, "ques_set_list": ques_set_list,
+                         "date_list": date_list})
 
 
-#返回最近七天的申请进入该组申请数
+# 返回最近七天的申请进入该组申请数
 def fetch_history_applications(request):
-    request_dict=json.loads(request.body.decode('utf-8'))
-    tid=request_dict['tid']
-    now=timezone.now()
-    seven_days_ago=now-timedelta(days=7)
-    reqs=list(JoinRequest.objects.filter(tid=tid).filter(create_time__gte=seven_days_ago))
-    return JsonResponse({"application_sum":len(reqs)})
+    request_dict = json.loads(request.body.decode('utf-8'))
+    tid = request_dict['tid']
+    now = timezone.now()
+    seven_days_ago = now - timedelta(days=7)
+    reqs = list(JoinRequest.objects.filter(tid=tid).filter(create_time__gte=seven_days_ago))
+    return JsonResponse({"application_sum": len(reqs)})
 
 
 def send_team_message(request):
-    request_dict=json.loads(request.body.decode('utf-8'))
-    tid=request_dict['tid']
-    uid_list=request_dict['uid_list']
-    message=request_dict['message']
-    team=Team.objects.get(tid=tid)
+    request_dict = json.loads(request.body.decode('utf-8'))
+    tid = request_dict['tid']
+    uid_list = request_dict['uid_list']
+    message = request_dict['message']
+    team = Team.objects.get(tid=tid)
     try:
-        sender=User.objects.get(user_name=team.team_name+"_VIRTUAL")
+        sender = User.objects.get(user_name=team.team_name + "_VIRTUAL")
     except:
-        tmp=User(user_name=team.team_name+"_VIRTUAL",password="123456",profile_photo=team.profile_photo)
+        tmp = User(user_name=team.team_name + "_VIRTUAL", password="123456", profile_photo=team.profile_photo)
         tmp.save()
-        sender=tmp
+        sender = tmp
     for uid in uid_list:
-        Message(sender=sender,receiver=User.objects.get(uid=uid),content=message).save()
-    return JsonResponse({"is_successful":"true"})
+        Message(sender=sender, receiver=User.objects.get(uid=uid), content=message).save()
+    return JsonResponse({"is_successful": "true"})
+
 
 def add_collection(request):
-    request_dict=json.loads(request.body.decode('utf-8'))
-    qsid=request_dict['qsid']
-    uid=request_dict['uid']
+    request_dict = json.loads(request.body.decode('utf-8'))
+    qsid = request_dict['qsid']
+    uid = request_dict['uid']
     try:
-        Favorite(uid=User.objects.get(uid=uid),qsid=QuestionSet.objects.get(qsid=qsid)).save()
-        return JsonResponse({"is_successful":"true"})
+        Favorite(uid=User.objects.get(uid=uid), qsid=QuestionSet.objects.get(qsid=qsid)).save()
+        return JsonResponse({"is_successful": "true"})
     except:
-        return JsonResponse({"is_successful":"false"})
+        return JsonResponse({"is_successful": "false"})
+
 
 def remove_collection(request):
-    request_dict=json.loads(request.body.decode('utf-8'))
-    qsid=request_dict['qsid']
-    uid=request_dict['uid']
+    request_dict = json.loads(request.body.decode('utf-8'))
+    qsid = request_dict['qsid']
+    uid = request_dict['uid']
     try:
-        Favorite.objects.get(uid=uid,qsid=qsid).delete()
-        return JsonResponse({"is_successful":"true"})
+        Favorite.objects.get(uid=uid, qsid=qsid).delete()
+        return JsonResponse({"is_successful": "true"})
     except:
-        return JsonResponse({"is_successful":"false"})
+        return JsonResponse({"is_successful": "false"})
+
+
 def get_collections(request):
-    request_dict=json.loads(request.body.decode('utf-8'))
-    uid=request_dict['user_id']
-    name_list=[]
-    creator_list=[]
-    introduction_list=[]
-    date_list=[]
-    id_list=[]
-    cols=Favorite.objects.filter(uid=uid)
+    request_dict = json.loads(request.body.decode('utf-8'))
+    uid = request_dict['user_id']
+    name_list = []
+    creator_list = []
+    introduction_list = []
+    date_list = []
+    id_list = []
+    cols = Favorite.objects.filter(uid=uid)
     for _ in cols:
         name_list.append(_.qsid.set_name)
         creator_list.append(_.qsid.creator.user_name)
         introduction_list.append(_.qsid.introduction)
         date_list.append(_.qsid.create_time.strftime("%Y-%m-%d %H:%M"))
         id_list.append(_.qsid.qsid)
-    return JsonResponse({"name_list":name_list,"creator_list":creator_list,
-                         "introduction_list":introduction_list,"date_list":date_list,
-                         "id_list":id_list
+    return JsonResponse({"name_list": name_list, "creator_list": creator_list,
+                         "introduction_list": introduction_list, "date_list": date_list,
+                         "id_list": id_list
                          })
 
 
 def in_collection(request):
-    request_dict=json.loads(request.body.decode('utf-8'))
-    qsid=request_dict['qsid']
-    uid=request_dict['uid']
+    request_dict = json.loads(request.body.decode('utf-8'))
+    qsid = request_dict['qsid']
+    uid = request_dict['uid']
     try:
-        Favorite.objects.get(uid=uid,qsid=qsid)
-        return JsonResponse({"value":"true"})
+        Favorite.objects.get(uid=uid, qsid=qsid)
+        return JsonResponse({"value": "true"})
     except:
-        return JsonResponse({"value":"false"})
+        return JsonResponse({"value": "false"})

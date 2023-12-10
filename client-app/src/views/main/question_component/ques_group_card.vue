@@ -29,7 +29,7 @@
           <el-button type="danger" :icon="Edit" class="button"
                      v-if="creator_name === user_name" @click="do_edit"/>
           <div style="flex-grow: 1;"/>
-          <svg width="20" height="20" viewBox="0 0 20 20" style="margin-top: 8px;" @click="clickCollection">
+          <svg width="20" height="20" class="star" viewBox="0 0 20 20" style="margin-top: 8px;" @click="clickCollection">
             <path d="M10 14.2L5 17l1-5.6-4-4 5.5-.7 2.5-5 2.5 5 5.6.8-4 4 .9 5.5z"
                   :stroke="isFavorite ? 'gold' : 'black'"
                   :fill="isFavorite ? 'gold' : 'none'"
@@ -206,5 +206,9 @@ export default {
   rgba(70, 64, 255, 0.56) 60%,
   rgba(214, 216, 220, 0.96) 100%);
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.star {
+  cursor: pointer;
 }
 </style>

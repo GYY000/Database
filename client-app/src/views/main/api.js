@@ -390,6 +390,24 @@ export function send_team_message(uids, tid, message) {
     )
 }
 
+export function fetch_favourite_sets(id) {
+    return axios.request(
+        {
+            url: '/get_collections',
+            method: "post",
+            data: JSON.stringify(
+                {
+                    user_id: id,
+                }
+            )
+        }
+    ).then(
+        (response) => {
+            return response.data
+        }
+    )
+}
+
 export function hand_in_score(qids, scores, qsid, uid, answers) {
     return axios.request(
         {

@@ -15,7 +15,7 @@
           </div>
           <div style="font-size: 12px">查看动态</div>
         </el-col>
-        <el-col :offset="15" :span="4">
+        <el-col :offset="16" :span="4" style="display: flex;justify-content: right">
           <el-button type="danger" v-if="creator_name === store.getUserName" @click="open_exit">
             注销
           </el-button>
