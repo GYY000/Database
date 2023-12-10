@@ -193,6 +193,18 @@ export function respond(id, team_name, applier_name, agree) {
     })
 }
 
+export function del_ques_set(set_name) {
+    return axios.request({
+        url: '/del_ques_set',
+        method: "post",
+        data: JSON.stringify({
+            ques_set_name: set_name,
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
 export function fetch_all_member(tid) {
     return axios.request({
         url: '/fetch_all_users_in_team',
@@ -380,6 +392,24 @@ export function send_team_message(uids, tid, message) {
                     uid_list: uids,
                     tid: tid,
                     message: message
+                }
+            )
+        }
+    ).then(
+        (response) => {
+            return response.data
+        }
+    )
+}
+
+export function fetch_favourite_sets(id) {
+    return axios.request(
+        {
+            url: '/get_collections',
+            method: "post",
+            data: JSON.stringify(
+                {
+                    user_id: id,
                 }
             )
         }

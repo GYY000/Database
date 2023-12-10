@@ -26,16 +26,15 @@
         </div>
         <div class="footer">
           <el-button type="primary" :icon="TopRight" class="button" @click="do_problem"/>
-          <el-button type="primary" :icon="MagicStick" class="button"/>
           <el-button type="danger" :icon="Edit" class="button"
                      v-if="creator_name === user_name" @click="do_edit"/>
-          <div style="flex-grow: 1;" />
-          <svg width="20" height="20" viewBox="0 0 20 20" style="margin-top: 8px;" @click="clickCollection">
-            <path d="M10 14.2L5 17l1-5.6-4-4 5.5-.7 2.5-5 2.5 5 5.6.8-4 4 .9 5.5z" 
-              :stroke="isFavorite ? 'gold' : 'black'"
-              :fill="isFavorite ? 'gold' : 'none'"
-              fill-rule="inherit" 
-              troke-linejoin="round">
+          <div style="flex-grow: 1;"/>
+          <svg width="20" height="20" class="star" viewBox="0 0 20 20" style="margin-top: 8px;" @click="clickCollection">
+            <path d="M10 14.2L5 17l1-5.6-4-4 5.5-.7 2.5-5 2.5 5 5.6.8-4 4 .9 5.5z"
+                  :stroke="isFavorite ? 'gold' : 'black'"
+                  :fill="isFavorite ? 'gold' : 'none'"
+                  fill-rule="inherit"
+                  troke-linejoin="round">
             </path>
           </svg>
         </div>
@@ -82,47 +81,48 @@ export default {
       router.push('/edit_ques_group/' + props.qs_id)
     }
 
-    const func = () => {
+    const init = () => {
       fetch_set_avatar(props.set_name).then(
           (data) => {
             avatar_url.value = data.avatar.startsWith('/9j')
                 ? 'data:image/jpg;base64,' + data.avatar : 'data:image/png;base64,' + data.avatar;
             flag.value = false;
           })
+      axios.post("/in_collection", {uid: store.getUserId, qsid: props.qs_id})
+          .then(response => {
+            console.log(response.data.value)
+            if (response.data.value == 'true') {
+              isFavorite.value = true;
+            } else {
+              isFavorite.value = false;
+            } // 在异步操作完成后设置isFavorite的值
+          })
+          .catch(error => {
+            console.error(error);
+          });
     }
 
-    func()
+    init()
 
     const isFavorite = ref(false);
-    axios.post("/in_collection", { uid:store.getUserId, qsid:props.qs_id})
-    .then(response => {
-      console.log(response.data.value)
-      if (response.data.value == 'true') {
-        isFavorite.value = true;
-      } else {
-        isFavorite.value = false;
-      } // 在异步操作完成后设置isFavorite的值
-    })
-    .catch(error => {
-      console.error(error);
-    });
+
     const clickCollection = () => {
       if (isFavorite.value) {
-        axios.post("/remove_collection", { uid:store.getUserId, qsid:props.qs_id})
-          .then(response => {
-            isFavorite.value = false;
-          })
-          .catch(error => {
-            console.error(error);
-          });
+        axios.post("/remove_collection", {uid: store.getUserId, qsid: props.qs_id})
+            .then(response => {
+              isFavorite.value = false;
+            })
+            .catch(error => {
+              console.error(error);
+            });
       } else {
-        axios.post("/add_collection", { uid:store.getUserId, qsid:props.qs_id})
-          .then(response => {
-            isFavorite.value = true;
-          })
-          .catch(error => {
-            console.error(error);
-          });
+        axios.post("/add_collection", {uid: store.getUserId, qsid: props.qs_id})
+            .then(response => {
+              isFavorite.value = true;
+            })
+            .catch(error => {
+              console.error(error);
+            });
       }
     }
     return {
@@ -206,5 +206,9 @@ export default {
   rgba(70, 64, 255, 0.56) 60%,
   rgba(214, 216, 220, 0.96) 100%);
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.star {
+  cursor: pointer;
 }
 </style>

@@ -48,7 +48,6 @@ urlpatterns = [
     re_path("get_profile_photo", views.get_profile_photo),
     re_path("post_hub", views.post_hub),
     re_path("create_post", views.create_post),
-    re_path("upload_team", views.upload_team),
     re_path("fetch_all_teams", views.fetch_all_teams),
     re_path("search_team", views.search_for_team),
     re_path("fetch_team_avatar", views.fetch_team_avatar),
@@ -81,4 +80,5 @@ urlpatterns = [
     re_path("remove_collection",views.remove_collection),
     re_path("get_collections",views.get_collections),
     re_path("in_collection",views.in_collection),
+    re_path("update_team_info", views.update_team)
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
