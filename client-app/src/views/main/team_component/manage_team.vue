@@ -237,7 +237,7 @@
       <div class="form-label">团队名</div>
       <el-input v-model="team_name" placeholder="请输入团队名"
                 clearable style="padding-bottom: 10px" maxlength="15" disabled></el-input>
-      <div class="form-label">问题组介绍</div>
+      <div class="form-label">团队介绍</div>
       <el-input v-model="edit_introduction" placeholder="请输入团队简介"
                 :autosize="{ minRows: 3, maxRows: 5 }"
                 type="textarea"
@@ -646,6 +646,7 @@ export default {
             creator_name.value = res.creator_name
             team_name.value = res.team_name
             introduction.value = res.introduction
+            edit_introduction.value = res.introduction
             avatar.value = res.avatar.startsWith('/9j')
                 ? 'data:image/jpg;base64,' + res.avatar : 'data:image/png;base64,' + res.avatar;
             change_avatar.value = res.avatar.startsWith('/9j')
@@ -676,7 +677,7 @@ export default {
     const hand_in_edit = () => {
       let form = new FormData
       form.append("tid", team_id.value)
-      form.append('introduction', introduction.value)
+      form.append('introduction', edit_introduction.value)
       form.append('file', hand_in_avatar.value)
       form.append('change_avatar', hand_in_avatar.value !== '')
       update_team(form).then(
