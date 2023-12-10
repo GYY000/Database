@@ -7,7 +7,10 @@ class User(models.Model):
     password = models.CharField(max_length=30)
     register_date = models.DateField(auto_now_add=True)
     profile_photo = models.BinaryField(null=True, blank=True)
-
+    class Meta:
+        indexes = [
+            models.Index(fields=['user_name']),
+        ]
 
 class Team(models.Model):
     tid = models.AutoField(primary_key=True)
@@ -16,6 +19,10 @@ class Team(models.Model):
     create_date = models.DateField(auto_now_add=True)
     introduction = models.CharField(null=False, max_length=200)
     profile_photo = models.BinaryField()
+    class Meta:
+        indexes = [
+            models.Index(fields=['team_name']),
+        ]
 
 
 class ReUserTeam(models.Model):
@@ -101,6 +108,10 @@ class Post(models.Model):
     update_time = models.DateTimeField(auto_now=True)
     # fixme auto_now_add -> auto_now
     title = models.CharField(max_length=40)
+    class Meta:
+        indexes = [
+            models.Index(fields=['title']),
+        ]    
 
 
 class Comment(models.Model):
