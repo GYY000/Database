@@ -48,7 +48,6 @@ urlpatterns = [
     re_path("get_profile_photo", views.get_profile_photo),
     re_path("post_hub", views.post_hub),
     re_path("create_post", views.create_post),
-    re_path("upload_team", views.upload_team),
     re_path("fetch_all_teams", views.fetch_all_teams),
     re_path("search_team", views.search_for_team),
     re_path("fetch_team_avatar", views.fetch_team_avatar),

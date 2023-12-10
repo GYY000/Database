@@ -119,6 +119,9 @@ group_name
         ReUserTeam.objects.get(tid=group_id, uid=user_id)
         return JsonResponse({"is_inside": "true"})
     except:
+        if group.creator.uid == user_id:
+            ReUserTeam(uid=User.objects.get(uid=user_id),tid=group,is_admin=True).save()
+            return JsonResponse({"is_inside":"true"}) #fixme 之前创建者不在用户组里面
         return JsonResponse({"is_inside": "false"})
 
 
@@ -455,6 +458,7 @@ url:/upload_team
         team = Team(team_name=group_name, creator=User.objects.get(uid=user_id), profile_photo=code,
                     introduction=introduction)
         team.save()
+        ReUserTeam(uid=User.objects.get(uid=user_id),tid=team,is_admin=True).save()
         # 通过GROUP_name+"_VIRTUAL"来获取虚拟
         User(user_name=group_name + "_VIRTUAL", password="123456", profile_photo=code).save()
         return JsonResponse({"is_successful": "true"})
