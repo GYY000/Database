@@ -393,10 +393,7 @@ def post_hub(request):
                    posts]
     arr = [{"pid": posts[i].pid, "title": posts[i].title, "creator_name": name_photos[i][0],
             "update_time": posts[i].update_time.strftime("%Y-%m-%d %H:%M"), "content": posts[i].content,
-            "uid": posts[i].creator.uid,"comment_contents":[_.content  for _ in list(Comment.objects.filter(pid=posts[i].pid))],
-            "comment_creator_names": [_.creator.user_name for _ in list(Comment.objects.filter(pid=posts[i].pid))],
-            "comment_creator_ids": [_.creator.uid for _ in list(Comment.objects.filter(pid=posts[i].pid))],
-            "comment_times": [_.create_time.strftime("%Y-%m-%d %H:%M") for _ in list(Comment.objects.filter(pid=posts[i].pid))]
+            "uid": posts[i].creator.uid,"comment_count":len(list(Comment.objects.filter(pid=posts[i].pid)))
             } for i in range(len(posts))]
     return JsonResponse({"posts": arr[start:end], "total": len(posts)}, safe=False)
 
