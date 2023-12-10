@@ -69,7 +69,7 @@ export default {
 }
 
 .box-card {
-  border-radius: 10px;
+  border-radius: 3px;
   /* 设置圆角 */
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   /* 添加阴影效果 */

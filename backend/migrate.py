@@ -1,28 +1,5 @@
 import os
 import time
-
-# 云端数据库配置
-cloud_db_config = {
-    'ENGINE': 'django.db.backends.mysql',
-    'NAME': 'db21373122',
-    'USER': '21373122',
-    'PASSWORD': 'Aa108174',
-    'HOST': '120.46.80.149',
-    'PORT': '',
-}
-
-# 本地数据库配置
-local_db_config = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'db_homework',
-        'USER': 'root',
-        'PASSWORD': '123456',
-        'HOST': 'localhost',
-        'PORT': '3306'
-    },
-}
-
 import sys
 option = sys.argv[1]
 

@@ -124,3 +124,10 @@ class Favorite(models.Model):
     qsid = models.ForeignKey(QuestionSet, on_delete=models.CASCADE)
     class Meta:
         unique_together = ('uid', 'qsid')
+
+class Entry(models.Model):
+    id = models.AutoField(primary_key=True)
+    uid = models.ForeignKey(User, on_delete=models.CASCADE)
+    eid = models.ForeignKey(Exam, on_delete=models.CASCADE)
+    class Meta:
+        unique_together = ('uid', 'eid')

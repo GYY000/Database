@@ -5,10 +5,14 @@
   <div class="center_class">
     <div class="main_container">
       <el-row style="margin-top: 30px">
-        <el-col :span="1" :offset="18">
+        <el-col :span="6" :offset="15">
           <el-button :icon="Upload" @click="open_form" class="control_button"
                      style="margin-right: 8px">
             添加题目
+          </el-button>
+          <el-button type="danger" :icon="del_set" @click="open_form" class="control_button"
+                     style="margin-right: 8px">
+            删除题集
           </el-button>
         </el-col>
       </el-row>
@@ -83,12 +87,13 @@
 import userStateStore from "@/store";
 import {ref} from "vue";
 import Ques_display from "@/views/quesDoing/ques_display.vue";
-import {fetch_ques_info} from "@/views/main/api";
+import {del_ques_set, fetch_ques_info} from "@/views/main/api";
 import Upload_ques_form from "@/views/quesDoing/upload_ques_form.vue";
 import Update_ques_form from "@/views/quesDoing/update_ques_form.vue";
 import {DocumentChecked, Edit, Plus, Upload} from "@element-plus/icons-vue";
 import router from "@/router";
 import {useRouter} from "vue-router";
+import {ElMessage} from "element-plus";
 
 export default {
   name: 'edit_ques_group',
@@ -202,6 +207,19 @@ export default {
       edit_mode.value = false
     }
 
+    const del_set = () => {
+      del_ques_set(ques_set_name.value).then(
+          (res) => {
+            if(res.is_successful === 'true') {
+              ElMessage.success("删除成功")
+              router.push('/main_page')
+            } else {
+              ElMessage.error("删除失败，请重新再试")
+            }
+          }
+      )
+    }
+
     const change_info = (data) => {
       sum_score.value = 0
       questions.value[data.id].score = data.score
@@ -230,7 +248,8 @@ export default {
       sum_score,
       introduction,
       ques_set_name,
-      statistic
+      statistic,
+      del_set
     }
   }
 }
