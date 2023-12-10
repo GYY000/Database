@@ -193,6 +193,18 @@ export function respond(id, team_name, applier_name, agree) {
     })
 }
 
+export function del_ques_set(set_name) {
+    return axios.request({
+        url: '/del_ques_set',
+        method: "post",
+        data: JSON.stringify({
+            ques_set_name: set_name,
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
 export function fetch_all_member(tid) {
     return axios.request({
         url: '/fetch_all_users_in_team',
