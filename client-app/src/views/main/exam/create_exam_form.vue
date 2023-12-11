@@ -64,6 +64,7 @@ import {ref} from "vue";
 import userStateStore from "@/store/index";
 import {create_exam} from "@/views/main/api";
 import {ElMessage} from "element-plus";
+import router from "@/router";
 
 export default {
   name: "create_exam_form",
@@ -92,6 +93,10 @@ export default {
     }
 
     const transmit = () => {
+      if(!(date.value.getTime() > new Date().getTime())) {
+        ElMessage.error("考试开始时间需要大于当前时间")
+        return ;
+      }
       const year = date.value.getFullYear();
       const month = String(date.value.getMonth() + 1).padStart(2, '0');
       const day = String(date.value.getDate()).padStart(2, '0');
@@ -108,6 +113,7 @@ export default {
               ElMessage.success("成功创建")
               context.emit('change_visible', false);
               context.emit('refresh')
+              router.go(0)
             }
           }
       )
