@@ -14,7 +14,7 @@
               v-model="date"
               type="date"
               placeholder="Pick exam date"
-              :default-value="new Date(2010, 9, 1)"
+              :default-value="new Date()"
           />
         </el-col>
         <el-col :offset="4" :span="8">
@@ -74,7 +74,7 @@ export default {
     const store = userStateStore()
     const exam_name = ref('')
     const ques_set_name = ref('')
-    const date = ref(new Date(2023, 12, 11))
+    const date = ref(new Date())
     const time = ref(null)
     const duration_min = ref(0)
     const duration_hour = ref(0)

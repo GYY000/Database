@@ -140,11 +140,10 @@ export default {
           score1 = 0
           is_empty = false
         } else {
+          score1 = parseFloat(do_score.value)
           if(score1 > props.sub_problem.score) {
             ElMessage.error("输入分数异常，请立即更正")
             score1 = 0
-          } else {
-            score1 = parseFloat(do_score.value)
           }
         }
       } else {

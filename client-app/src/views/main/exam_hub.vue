@@ -33,13 +33,13 @@
           <el-table
               :data="exams"
               style="width: 100%"
-              height="400px"
+              height="800px"
               stripe
           >
             <el-table-column property="eid" label="id" width="70px" sortable/>
             <el-table-column property="exam_name" label="考试名"/>
             <el-table-column property="start_time" label="考试时间" sortable/>
-            <el-table-column property="duration" label="持续时间" sortable/>
+            <el-table-column property="duration" label="持续时间" style="width: 60px"/>
             <el-table-column property="creator_name" label="创建者"/>
             <el-table-column label="">
               <template #default="scope">

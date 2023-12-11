@@ -204,6 +204,7 @@ export default {
     const update_sub_score = (data) => {
       cur_score.value[data.id] = data.score
       sub_empty.value[data.id] = data.is_empty
+      sum_score.value = 0
       for (let i = 0; i < props.ques.content.sub_problem.length; i++) {
         sum_score.value = sum_score.value + cur_score.value[i];
       }
