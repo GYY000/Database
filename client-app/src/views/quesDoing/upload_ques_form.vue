@@ -102,12 +102,13 @@
 
 <script>
 import {ref} from "vue";
-import {upload_picture, upload_ques} from "@/views/main/api";
+import {array2String, upload_picture, upload_ques} from "@/views/main/api";
 import Ques_option from "@/views/quesDoing/ques_option.vue";
 import Sub_prob_form from "@/views/quesDoing/sub_prob_form.vue";
 import {Plus} from "@element-plus/icons-vue";
 import {ElMessage} from "element-plus";
 import userStateStore from "@/store";
+import router from "@/router";
 
 export default {
   name: 'upload_ques_form',
@@ -130,7 +131,7 @@ export default {
 
     const form = ref(
         {
-          qs_id: props.qs_id,
+          qs_id: parseInt(props.qs_id),
           creator_id: store.getUserId,
           serial_number: 1,
           score: 1.0,
@@ -265,7 +266,13 @@ export default {
                 showClose: true,
                 type: 'success',
               })
-              context.emit("close")
+              router.go(0)
+            } else {
+              ElMessage({
+                message: '题目上传失败',
+                showClose: true,
+                type: 'error',
+              })
             }
           }
       )

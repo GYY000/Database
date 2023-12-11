@@ -323,6 +323,7 @@ export function upload_ques(form) {
             content: form.content,
             serial_num: form.serial_number,
             score: form.score,
+            qs_id: form.qs_id,
             creator_id: form.creator_id
         })
     }).then(response => {

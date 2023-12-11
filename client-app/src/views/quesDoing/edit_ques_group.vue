@@ -78,7 +78,7 @@
         <div :id="titleId" class="edit_title">上传问题</div>
       </div>
     </template>
-    <upload_ques_form @close="close_form"/>
+    <upload_ques_form :qs_id="ques_set_id" @close="close_form"/>
   </el-dialog>
 </template>
 
@@ -142,6 +142,7 @@ export default {
     const sum_score = ref(0.0)
     const ques_set_name = ref('')
     const introduction = ref()
+    const ques_set_id = ref()
 
     const handlePageChange = (val) => {
       page.value = val;
@@ -150,6 +151,7 @@ export default {
 
     const init = () => {
       let router = useRouter()
+      ques_set_id.value = router.currentRoute.value.params.qs_id
       fetch_ques_info(router.currentRoute.value.params.qs_id).then(
           (res) => {
             ques_set_name.value = res.ques_set_name
@@ -248,7 +250,8 @@ export default {
       introduction,
       ques_set_name,
       statistic,
-      del_set
+      del_set,
+      ques_set_id
     }
   }
 }

@@ -307,8 +307,6 @@ export default {
             qsid.value = res.qsid
             duration.value = res.duration
             start_time.value = res.start_time
-            console.log(duration.value)
-            console.log(start_time.value)
             if (isWithinTimeRange(res.start_time, duration)) {
               exam_mode.value = true
               const startTime = new Date(start_time.value);

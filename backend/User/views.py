@@ -801,15 +801,18 @@ def search_post(request):
 
 def upload_ques(request):
     request_dict = json.loads(request.body.decode('utf-8'))
+    print(request_dict)
     try:
         Question(creator=User.objects.get(uid=request_dict['creator_id']),
-                 qsid=request_dict['qs_id'],
+                 qsid=Question.objects.get(qsid=request_dict['qs_id']),
                  content=request_dict['content'],
                  serial_num=request_dict['serial_num'],
                  score=request_dict['score']
                  ).save()
         return JsonResponse({"is_successful": "true"})
-    except:
+    except Exception as e:
+        print(e)
+        print(1)
         return JsonResponse({"is_successful": "false"})
 
 
