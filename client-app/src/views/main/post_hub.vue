@@ -41,7 +41,7 @@
     <div class="post-list">
       <post v-for="post in posts" :key="post.pid" :post="post" />
     </div>
-    <el-pagination background layout="prev, pager, next" :page-count="totalPages" @current-change="loadPage"/>
+    <el-pagination background layout="prev, pager, next" :page-count="totalPages" @current-change="loadPage" style="margin-top: 10px;"/>
   </div>
 </template>
     

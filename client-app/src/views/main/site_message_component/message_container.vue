@@ -7,7 +7,7 @@
         </h1>
         <el-input placeholder="请输入查找的用户" v-model="this.searched_username" @keyup.enter.native="search_user"> </el-input>
         <contact v-for="contact in contacts" :key="contact.user_id" :contact="contact" @open-message="handleContactClicked" />
-        <div v-if="contacts.length == 0">没有人给你发消息</div>
+        <div v-if="contacts.length == 0"> {{ loading_message }} </div>
       </el-aside>
       <el-container>
         <el-header style="background-color:#DDE4F2;">
@@ -46,6 +46,7 @@ export default {
       cur_contact: {},
       new_message: '',
       searched_username: '',
+      loading_message: '加载中...'
     };
   },
   mounted () {
@@ -68,6 +69,9 @@ export default {
       axios.post("/get_all_relative_person", request)
         .then(response => {
           this.contacts = response.data
+          if (this.contacts.length == 0) {
+            this.loading_message = '还没有人给你发消息哦';
+          }
         })
         .catch(error => {
           console.error(error);

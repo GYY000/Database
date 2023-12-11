@@ -14,6 +14,20 @@
     </div>
   </el-dialog>
 
+  <el-dialog v-model="confirmVisible" title="Warning" width="30%" center>
+    <span>
+      {{ confirmMessage }}
+    </span>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="confirmVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="deletePost">
+          Confirm
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
+
   <div ref="detailDiv" style="width: 1000px;position:absolute;margin: auto;top: 0;left: 0;bottom: 0;right: 0;height: auto;">
     <el-card class="box-card">
       <div class="card-content">
@@ -23,12 +37,17 @@
         </div>
         <h3>{{ post.title }}</h3>
         <v-md-preview :text="post.content" ></v-md-preview>
+        <el-button plain v-if="post.creator_name == store.getUserName" class="delete-button" @click="confirmVisible=true, confirmMessage='你确定要删除你的帖子吗'">
+          <el-icon style="color:brown;"><CloseBold /></el-icon>
+        </el-button>
         <p class="update-time">{{ post.update_time }}</p> <!-- 更新时间放在右下角 -->
       </div>
     </el-card>
+
     <div class="line"></div> <!-- 添加分割线 -->
+
     <div class="comment-list">
-      <comment v-for="comment in comments" :key="comment.cid" :comment="comment" />
+      <comment v-for="comment in comments" :key="comment.cid" :comment="comment" :deletable="post.creator_name == store.getUserName || comment.user_name == store.getUserName"/>
     </div>
     <el-button @click="() => { dialogVisible = true }" style="position: fixed;right: calc(50% - 580px); bottom: 5%; width: 55px;height: 55px;">
       <el-icon :size="30"><Comment /></el-icon>
@@ -62,10 +81,12 @@ export default {
       comments: [],
       profile_photo: '/src/assets/image/default-avatar.png',
       newComment: {},
+      confirmMessage: ""
     };
   },
   setup() {
     const dialogVisible = ref(false);
+    const confirmVisible = ref(false);
     const mavon_config = ref({
       scrollStyle: true,
       toolbars: {
@@ -101,15 +122,28 @@ export default {
       }
     }
     )
+    const store = userStateStore()
     return {
       dialogVisible,
-      mavon_config
+      mavon_config,
+      store,
+      confirmVisible
     }
   },
   mounted() {
     this.fetchPostDetail();
   },
   methods: {
+    deletePost() {
+      this.confirmVisible = false;
+      axios.post(`/delete_post`, {pid:this.$route.params.pid})
+        .then((response) => {
+          this.$router.push(`/post_hub`)
+        })
+        .catch(error => {
+          console.error(error)
+        })
+    },
     fetchPostDetail() {
       const pid = this.$route.params.pid;
       axios.get(`/post_detail/${pid}`)
@@ -132,7 +166,6 @@ export default {
         });
     },
     saveComment() {
-      // 这里可以添加保存帖子的逻辑，比如发送到后端API
       const store = userStateStore();
       const postData = {
         uid: store.getUserId,
@@ -233,13 +266,23 @@ export default {
 
 .update-time {
   position: absolute;
-  bottom: 10px;
+  bottom: 8px;
   /* 距离底部10px */
   right: 10px;
   /* 距离右侧10px */
   font-size: 12px;
   /* 字体变小 */
   color: #999;
+  margin-bottom: 5px;
   /* 颜色变淡 */
+}
+
+.delete-button {
+  position: absolute;
+  right: 10px; 
+  bottom: 30px;
+  width: 15px;
+  height: 25px;
+  color: brown;
 }
 </style>
