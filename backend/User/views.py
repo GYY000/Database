@@ -552,9 +552,9 @@ team_name	    is_successful(true,false)
 url:/del_team
     '''
     request_dict = json.loads(request.body.decode('utf-8'))
-    team_name = request_dict['team_name']
+    tid = request_dict['tid']
     try:
-        team = Team.objects.get(team_name=team_name)
+        team = Team.objects.get(tid=tid)
         team.delete()
         return JsonResponse({"is_successful": "true"})
     except:

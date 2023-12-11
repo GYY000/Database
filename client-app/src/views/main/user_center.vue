@@ -1,5 +1,5 @@
 <template>
-  <el-row>
+  <el-row style="height: 200px">
     <el-col :span="11" style="display: flex;justify-content: right;margin-right: 15px">
       <el-upload
           class="avatar-uploader"
@@ -103,7 +103,7 @@ export default {
 
 <style scoped>
 .avatar-uploader .el-upload:hover {
-  border-color: #409EFF;
+  border: 1px dashed  #409EFF;
 }
 
 .avatar {
@@ -117,7 +117,6 @@ export default {
 }
 
 .avatar-uploader {
-  padding-top: 3%;
   border: 1px dashed #d9d9d9;
   border-radius: 6px;
   cursor: pointer;

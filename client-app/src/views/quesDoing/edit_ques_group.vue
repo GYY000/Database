@@ -1,7 +1,6 @@
 <template>
   <img src="@/assets/image/background3.jpg" class="background">
   <div class="secbackground"></div>
-  <!-- TODO BackGround -->
   <div class="center_class">
     <div class="main_container">
       <el-row style="margin-top: 30px">
@@ -10,7 +9,7 @@
                      style="margin-right: 8px">
             添加题目
           </el-button>
-          <el-button type="danger" :icon="del_set" @click="open_form" class="control_button"
+          <el-button type="danger" icon="Close" @click="del_set" class="control_button"
                      style="margin-right: 8px">
             删除题集
           </el-button>
@@ -212,7 +211,7 @@ export default {
           (res) => {
             if(res.is_successful === 'true') {
               ElMessage.success("删除成功")
-              router.push('/main_page')
+              router.push('/question_hub')
             } else {
               ElMessage.error("删除失败，请重新再试")
             }
