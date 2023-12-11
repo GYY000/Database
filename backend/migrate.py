@@ -28,7 +28,7 @@ elif option == 'download':
     db_settings_file.write('''
 now_database = {
     'ENGINE': 'django.db.backends.mysql',
-    'NAME': 'db_homework',
+    'NAME': 'tempdb',
     'USER': 'root',
     'PASSWORD': '123456',
     'HOST': 'localhost',

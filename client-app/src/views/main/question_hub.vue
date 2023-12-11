@@ -12,7 +12,7 @@
         全部问题组
       </el-button>
       <el-button type="primary" @click="get_favourite_sets">
-        收藏问题组
+        我的收藏
       </el-button>
       <el-button type="info" @click="get_my_sets">
         我的问题组

@@ -422,6 +422,10 @@ def post_hub_param(request, pid):
         post = Post.objects.get(pid=pid)
         post.update_time = timezone.now()
         post.save()
+        if uid != post.creator.uid:
+            Message(sender=User.objects.get(user_name="帖子管理小助手"), 
+                    receiver=post.creator, 
+                    content=f"{User.objects.get(uid=uid).user_name}回复了你的“{post.title}”帖子，快去看看吧~").save()
         return JsonResponse({"cid": comment.id, "user_name": comment.creator.user_name,
                              "uid": comment.creator.uid,
                              "content": comment.content,

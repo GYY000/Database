@@ -1,11 +1,9 @@
 <template>
     <el-card class="box-card" @click="sendUserToParent" shadow="never">
-        <el-card__body>
             <div class="profile-wrapper">
                 <img :src="profile_photo" alt="头像" class="profile-photo" />
                 <p class="name">{{ contact.user_name }}</p>
             </div>
-        </el-card__body>
     </el-card>
 </template>
   

@@ -45,7 +45,7 @@ export default {
       if (password.value === confirmPassword.value) {
         user_register(register_data).then((res) => {
           can_reg.value = Boolean(res.is_successful === "true");
-          if (res.duplicated === "true") {
+          if (res.duplicate === "true") {
             ElMessage.error("用户名已经被注册，请更换用户名");
           } else if (!can_reg.value) {
             ElMessage.error("注册失败，请稍后再试");
