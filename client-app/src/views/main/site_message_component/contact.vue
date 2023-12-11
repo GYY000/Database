@@ -1,9 +1,11 @@
 <template>
     <el-card class="box-card" @click="sendUserToParent" shadow="never">
-        <div class="profile-wrapper">
-            <img :src="profile_photo" alt="头像" class="profile-photo" />
-            <div class="name">{{ contact.user_name }}</div>
-        </div>
+        <el-card__body>
+            <div class="profile-wrapper">
+                <img :src="profile_photo" alt="头像" class="profile-photo" />
+                <p class="name">{{ contact.user_name }}</p>
+            </div>
+        </el-card__body>
     </el-card>
 </template>
   
@@ -56,9 +58,8 @@ export default {
 
 .box-card {
     border-radius: 0; /* 去除圆角 */
-    height: 60px;
-    padding-top: 0px; /* 调整上方内边距 */
-    padding-bottom: 10px; /* 调整下方内边距 */
+    height: 70px;
+    box-shadow: none;
 }
 
 .box-card:hover {
@@ -72,8 +73,9 @@ export default {
 
 .name {
   margin-left: 10px; /* 可根据需要调整头像和名字之间的间距 */
-}
-.box-card {
-  box-shadow: none;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 1.3;
+  text-align: left;
 }
 </style>

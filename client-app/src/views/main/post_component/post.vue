@@ -7,7 +7,9 @@
       </div>
       <h3>{{ post.title }}</h3>
       <p class="content">{{ post.content }}</p>
-      <p class="update-time">{{ post.update_time }}</p> <!-- 更新时间放在右下角 -->
+      <p class="update-time"> {{ post.comment_count }}
+        条回复,更新于
+        {{ post.update_time }} </p> <!-- 更新时间放在右下角 -->
     </el-card>
   </router-link>
 </template>
