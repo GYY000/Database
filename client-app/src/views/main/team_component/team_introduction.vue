@@ -2,13 +2,13 @@
   <div style="display: flex;flex-direction: column;">
     <div style="display: flex; justify-content: center">
       <div style="padding-right: 30px">
-        <img :src="avatar" style="height: 200px;width: 200px;"/>
+        <img :src="avatar" style="height: 200px;width: 200px;object-fit: cover"/>
       </div>
       <div style="display: flex;flex-direction: column">
         <div class="name_css">{{ team_name }}</div>
         <div style="display: flex;">
           <div style="padding-top: 10px;padding-right: 20px">
-            <user_show_card :name="creator" :group_name="team_name" :date="date"></user_show_card>
+            <user_show_card :name="creator" :mode="'avatar'" :group_name="team_name" :date="date"></user_show_card>
           </div>
           <div style="display: flex;flex-direction: column">
             <div style="padding-top: 15px;font-size: 15px">创建于</div>
