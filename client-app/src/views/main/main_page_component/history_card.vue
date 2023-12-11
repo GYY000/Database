@@ -12,9 +12,9 @@
             </div>
         </div>
         <div style="flex-grow: 1;" />
-        <div style="font-size: 20px;font-weight: 800;">
-            {{ Number.isInteger(record.user_score) ? record.user_score : record.user_score.toFixed(2) }} 
-            / {{ Number.isInteger(record.total_score) ? record.total_score : record.total_score.toFixed(2) }}
+        <div style="font-size: 15px;font-weight: 800;">
+            {{ Number.isInteger(record.user_score) ? record.user_score : record.user_score.toFixed(1) }}
+            / {{ Number.isInteger(record.total_score) ? record.total_score : record.total_score.toFixed(1) }}
         </div>
     </div>
 </template>
@@ -78,7 +78,7 @@ export default {
 .content {
     margin-left: 10px;
     /* 内容离图片的间距 */
-    width: 150px;
+    width: 130px;
 }
 
 .team_name {

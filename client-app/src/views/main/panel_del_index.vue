@@ -30,6 +30,12 @@
       </el-icon>
       团队
     </el-menu-item>
+    <el-menu-item index="/exam_hub">
+      <el-icon>
+        <List />
+      </el-icon>
+      考试
+    </el-menu-item>
     <div class="r-container" style="position: absolute; right: 50px; top:20%">
       <el-badge :value="messages.id_list.length" v-if="messages !== null" :max="20" class="item"
                 style="margin-right: 15px;" :hidden="messages.id_list.length === 0">
