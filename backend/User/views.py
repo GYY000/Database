@@ -811,8 +811,6 @@ def upload_ques(request):
                  ).save()
         return JsonResponse({"is_successful": "true"})
     except Exception as e:
-        print(e)
-        print(1)
         return JsonResponse({"is_successful": "false"})
 
 

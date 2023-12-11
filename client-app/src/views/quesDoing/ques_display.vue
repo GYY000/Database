@@ -108,6 +108,7 @@ import Ques_option from "@/views/quesDoing/ques_option.vue";
 import {DeleteFilled, Edit} from "@element-plus/icons-vue";
 import Update_ques_form from "@/views/quesDoing/update_ques_form.vue";
 import Sub_problem_show from "@/views/quesDoing/sub_problem_show.vue";
+import router from "@/router";
 
 export default {
   name: "ques_display",
@@ -166,6 +167,7 @@ export default {
                 message: "删除成功",
                 type: "success",
               });
+              router.go(0)
             } else {
               ElMessage({
                 message: "删除失败",
