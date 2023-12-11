@@ -42,10 +42,12 @@ import userStateStore from "@/store/index";
 import {check_inside_group, upload_ques_set} from "@/views/main/api";
 import {ElMessage} from "element-plus";
 import {Plus} from "@element-plus/icons-vue";
+import router from "@/router";
 
 export default {
   name: "create_ques_group",
   props: ["dialog_visible"],
+  emits: ['refresh', 'change_visible'],
 
   setup(_, context) {
     const store = userStateStore()
@@ -63,8 +65,7 @@ export default {
       group_name.value = ''
       image_src.value = ''
       introduction.value = ''
-      context.emit('change_visible', false);
-      context.emit('refresh')
+      context.emit('change_visible', false)
     }
 
     const handle_change = (uploadFile, uploadFiles) => {
@@ -103,6 +104,7 @@ export default {
               })
               set_name.value = ''
               group_name.value = ''
+              router.go(0)
             } else {
               ElMessage({
                 message: '上传失败，请稍后再试',
@@ -128,12 +130,8 @@ export default {
         add_ques_set()
         closure()
       } else {
-        const data = {
-          user_name: store.getUserName,
-          group_name: group_name.value
-        }
         const boolean = ref(false)
-        check_inside_group(data).then(
+        check_inside_group(store.getUserId, group_name.value).then(
             (res) => {
               boolean.value = res.is_inside === "true"
             }

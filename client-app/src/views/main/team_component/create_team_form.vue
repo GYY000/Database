@@ -24,6 +24,7 @@ import {ref} from "vue";
 import userStateStore from "@/store/index";
 import {upload_team} from "@/views/main/api";
 import {ElMessage} from "element-plus";
+import router from "@/router";
 
 export default {
   name: "create_team_group",
@@ -31,7 +32,7 @@ export default {
 
   setup(_, context) {
     const store = userStateStore()
-    const group_name = ref('none')
+    const group_name = ref('')
     const set_name = ref('')
     const upload_img = ref(null)
     const image_src = ref('')
@@ -43,35 +44,42 @@ export default {
       image_src.value = ''
       introduction.value = ''
       context.emit('change_visible', false);
-      context.emit('refresh');
     }
 
     const add_team = () => {
-      let form = new FormData
-      form.append("user_id", store.getUserId)
-      form.append("group_name", group_name.value)
-      form.append('introduction', introduction.value)
-      form.append('file', upload_img.value.files[0])
-      //TODO: 后续可加入tag
-      upload_team(form).then(
-          (res) => {
-            if (res.is_successful === "true") {
-              ElMessage({
-                message: '上传成功',
-                showClose: true,
-                type: 'success',
-              })
-              set_name.value = ''
-              group_name.value = ''
-            } else {
-              ElMessage({
-                message: '上传失败，请稍后再试',
-                showClose: true,
-                type: 'error',
-              })
+      if (group_name.value === '') {
+        ElMessage.error("请填入团队名")
+      } else if (introduction.value === '') {
+        ElMessage.error("请填入团队介绍")
+      } else if (upload_img.value === '') {
+        ElMessage.error("请填入团队头像")
+      } else {
+        let form = new FormData
+        form.append("user_id", store.getUserId)
+        form.append("group_name", group_name.value)
+        form.append('introduction', introduction.value)
+        form.append('file', upload_img.value.files[0])
+        upload_team(form).then(
+            (res) => {
+              if (res.is_successful === "true") {
+                ElMessage({
+                  message: '上传成功',
+                  showClose: true,
+                  type: 'success',
+                })
+                set_name.value = ''
+                group_name.value = ''
+                router.go(0)
+              } else {
+                ElMessage({
+                  message: '上传失败，请稍后再试',
+                  showClose: true,
+                  type: 'error',
+                })
+              }
             }
-          }
-      )
+        )
+      }
     }
 
     const show_pic = (event) => {
