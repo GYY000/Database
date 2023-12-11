@@ -440,14 +440,6 @@ def create_post(request):
 
 
 def upload_team(request):
-    '''
-    前->后	后->前
-user_id	                is_successful(true false)
-group_name
-file
-introduction
-url:/upload_team
-    '''
     assert request.method == "POST"
     user_id = request.POST.get('user_id')
     group_name = request.POST.get('group_name')
@@ -466,7 +458,6 @@ url:/upload_team
         User(user_name=group_name + "@TEAM", password="123456", profile_photo=code).save()
         return JsonResponse({"is_successful": "true"})
     except Exception as e:
-        print(e)
         return JsonResponse({"is_successful": "false"})
 
 
