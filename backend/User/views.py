@@ -804,7 +804,7 @@ def upload_ques(request):
     print(request_dict)
     try:
         Question(creator=User.objects.get(uid=request_dict['creator_id']),
-                 qsid=Question.objects.get(qsid=request_dict['qs_id']),
+                 qsid=QuestionSet.objects.get(qsid=request_dict['qs_id']),
                  content=request_dict['content'],
                  serial_num=request_dict['serial_num'],
                  score=request_dict['score']
