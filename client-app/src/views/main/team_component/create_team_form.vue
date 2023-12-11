@@ -7,11 +7,11 @@
            accept="image/jpeg,image/png" ref="upload_img"
            @change="show_pic" style="padding-bottom: 15px"/>
     <el-input v-model="group_name" placeholder="请输入用户团队的名字"
-              clearable style="padding-bottom: 10px" maxlength="15"></el-input>
+              clearable style="padding-bottom: 10px" maxlength="30"></el-input>
     <el-input v-model="introduction" placeholder="请输入团队简介"
               :autosize="{ minRows: 3, maxRows: 5 }"
               type="textarea"
-              clearable maxlength="30"></el-input>
+              clearable maxlength="50"></el-input>
   </el-form>
   <el-button @click="closure">Cancel</el-button>
   <el-button type="primary" @click="transmit">

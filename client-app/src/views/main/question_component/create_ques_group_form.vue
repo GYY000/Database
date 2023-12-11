@@ -14,12 +14,12 @@
     </el-upload>
     <div class="form-label">问题组名称</div>
     <el-input v-model="set_name" placeholder="请输入问题组的名字"
-              clearable style="padding-bottom: 10px" maxlength="15"></el-input>
+              clearable style="padding-bottom: 10px" maxlength="30"></el-input>
     <div class="form-label">问题组介绍</div>
     <el-input v-model="introduction" placeholder="请输入问题组的简介"
               :autosize="{ minRows: 3, maxRows: 5 }"
               type="textarea"
-              clearable maxlength="30"></el-input>
+              clearable maxlength="50"></el-input>
     <div class="form-label" style="margin-bottom: 0px">问题组类型</div>
     <div>
       <el-radio-group v-model="is_public" class="ml-4">
