@@ -58,7 +58,7 @@
       </el-button>
       <span v-if="!is_login">请先登录</span>
       <span v-else>
-        <el-button @click="goto('/user_center')" type="" text class="button1">
+        <el-button @click="open_user_dialog" type="" text class="button1">
           <img :src="avatar" class="avatar">
           {{ user_name }}
         </el-button>
@@ -78,11 +78,26 @@
     @open="before_open_pm">
     <message_container ref="messageContainer"></message_container>
   </el-dialog>
+  <el-dialog v-model="user_dialog">
+    <template #header>
+      <div class="title">UserCenter</div>
+    </template>
+    <user_center></user_center>
+  </el-dialog>
 </template>
 
-
-
 <style scoped>
+.title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Lobster', cursive;
+  color: #1169ea;
+  font-size: 50px;
+  font-weight: 600;
+  padding-top: 10px;
+}
+
 .fixed-menu1 {
   position: fixed;
   top: 0;
@@ -170,10 +185,11 @@ import { fetch_all_application } from "@/views/main/api";
 import Message_box from "@/views/main/message_box.vue";
 import message_container from '@/views/main/site_message_component/message_container.vue';
 import { useRoute } from 'vue-router';
+import User_center from "@/views/main/user_center.vue";
 
 export default {
   name: "index",
-  components: { Message_box, Message, Team_hub, Post_hub, Question_hub, message_container },
+  components: {User_center, Message_box, Message, Team_hub, Post_hub, Question_hub, message_container },
   setup() {
     const store = userStateStore()
     const is_login = ref(store.getIsAuthentic);
@@ -184,6 +200,7 @@ export default {
     const open_message = ref(false)
     const open_private_message = ref(false)
     const messages = ref(null)
+    const user_dialog = ref(false)
 
     let lastPath = useRoute().fullPath;
     if (lastPath == "/") {
@@ -225,6 +242,10 @@ export default {
       )
     }
 
+    const open_user_dialog = () => {
+      user_dialog.value = true
+    }
+
     init();
     return {
       activeTab,
@@ -240,7 +261,9 @@ export default {
       open_message,
       messages,
       open_private_message,
-      activeIndex
+      activeIndex,
+      user_dialog,
+      open_user_dialog
     };
   },
 

@@ -65,30 +65,31 @@ const routes = [
     },
     {
         path: '/panel_del_index',
-        name: "panel_del_index",
-        component: panel_del_index,
-        children: [
-            {
-                path: 'do_prob/:qs_id',
-                name: "do_prob",
-                component: do_problem
-            },
-            {
-                path: 'do_exam/:eid',
-                name: "do_exam",
-                component: exam
-            }
-        ]
-    },
+        name:
+            "panel_del_index",
+        component:
+        panel_del_index,
+        children:
+            [
+                {
+                    path: 'do_prob/:qs_id',
+                    name: "do_prob",
+                    component: do_problem
+                },
+                {
+                    path: 'do_exam/:eid',
+                    name: "do_exam",
+                    component: exam
+                }
+            ]
+    }
+    ,
     {
         path: "/log_reg",
-        name: "log_reg",
-        component: log_reg,
-    },
-    {
-        path: '/user_center',
-        name: "user_center",
-        component: user_center
+        name:
+            "log_reg",
+        component:
+        log_reg,
     }
 ]
 

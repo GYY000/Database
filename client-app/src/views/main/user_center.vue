@@ -1,83 +1,52 @@
 <template>
-  <img src="src/assets/image/inside_backpage1.jpg" class="background">
-  <div class="all-container">
-    <div class="container">
-      <div class="title">U s e r C e n t e r</div>
-      <div class="seperator"></div>
-      <div class="show_info">
-        <div class="left-column">
-          <el-upload
-              class="avatar-uploader"
-              :action=action_url
-              :before-upload="handleBeforeUpload"
-              :auto-upload="true"
-              :show-file-list="false"
-              accept=".jpg,.png"
-              :on-success="handleAvatarSuccess"
-          >
-            <img v-if="src1" :src="src1" class="avatar">
-          </el-upload>
+  <el-row>
+    <el-col :span="11" style="display: flex;justify-content: right;margin-right: 15px">
+      <el-upload
+          class="avatar-uploader"
+          :action=action_url
+          :before-upload="handleBeforeUpload"
+          :auto-upload="true"
+          :show-file-list="false"
+          accept=".jpg,.png"
+          :on-success="handleAvatarSuccess"
+      >
+        <img v-if="src1" :src="src1" class="avatar">
+      </el-upload>
+    </el-col>
+    <el-col :span="11">
+      <div class="title_sub">
+        <div style="display: flex; align-items: center; justify-content: center;">
+          <el-icon style="padding-right: 10px">
+            <User/>
+          </el-icon>
+          {{ store.getUserName }}
         </div>
-        <div class="right-column">
-          <div class="title_sub">
+      </div>
+      <div class="seperator_sub"></div>
+      <div class="info-box">
+        <div class="left-column1" style="flex: 1">
+          <div class="row-left">
+            <el-tag type="" effect="dark" class="show_tag">
+              <div style="display: flex; align-items: center; justify-content: center;">
+                <el-icon>
+                  <Calendar/>
+                </el-icon>
+                <span>注册日期</span>
+              </div>
+            </el-tag>
+            <el-button type="primary" @click="logout" style="margin-top: 15px">logout</el-button>
+          </div>
+        </div>
+        <div class="right-column" style="flex: 3">
+          <div class="row-right">
             <div style="display: flex; align-items: center; justify-content: center;">
-              <el-icon style="padding-right: 10px">
-                <User/>
-              </el-icon>
-              {{ store.getUserName }}
-            </div>
-          </div>
-          <div class="seperator_sub"></div>
-          <div class="info-box">
-            <div class="left-column1" style="flex: 1">
-              <div class="row-left">
-                <el-tag type="" effect="dark" class="show_tag">
-                  <div style="display: flex; align-items: center; justify-content: center;">
-                    <el-icon>
-                      <Calendar/>
-                    </el-icon>
-                    <span>注册日期</span>
-                  </div>
-                </el-tag>
-              </div>
-              <div class="row-left">
-                <el-tag type="" effect="dark" class="show_tag">
-                  <div style="display: flex; align-items: center; justify-content: center;">
-                    <el-icon>
-                      <Notification/>
-                    </el-icon>
-                    <span>箴言</span>
-                  </div>
-                </el-tag>
-              </div>
-            </div>
-            <div class="right-column" style="flex: 3">
-              <div class="row-right">
-                <div style="display: flex; align-items: center; justify-content: center;">
-                  <span class="info_font">{{ store.getRegisterDate }}</span>
-                </div>
-              </div>
-              <div class="row-right">
-                <div style="display: flex; align-items: center; justify-content: center;">
-                  <span class="info_font">还是待做咧</span>
-                </div>
-              </div>
+              <span class="info_font">{{ store.getRegisterDate }}</span>
             </div>
           </div>
         </div>
       </div>
-      <div class="footer">
-        <div class="button-wrapper">
-          <el-button color="#626aef" @click="back_to_main">mainpage</el-button>
-          <el-button type="primary" @click="logout">logout</el-button>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
-
-
+    </el-col>
+  </el-row>
 </template>
 
 <script>
@@ -115,9 +84,6 @@ export default {
       src1.value = store.getProfilePhoto
     }
 
-    const back_to_main = () => {
-      router.push('/')
-    }
     const logout = () => {
       store.logout()
       router.push({path: '/log_reg'});
@@ -129,7 +95,6 @@ export default {
       action_url,
       handleAvatarSuccess,
       store,
-      back_to_main,
       logout
     }
   }
@@ -142,28 +107,9 @@ export default {
 }
 
 .avatar {
-  width: 80%;
-  height: 80%;
-  left: 10%;
-  position: relative;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
-}
-
-.container {
-  position: relative;
-  width: 70%;
-  height: 100vh;
-  background: linear-gradient(to bottom right, #a8edea 0%, #fed6e3 100%);
-  opacity: 90%;
-  backdrop-filter: blur(2px);
-  border-radius: 10px;
-  box-shadow: 0 14px 28px rgba(0, 0, 0, .25), 0 10px 10px rgba(0, 0, 0, .22);
-}
-
-.left-column {
-  flex: 1;
-  display: flex;
-  justify-content: flex-end;
 }
 
 .left-column1 {
@@ -177,8 +123,8 @@ export default {
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  width: 40%;
-  padding-right: 50px;
+  width: 150px;
+  height: 150px;
 }
 
 .right-column {
@@ -207,11 +153,6 @@ export default {
   height: 100%
 }
 
-.show_info {
-  display: flex;
-  height: 40vh;
-}
-
 .info_font {
   padding: 5px;
   font-weight: bold;
@@ -221,27 +162,6 @@ export default {
 
 .info-box {
   display: flex;
-}
-
-.title {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: 'Lobster', cursive;
-  color: #1169ea;
-  font-size: 50px;
-  font-weight: 600;
-  padding-top: 10px;
-}
-
-.seperator {
-  height: 1px;
-  width: 80%;
-  position: relative;
-  left: 10%;
-  background: linear-gradient(to bottom right, rgba(70, 64, 255, 0.56) 0%, rgba(254, 214, 227, 0.87) 100%);
-  margin: 10px 0;
-  box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .title_sub {
@@ -255,20 +175,13 @@ export default {
   padding-top: 10px;
 }
 
-.seperator_sub {
-  height: 1px;
-  width: 80%;
-  position: relative;
-  background: linear-gradient(to bottom right, rgba(70, 64, 255, 0.56) 0%, rgba(254, 214, 227, 0.87) 100%);
-  margin: 10px 0;
-}
-
 .background {
   top: 0;
   left: 0;
   width: 100%;
   height: 100vh;
   position: fixed;
+  opacity: 10%;
   z-index: -1;
 }
 
@@ -282,10 +195,5 @@ export default {
   width: 30%;
   display: flex;
   justify-content: space-around;
-}
-
-.all-container {
-  display: flex;
-  justify-content: center;
 }
 </style>
