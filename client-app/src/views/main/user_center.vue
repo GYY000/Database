@@ -34,7 +34,7 @@
                 <span>注册日期</span>
               </div>
             </el-tag>
-            <el-button type="primary" @click="logout" style="margin-top: 15px">logout</el-button>
+            <el-button type="danger" @click="logout" style="margin-top: 15px">退出登录</el-button>
           </div>
         </div>
         <div class="right-column" style="flex: 3">
