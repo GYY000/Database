@@ -1,6 +1,32 @@
 <template>
   <div class="message-container" ref="container" style="height: 85%;">
-    <div v-for="message in messages" :key="message.id" :class="[messageLoaded ? 'message-loaded' : '']">
+    <div v-if="messages.length == 0 && messageLoaded" style="margin-top: 30px;font-size: 20px;"> 你们还没有过聊天记录 </div>
+    <div style="display: flex; justify-content: center; align-items: center" v-if="!messageLoaded">
+      <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+        x="0px" y="0px" width="24px" height="30px" viewBox="0 0 24 30" style="enable-background:new 0 0 50 50;"
+        xml:space="preserve">
+        <rect x="0" y="13" width="4" height="5" fill="#333">
+          <animate attributeName="height" attributeType="XML" values="5;21;5" begin="0s" dur="0.6s"
+            repeatCount="indefinite" />
+          <animate attributeName="y" attributeType="XML" values="13; 5; 13" begin="0s" dur="0.6s"
+            repeatCount="indefinite" />
+        </rect>
+        <rect x="10" y="13" width="4" height="5" fill="#333">
+          <animate attributeName="height" attributeType="XML" values="5;21;5" begin="0.15s" dur="0.6s"
+            repeatCount="indefinite" />
+          <animate attributeName="y" attributeType="XML" values="13; 5; 13" begin="0.15s" dur="0.6s"
+            repeatCount="indefinite" />
+        </rect>
+        <rect x="20" y="13" width="4" height="5" fill="#333">
+          <animate attributeName="height" attributeType="XML" values="5;21;5" begin="0.3s" dur="0.6s"
+            repeatCount="indefinite" />
+          <animate attributeName="y" attributeType="XML" values="13; 5; 13" begin="0.3s" dur="0.6s"
+            repeatCount="indefinite" />
+        </rect>
+      </svg>
+      <span style="margin-left: 10px;">加载中...</span>
+    </div>
+    <div v-for="message in messages" :key="message.id">
       <div v-if="message.is_sender" class="message-right">
         <div style="display: flex;flex-direction: column;   align-items: flex-end; justify-content: flex-end;">
           <div class="time">{{ message.time }}</div>
@@ -44,10 +70,12 @@ export default {
         "profile_photo": store.getProfilePhoto
       },
       messageLoaded: false,
+
     };
   },
   mounted() {
     console.log("mounted钩子启动")
+    this.messageLoaded = false;
     this.getProfilePhoto();
     this.getMessages();
     this.updateData();
@@ -82,6 +110,7 @@ export default {
       const store = userStateStore()
       axios.post('/get_history_message', { receiver: this.contact.user_id, sender: store.getUserId })
         .then(response => {
+          this.messageLoaded = true;
           if (response.data.receiver == this.contact.user_id && response.data.message_list.length > this.messages.length) {
             const diff = response.data.message_list.length - this.messages.length;
             this.messages.push(...response.data.message_list.slice(-diff));
