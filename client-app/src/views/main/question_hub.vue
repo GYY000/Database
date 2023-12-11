@@ -39,6 +39,38 @@
       center>
     <create_ques_group_form @change_visible="change_dialog_visible" @refresh="refresh"></create_ques_group_form>
   </el-dialog>
+
+  <div style="display: flex; justify-content: center; align-items: center" v-if="isLoading">
+    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+      width="24px" height="30px" viewBox="0 0 24 30" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+      <rect x="0" y="13" width="4" height="5" fill="#333">
+        <animate attributeName="height" attributeType="XML"
+          values="5;21;5" 
+          begin="0s" dur="0.6s" repeatCount="indefinite" />
+        <animate attributeName="y" attributeType="XML"
+          values="13; 5; 13"
+          begin="0s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+      <rect x="10" y="13" width="4" height="5" fill="#333">
+        <animate attributeName="height" attributeType="XML"
+          values="5;21;5" 
+          begin="0.15s" dur="0.6s" repeatCount="indefinite" />
+        <animate attributeName="y" attributeType="XML"
+          values="13; 5; 13"
+          begin="0.15s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+      <rect x="20" y="13" width="4" height="5" fill="#333">
+        <animate attributeName="height" attributeType="XML"
+          values="5;21;5" 
+          begin="0.3s" dur="0.6s" repeatCount="indefinite" />
+        <animate attributeName="y" attributeType="XML"
+          values="13; 5; 13"
+          begin="0.3s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+    </svg>
+    <span style="margin-left: 10px;">加载中...</span>
+  </div>
+  
   <el-row class="groups-container">
     <ques_group_card style="margin-right: 12px" v-for="(item,index) in ques_sets.creator_list" :creator_name="item"
                      :qs_id="ques_sets.id_list[index]"
@@ -73,11 +105,13 @@ export default {
     const search_content = ref("")
     const store = userStateStore()
     const ques_sets = ref([])
+    const isLoading = ref(true)
 
     const init = () => {
       fetch_all_visible_ques_set(store.getUserId).then(
           (data) => {
             ques_sets.value = data;
+            isLoading.value = false;
           })
     }
 
@@ -144,7 +178,8 @@ export default {
       get_my_sets,
       refresh,
       get_favourite_sets,
-      get_all_sets
+      get_all_sets,
+      isLoading
     }
   }
 }

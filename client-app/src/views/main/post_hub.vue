@@ -19,24 +19,42 @@
     </el-dialog>
   </div>
   <div style="width: 1000px;position:absolute;margin: auto;top: 0;left: 0;bottom: 0;right: 0;">
-      <el-card style="margin-top: 20px;display: flex; align-items: center; margin-bottom: 20px; width: 100%;">
-        <h1 style="width: auto;">{{ this.title }}</h1>
-        <div style="display: flex; align-items: center; width: 960px;">
-          <el-input v-model="searchKeyword" placeholder="输入关键字搜索" style="display: inline-block; width: 190px;" />
-          <el-button plain type="primary" @click="searchPosts">
-            <el-icon><Search /></el-icon>
+    <el-card style="margin-top: 20px;display: flex; align-items: center; margin-bottom: 20px; width: 100%;">
+      <h1 style="width: auto;">{{ this.title }}</h1>
+      <div style="display: flex; align-items: center; width: 960px;">
+        <el-input v-model="searchKeyword" placeholder="输入关键字搜索" style="display: inline-block; width: 190px;" />
+        <el-button plain type="primary" @click="searchPosts">
+          <el-icon><Search /></el-icon>
+        </el-button>
+        <span style="position: absolute; right:20px;">
+          <el-button plain type="primary" @click="searchMyPosts">查看我的帖子</el-button>
+          <el-button type="primary" @click="showDialog" color="#626aef">
+            <el-icon><Plus /></el-icon>
+            <span> 新建帖子</span>
           </el-button>
-          <span style="position: absolute; right:20px;">
-            <el-button plain type="primary" @click="searchMyPosts">查看我的帖子</el-button>
-            <el-button type="primary" @click="showDialog" color="#626aef">
-              <el-icon><Plus /></el-icon>
-              <span> 新建帖子</span>
-            </el-button>
-          </span>
-        </div>
-      </el-card>
+        </span>
+      </div>
+    </el-card>
 
-
+    <div style="display: flex; justify-content: center; align-items: center" v-if="isLoading">
+      <svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+        width="30px" height="30px" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">
+        <path opacity="0.2" fill="#000" d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946
+          s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634
+          c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z"/>
+        <path fill="#000" d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0
+          C22.32,8.481,24.301,9.057,26.013,10.047z">
+          <animateTransform attributeType="xml"
+            attributeName="transform"
+            type="rotate"
+            from="0 20 20"
+            to="360 20 20"
+            dur="0.5s"
+            repeatCount="indefinite"/>
+        </path>
+      </svg>
+      加载中...
+    </div>
 
     <div class="post-list">
       <post v-for="post in posts" :key="post.pid" :post="post" />
@@ -65,7 +83,8 @@ export default {
       totalPosts: 0,
       searchKeyword: '',
       state: 'all',
-      newPost: {}
+      newPost: {},
+      isLoading: true,
     };
   },
   setup() {
@@ -152,10 +171,16 @@ export default {
         })
         .catch(error => {
           console.error('加载帖子失败', error);
+        })
+        .finally(()=> {
+          this.isLoading = false;
         });
     },
     loadPage(page) {
       this.pageNo = page
+      this.isLoading = true;
+      this.posts = [];
+      console.log("loadPage")
       switch (this.state) {
         case "all": this.loadPosts(); break;
         case "search": this.searchMyPosts(); break;
@@ -163,6 +188,8 @@ export default {
       }
     },
     searchPosts() {
+      this.isLoading = true;
+      this.posts = [];
       if (this.searchKeyword == "") {
         this.pageNo = 1;
         this.loadPosts();
@@ -191,9 +218,14 @@ export default {
         })
         .catch(error => {
           console.error('加载帖子失败', error);
+        })
+        .finally(()=> {
+          this.isLoading = false;
         });
     },
     searchMyPosts() {
+      this.isLoading = true;
+      this.posts = [];
       if (this.state != "my") {
         this.state = "my";
         this.pageNo = 1;
@@ -215,6 +247,9 @@ export default {
         })
         .catch(error => {
           console.error('加载帖子失败', error);
+        })
+        .finally(()=> {
+          this.isLoading = false;
         });
     },
     showDialog() {

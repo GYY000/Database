@@ -20,7 +20,7 @@
       <el-icon>
         <Postcard />
       </el-icon>
-      帖子
+      讨论区
     </el-menu-item>
     <el-menu-item index="/team_hub">
       <el-icon>

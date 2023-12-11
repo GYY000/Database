@@ -26,6 +26,38 @@
       center>
     <create_team_form @change_visible="change_dialog_visible" @refresh="refresh"></create_team_form>
   </el-dialog>
+  
+  <div style="display: flex; justify-content: center; align-items: center" v-if="isLoading">
+    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+      width="24px" height="30px" viewBox="0 0 24 30" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+      <rect x="0" y="13" width="4" height="5" fill="#333">
+        <animate attributeName="height" attributeType="XML"
+          values="5;21;5" 
+          begin="0s" dur="0.6s" repeatCount="indefinite" />
+        <animate attributeName="y" attributeType="XML"
+          values="13; 5; 13"
+          begin="0s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+      <rect x="10" y="13" width="4" height="5" fill="#333">
+        <animate attributeName="height" attributeType="XML"
+          values="5;21;5" 
+          begin="0.15s" dur="0.6s" repeatCount="indefinite" />
+        <animate attributeName="y" attributeType="XML"
+          values="13; 5; 13"
+          begin="0.15s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+      <rect x="20" y="13" width="4" height="5" fill="#333">
+        <animate attributeName="height" attributeType="XML"
+          values="5;21;5" 
+          begin="0.3s" dur="0.6s" repeatCount="indefinite" />
+        <animate attributeName="y" attributeType="XML"
+          values="13; 5; 13"
+          begin="0.3s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+    </svg>
+    <span style="margin-left: 10px;">加载中...</span>
+  </div>
+  
   <el-row class="groups-container" v-if="begin_flag">
     <team_card v-for="(item,index) in team_sets.creator_list" :creator_name="item"
                :group_name="team_sets.group_name_list[index]"
@@ -66,16 +98,18 @@ export default {
     const store = userStateStore()
     const team_sets = ref(null)
     const begin_flag = ref(false)
+    const isLoading = ref(true)
 
     const change_dialog_visible = (flag) => {
-      dialog_visible.value = flag
+      dialog_visible.value = flag;
     }
 
     const init = () => {
       fetch_all_teams().then(
           (data) => {
             team_sets.value = data;
-            begin_flag.value = true
+            begin_flag.value = true;
+            isLoading.value = false;
           })
     }
 
@@ -112,7 +146,8 @@ export default {
       search,
       team_sets,
       begin_flag,
-      refresh
+      refresh,
+      isLoading
     }
   }
 }
