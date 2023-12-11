@@ -46,12 +46,21 @@ export default {
       context.emit('change_visible', false);
     }
 
-    const add_team = () => {
+    const show_pic = (event) => {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        image_src.value = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    const transmit = () => {
       if (group_name.value === '') {
         ElMessage.error("请填入团队名")
       } else if (introduction.value === '') {
         ElMessage.error("请填入团队介绍")
-      } else if (upload_img.value === '') {
+      } else if (image_src.value === '') {
         ElMessage.error("请填入团队头像")
       } else {
         let form = new FormData
@@ -82,25 +91,10 @@ export default {
       }
     }
 
-    const show_pic = (event) => {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        image_src.value = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    const transmit = () => {
-      add_team()
-      closure()
-    }
-
     return {
       closure,
       group_name,
       transmit,
-      add_team,
       upload_img,
       show_pic,
       image_src,

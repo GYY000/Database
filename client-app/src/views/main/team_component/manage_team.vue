@@ -742,6 +742,7 @@ export default {
                   showClose: true,
                   type: 'success',
                 })
+                router.push('/team_hub')
               } else {
                 ElMessage({
                   message: '注销失败',
@@ -762,6 +763,7 @@ export default {
                   showClose: true,
                   type: 'success',
                 })
+                router.push('/team_hub')
               } else {
                 ElMessage({
                   message: '退出失败',
