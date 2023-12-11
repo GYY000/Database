@@ -12,6 +12,8 @@ import team_hub from "@/views/main/team_hub.vue";
 import question_hub from "@/views/main/question_hub.vue";
 import panel_del_index from "@/views/main/panel_del_index.vue";
 import manage_team from "@/views/main/team_component/manage_team.vue";
+import exam from "@/views/quesDoing/exam.vue";
+import exam_hub from "@/views/main/exam_hub.vue";
 
 const routes = [
     {
@@ -33,6 +35,11 @@ const routes = [
                 path: '/post_hub',
                 name: "post_hub",
                 component: post_hub
+            },
+            {
+                path: '/exam_hub',
+                name: "exam_hub",
+                component: exam_hub
             },
             {
                 path: '/main_page',
@@ -65,6 +72,11 @@ const routes = [
                 path: 'do_prob/:qs_id',
                 name: "do_prob",
                 component: do_problem
+            },
+            {
+                path: 'do_exam/:eid',
+                name: "do_exam",
+                component: exam
             }
         ]
     },

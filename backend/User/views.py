@@ -120,8 +120,8 @@ group_name
         return JsonResponse({"is_inside": "true"})
     except:
         if group.creator.uid == user_id:
-            ReUserTeam(uid=User.objects.get(uid=user_id),tid=group,is_admin=True).save()
-            return JsonResponse({"is_inside":"true"}) #fixme 之前创建者不在用户组里面
+            ReUserTeam(uid=User.objects.get(uid=user_id), tid=group, is_admin=True).save()
+            return JsonResponse({"is_inside": "true"})  # fixme 之前创建者不在用户组里面
         return JsonResponse({"is_inside": "false"})
 
 
@@ -393,7 +393,7 @@ def post_hub(request):
                    posts]
     arr = [{"pid": posts[i].pid, "title": posts[i].title, "creator_name": name_photos[i][0],
             "update_time": posts[i].update_time.strftime("%Y-%m-%d %H:%M"), "content": posts[i].content,
-            "uid": posts[i].creator.uid,"comment_count":len(list(Comment.objects.filter(pid=posts[i].pid)))
+            "uid": posts[i].creator.uid, "comment_count": len(list(Comment.objects.filter(pid=posts[i].pid)))
             } for i in range(len(posts))]
     return JsonResponse({"posts": arr[start:end], "total": len(posts)}, safe=False)
 
@@ -419,8 +419,8 @@ def post_hub_param(request, pid):
         content = sensi_filter.filter(request_dict["content"])
         comment = Comment(creator=User.objects.get(uid=uid), content=content, pid=Post.objects.get(pid=pid))
         comment.save()
-        post=Post.objects.get(pid=pid)
-        post.update_time=timezone.now()
+        post = Post.objects.get(pid=pid)
+        post.update_time = timezone.now()
         post.save()
         return JsonResponse({"cid": comment.id, "user_name": comment.creator.user_name,
                              "uid": comment.creator.uid,
@@ -461,7 +461,7 @@ url:/upload_team
         team = Team(team_name=group_name, creator=User.objects.get(uid=user_id), profile_photo=code,
                     introduction=introduction)
         team.save()
-        ReUserTeam(uid=User.objects.get(uid=user_id),tid=team,is_admin=True).save()
+        ReUserTeam(uid=User.objects.get(uid=user_id), tid=team, is_admin=True).save()
         # 通过GROUP_name+"_VIRTUAL"来获取虚拟
         User(user_name=group_name + "@TEAM", password="123456", profile_photo=code).save()
         return JsonResponse({"is_successful": "true"})
@@ -1158,84 +1158,104 @@ def in_collection(request):
     except:
         return JsonResponse({"value": "false"})
 
+
 def delete_comment(request):
-    request_dict=json.loads(request.body.decode('utf-8'))
+    request_dict = json.loads(request.body.decode('utf-8'))
     try:
         Comment.objects.get(id=request_dict['cid']).delete()
     except:
         print("No such comment!")
-    return JsonResponse({"is_successful":"true"})
+    return JsonResponse({"is_successful": "true"})
+
 
 def delete_post(request):
-    request_dict=json.loads(request.body.decode('utf-8'))
+    request_dict = json.loads(request.body.decode('utf-8'))
     try:
         Post.objects.get(pid=request_dict['pid']).delete()
     except:
         print("No such post")
-    return JsonResponse({"is_successful":"true"})
+    return JsonResponse({"is_successful": "true"})
+
 
 def fetch_all_future_intime_tests(request):
-    exams=[]
+    exams = []
+    request_dict = json.loads(request.body.decode('utf-8'))
+    uid = request_dict['uid']
+    is_inside_list = []
     for _ in Exam.objects.all():
-        if _.start_time+_.duration>timezone.now():
+        if _.start_time + _.duration > timezone.now():
             exams.append(_)
+            try:
+                Entry.objects.get(uid=uid, eid=_.eid)
+                is_inside_list.append('true')
+            except:
+                is_inside_list.append('false')
     return JsonResponse(
         {
-            "eid_list":[_.eid for _ in exams],
-            "start_time_list":[_.start_time.strftime("%Y-%m-%d %H:%M") for _ in exams],
-            "duration_list":[_.duration for _ in exams],
-            "creator_name_list":[_.creator.user_name for _ in exams]
+            "eid_list": [_.eid for _ in exams],
+            "start_time_list": [_.start_time.strftime("%Y-%m-%d %H:%M") for _ in exams],
+            "duration_list": [_.duration.total_seconds() for _ in exams],
+            "creator_name_list": [_.creator.user_name for _ in exams],
+            "exam_name_list": [_.exam_name for _ in exams],
+            "is_inside_list": is_inside_list
         }
-
     )
 
 
+from datetime import datetime
+
 
 def create_exam(request):
-    request_dict=json.loads(request.body.decode('utf-8'))
-    creator_id=request_dict['creator_id']
-    start_time=request_dict['start_time']
-    duration=request_dict['duration']
-    ques_set_name=request_dict['ques_set_name']
-    exam_name=request_dict['exam_name']
-    qs=QuestionSet.objects.get(set_name=ques_set_name)
+    request_dict = json.loads(request.body.decode('utf-8'))
+    creator_id = request_dict['creator_id']
+    start_time = request_dict['start_time']
+    datetime_format = "%Y-%m-%d %H:%M"
+    start_time = datetime.strptime(start_time, datetime_format)
+    duration = request_dict['duration']
+    ques_set_name = request_dict['ques_set_name']
+    exam_name = request_dict['exam_name']
+    duration = timedelta(seconds=duration)
+    qs = QuestionSet.objects.get(set_name=ques_set_name)
     if not qs.is_public:
-        permits=list(QuestionSetPerm.objects.filter(qsid=qs.qsid))
-        permits=[_.tid.creator.uid for _ in permits]
+        permits = list(QuestionSetPerm.objects.filter(qsid=qs.qsid))
+        permits = [_.tid.creator.uid for _ in permits]
         if not permits.__contains__(creator_id):
             return JsonResponse({"is_successful": "false", "has_no_perm": "true"})
         else:
             Exam(creator=User.objects.get(uid=creator_id), qsid=qs, exam_name=exam_name,
                  start_time=start_time, duration=duration).save()
+            return JsonResponse({"is_successful": "true", "has_no_perm": "false"})
     else:
-        Exam(creator=User.objects.get(uid=creator_id),qsid=qs,exam_name=exam_name,
-             start_time=start_time,duration=duration).save()
-    return JsonResponse({"is_successful":"true","has_no_perm":"false"})
+        Exam(creator=User.objects.get(uid=creator_id), qsid=qs, exam_name=exam_name,
+             start_time=start_time, duration=duration).save()
+    return JsonResponse({"is_successful": "true", "has_no_perm": "false"})
 
 
 def participate_exam(request):
-    request_dict=json.loads(request.body.decode('utf-8'))
-    uid=request_dict['uid']
-    eid=request_dict['eid']
-    Entry(uid=User.objects.get(uid=uid),eid=Exam.objects.get(eid=eid)).save()
-    return JsonResponse({"is_successful":"true"})
+    request_dict = json.loads(request.body.decode('utf-8'))
+    uid = request_dict['uid']
+    eid = request_dict['eid']
+    Entry(uid=User.objects.get(uid=uid), eid=Exam.objects.get(eid=eid)).save()
+    return JsonResponse({"is_successful": "true"})
+
 
 def fetch_exam_info(request):
-    request_dict=json.loads(request.body.decode('utf-8'))
-    eid=request_dict['eid']
-    exam=Exam.objects.get(eid=eid)
+    request_dict = json.loads(request.body.decode('utf-8'))
+    eid = request_dict['eid']
+    exam = Exam.objects.get(eid=eid)
     return JsonResponse({
-        "qsid":exam.qsid.qsid,
-        "start_time":exam.start_time.strftime("%Y-%m-%d %H:%M"),
-        "duration":exam.duration
+        "qsid": exam.qsid.qsid,
+        "start_time": exam.start_time.strftime("%Y-%m-%d %H:%M"),
+        "duration": exam.duration
     })
 
+
 def inside_exam(request):
-    request_dict=json.loads(request.body.decode('utf-8'))
-    uid=request_dict['uid']
-    eid=request_dict['eid']
+    request_dict = json.loads(request.body.decode('utf-8'))
+    uid = request_dict['uid']
+    eid = request_dict['eid']
     try:
-        Entry.objects.get(uid=uid,eid=eid)
-        return JsonResponse({"is_inside":"true"})
+        Entry.objects.get(uid=uid, eid=eid)
+        return JsonResponse({"is_inside": "true"})
     except:
-        return JsonResponse({"is_inside":"false"})
+        return JsonResponse({"is_inside": "false"})

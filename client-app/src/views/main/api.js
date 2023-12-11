@@ -442,3 +442,99 @@ export function hand_in_score(qids, scores, qsid, uid, answers) {
     )
 }
 
+export function create_exam(creator_id, start_time, duration, ques_set_name, exam_name) {
+    return axios.request(
+        {
+            url: '/create_exam',
+            method: "post",
+            data: JSON.stringify(
+                {
+                    creator_id: creator_id,
+                    start_time: start_time,
+                    duration: duration,
+                    ques_set_name: ques_set_name,
+                    exam_name: exam_name
+                }
+            )
+        }
+    ).then(
+        (response) => {
+            return response.data
+        }
+    )
+}
+
+export function fetch_all_coming_test(uid) {
+    return axios.request(
+        {
+            url: '/fetch_all_future_intime_tests',
+            method: "post",
+            data: JSON.stringify(
+                {
+                    uid: uid
+                }
+            )
+        }
+    ).then(
+        (response) => {
+            return response.data
+        }
+    )
+}
+
+export function check_inside_exam(uid, eid) {
+    return axios.request(
+        {
+            url: '/inside_exam',
+            method: "post",
+            data: JSON.stringify(
+                {
+                    uid:uid,
+                    eid:eid
+                }
+            )
+        }
+    ).then(
+        (response) => {
+            return response.data
+        }
+    )
+}
+
+export function participate_exam(uid, eid) {
+    return axios.request(
+        {
+            url: '/participate_exam',
+            method: "post",
+            data: JSON.stringify(
+                {
+                    uid:uid,
+                    eid:eid
+                }
+            )
+        }
+    ).then(
+        (response) => {
+            return response.data
+        }
+    )
+}
+
+export function fetch_exam_info(eid) {
+    return axios.request(
+        {
+            url: '/fetch_exam_info',
+            method: "post",
+            data: JSON.stringify(
+                {
+                    eid:eid
+                }
+            )
+        }
+    ).then(
+        (response) => {
+            return response.data
+        }
+    )
+}
+
