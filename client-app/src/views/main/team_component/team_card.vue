@@ -163,6 +163,7 @@ export default {
 <style scoped>
 .card_layout {
   display: flex;
+  justify-content: center;
   flex-direction: column;
   width: 90%;
   padding-left: 5%;

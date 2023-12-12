@@ -1,12 +1,13 @@
 <template>
   <div class="background_wrap"></div>
-  <div class="top_panel">
-    <span>
-      <el-button type="success" @click="dialog_visible = true">
-        创建团队
-      </el-button>
-    </span>
-    <span>
+  <el-row style="margin-bottom: 20px">
+    <el-col :span="4">
+      <div style="font-size: 18px;color: dodgerblue;margin-bottom: 5px;font-weight: bold">
+        Team Hub
+      </div>
+      <div style="font-size: 12px">团队广场</div>
+    </el-col>
+    <el-col :offset="12" :span="8" style="display: flex;justify-content: right;margin-top: 5px">
       <el-input
           v-model="search_content"
           style="width: 100%"
@@ -14,8 +15,11 @@
           :prefix-icon="Search"
           @keyup.enter.native="search"
       />
-    </span>
-  </div>
+      <el-button type="success" @click="dialog_visible = true" style="height: 100%;margin-left: 15px">
+        创建团队
+      </el-button>
+    </el-col>
+  </el-row>
 
   <el-dialog
       v-model="dialog_visible"
@@ -160,8 +164,6 @@ export default {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: left;
-  width: 95%;
-  left: 2.5%;
 }
 
 .background_wrap {

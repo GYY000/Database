@@ -107,6 +107,7 @@ import Sub_prob_form from "@/views/quesDoing/sub_prob_form.vue";
 import {Plus} from "@element-plus/icons-vue";
 import {ElMessage} from "element-plus";
 import userStateStore from "@/store";
+import router from "@/router";
 
 export default {
   name: 'update_ques_form',
@@ -277,6 +278,7 @@ export default {
                 message: "更新成功",
                 type: "success",
               });
+              router.go(0)
             } else {
               ElMessage({
                 message: "更新失败",

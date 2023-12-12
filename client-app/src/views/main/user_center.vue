@@ -61,10 +61,10 @@
         label-position="left"
         label-width="75px"
         style="max-width: 300px;margin:auto">
-      <el-form-item label="密码">
+      <el-form-item label="旧密码">
         <el-input v-model="old_password" :show-password="true"/>
       </el-form-item>
-      <el-form-item label="密码">
+      <el-form-item label="新密码">
         <el-input v-model="new_password" :show-password="true"/>
       </el-form-item>
       <el-form-item label="确认密码">
