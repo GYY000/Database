@@ -3,7 +3,7 @@
   <div class="center_class">
     <div class="main_container">
       <el-row style="margin-bottom: 20px">
-        <el-col :span="4" v-if="creator_name === store.getUserName">
+        <el-col :span="4" v-if="is_a">
           <div style="font-size: 18px;color: dodgerblue;margin-bottom: 5px;font-weight: bold">
             {{ team_name }}
           </div>
@@ -125,19 +125,19 @@
 
       <el-row style="margin-top: 20px">
         <el-card style="width: 100%;">
-          <el-row v-if="creator_name === store.getUserName" style="margin-bottom: 15px;color: grey;font-weight: bold">
+          <el-row v-if="is_admin_perm" style="margin-bottom: 15px;color: grey;font-weight: bold">
             成员管理
           </el-row>
           <el-row v-else style="margin-bottom: 15px;color: grey;font-weight: bold">
             成员信息
           </el-row>
           <el-col :span="24">
-            <el-row v-if="creator_name === store.getUserName" style="margin-bottom: 10px;">
+            <el-row v-if="is_admin_perm" style="margin-bottom: 10px;">
               <el-button type="primary" :icon="ChatSquare" @click="open_group_message">
                 群发消息
               </el-button>
-              <el-button type="primary" :icon="EditPen">
-                发起考试
+              <el-button type="primary" v-if="creator_name === store.getUserName" :icon="EditPen" @click="open_admin_dialog">
+                晋升管理员
               </el-button>
               <el-button type="danger" :icon="Close" @click="open_del_member">
                 删除成员
@@ -152,7 +152,7 @@
                   stripe
                   @selection-change="handleSelectionChange"
               >
-                <el-table-column v-if="creator_name === store.getUserName" type="selection"/>
+                <el-table-column v-if="is_admin_perm" type="selection"/>
                 <el-table-column property="id" label="id" sortable/>
                 <el-table-column property="name" label="用户名" sortable/>
                 <el-table-column property="date" label="加入时间" sortable/>
@@ -170,7 +170,7 @@
       </el-row>
       <el-row style="margin-top: 20px">
         <el-card style="width: 100%;">
-          <el-row v-if="creator_name === store.getUserName" style="margin-bottom: 15px;color: grey;font-weight: bold">
+          <el-row v-if="is_admin_perm" style="margin-bottom: 15px;color: grey;font-weight: bold">
             问题组管理
           </el-row>
           <el-row v-else style="margin-bottom: 15px;color: grey;font-weight: bold">
@@ -254,7 +254,7 @@
       </span>
     </template>
   </el-dialog>
-  <el-dialog v-if="creator_name === store.getUserName" v-model="group_message_dialog">
+  <el-dialog v-if="is_admin_perm" v-model="group_message_dialog">
     <template #header>
       <div style="display: flex;justify-content: center">
         <el-icon style="color: dodgerblue;height: 25px;width: 25px;margin-right: 5px">
@@ -293,6 +293,35 @@
           发送
         </el-button>
         <el-button type="danger" @click="exit_message_send">
+          取消
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
+  <el-dialog v-if="creator_name === store.getUserName" v-model="admin_dialog">
+    <template #header>
+      <div style="display: flex;justify-content: center">
+        <span style="font-size: 18px;color:dodgerblue">晋升管理员</span>
+      </div>
+    </template>
+    <el-row style="margin-top: 15px" align="center">
+      <el-col :offset="1" :span="5" style="font-size: 15px;margin-top: 3px;color: grey">所选用户</el-col>
+      <el-col :offset="1" :span="10">
+        <el-select
+            v-model="option_user"
+            placeholder="Please select"
+            style="width: 240px"
+            multiple
+            disabled
+        />
+      </el-col>
+    </el-row>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button type="primary" @click="set_admin">
+          确定
+        </el-button>
+        <el-button type="danger" @click="exit_admin">
           取消
         </el-button>
       </span>
@@ -405,7 +434,7 @@
           <el-tag style="width: 70px">平均分</el-tag>&nbsp{{ques_set_info.average_score}}
         </div>
         <div>
-          <el-button v-if="creator_name === store.getUserName" type="primary" style="margin-left: 3px" @click="goto_ques_set(ques_set_info.id)">
+          <el-button v-if="is_admin_perm" type="primary" style="margin-left: 3px" @click="goto_ques_set(ques_set_info.id)">
             详情
           </el-button>
           <el-button v-else type="primary" style="margin-left: 3px" @click="goto_ques_set(ques_set_info.id)">
@@ -421,6 +450,7 @@
 import {ref} from "vue";
 import {useRouter} from "vue-router";
 import {
+  check_team_perm,
   del_members,
   del_team,
   fetch_all_member,
@@ -429,7 +459,7 @@ import {
   fetch_history_application,
   fetch_history_team,
   fetch_set_avatar,
-  fetch_team_info,
+  fetch_team_info, send_set_admin,
   send_team_message,
   update_team,
 } from "@/views/main/api";
@@ -497,6 +527,32 @@ export default {
     const ques_set_avatar_flag = ref(true)
     const ques_set_info = ref(null)
     const history_show = ref(false)
+    const admin_dialog = ref(false)
+    const is_admin_perm = ref(false)
+
+    const open_admin_dialog = () => {
+      if (user_selection.value.length === 0) {
+        ElMessage.error("请先选择要晋升的成员")
+      } else {
+        admin_dialog.value = true
+      }
+    }
+
+    const set_admin = () => {
+      let uids = []
+      for (let user of user_selection.value) {
+        uids.push(user.id)
+      }
+      send_set_admin(uids, team_id.value, store.getUserId).then(
+          (res) => {
+            if (res.is_successful === 'true') {
+              ElMessage.success("发送成功")
+            } else {
+              ElMessage.error("发送失败")
+            }
+          }
+      )
+    }
 
     const goto_ques_set = (id) => {
       if(creator_name.value === store.getUserName) {
@@ -573,6 +629,11 @@ export default {
     const init = () => {
       let router1 = useRouter()
       team_id.value = router1.currentRoute.value.params.tid
+      check_team_perm(store.getUserId,team_id.value).then(
+          (res) => {
+            is_admin_perm.value = res.is_admin === "true"
+          }
+      )
       fetch_all_member(team_id.value).then(
           (res) => {
             console.log(res)
@@ -813,6 +874,10 @@ export default {
       del_member_dialog.value = false
     }
 
+    const exit_admin = () => {
+      admin_dialog.value = false
+    }
+
     init()
 
     return {
@@ -858,7 +923,12 @@ export default {
       ques_set_avatar_flag,
       ques_set_info,
       goto_ques_set,
-      history_show
+      history_show,
+      admin_dialog,
+      open_admin_dialog,
+      set_admin,
+      exit_admin,
+      is_admin_perm
     }
   }
 }

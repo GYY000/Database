@@ -22,7 +22,7 @@
                     :toolbars="mavon_config.toolbars"
                     placeholder="请输入内容"
                     style="height: 100px;width: 85%; left: 10%; margin-bottom: 10px"
-                    @imgAdd="img_add"/>
+                    @imgAdd="img_add_content"/>
       <el-form-item v-if="form.type === '选择'" style="margin-top: 15px">
         <el-button @click="add_ops" :icon="Plus" style="width: 20%;">添加选项</el-button>
       </el-form-item>
@@ -70,7 +70,7 @@
                     :toolbars="mavon_config.toolbars"
                     placeholder="请输入您的答案"
                     style="height: 200px;width: 90%; left: 5%;margin-bottom: 10px"
-                    @imgAdd="img_add"/>
+                    @imgAdd="img_add_ans"/>
     </el-form>
   </div>
   <div style="display: flex;width: 100%;justify-content: center;padding-top: 10px">
@@ -165,12 +165,12 @@ export default {
       blank_ans.value.splice(index, 1)
     }
 
-    const img_add = (pos, file) => {
+    const img_add_content = (pos, file) => {
       let form_data = new FormData
       form_data.append('image', file)
       upload_picture(form_data).then(
           (res) => {
-            let content = form.value.content.ques_content
+            let content = form.value.ques_content
             let name = file.name
             // 第二步.将返回的url替换到文本原位置![...](0) -> ![...](url)  这里是必须要有的
             if (content.includes(name)) {
@@ -181,7 +181,29 @@ export default {
               let insertStr = (soure, start, newStr) => {
                 return soure.slice(0, start) + newStr + soure.slice(start)
               }
-              form.value.content.ques_content = insertStr(str, index, nStr)
+              form.value.ques_content = insertStr(str, index, nStr)
+            }
+          }
+      )
+    }
+
+    const img_add_ans = (pos, file) => {
+      let form_data = new FormData
+      form_data.append('image', file)
+      upload_picture(form_data).then(
+          (res) => {
+            let content = form.value.ans
+            let name = file.name
+            // 第二步.将返回的url替换到文本原位置![...](0) -> ![...](url)  这里是必须要有的
+            if (content.includes(name)) {
+              let oStr = `(${pos})`
+              let nStr = `(${res.img_url})`
+              let index = content.indexOf(oStr)
+              let str = content.replace(oStr, '')
+              let insertStr = (soure, start, newStr) => {
+                return soure.slice(0, start) + newStr + soure.slice(start)
+              }
+              form.value.ans = insertStr(str, index, nStr)
             }
           }
       )
@@ -206,7 +228,8 @@ export default {
       upload_op,
       add_ops,
       delete_op,
-      img_add,
+      img_add_content,
+      img_add_ans,
       delete_sub_prob,
       upload_sub_prob,
       add_blank,
