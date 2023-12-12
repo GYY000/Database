@@ -130,8 +130,12 @@ export default {
           }
         }
       } else if (props.ques.content.type === '问答') {
-        ans = q_and_a_ans.value
-        filled = q_and_a_ans.value !== ''
+        setTimeout(()=>{
+          ans = q_and_a_ans.value
+          filled = q_and_a_ans.value !== ''
+          context.emit("update_ans", {id: props.id, ans: ans, filled: filled})
+        }, 100);
+        return;
       } else {
         ans = sub_ans.value
         for(let i = 0;i < filled_sub.value.length;i++) {

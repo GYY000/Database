@@ -1,6 +1,6 @@
 <template>
   <div class="message-container" ref="container" style="height: 85%;">
-    <div v-if="messages.length == 0 && messageLoaded" style="margin-top: 30px;font-size: 20px;"> 你们还没有过聊天记录 </div>
+    <div v-if="messages.length == 0 && messageLoaded == true" style="margin-top: 30px;font-size: 20px;"> 你们还没有过聊天记录 </div>
     <div style="display: flex; justify-content: center; align-items: center" v-if="!messageLoaded">
       <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
         x="0px" y="0px" width="24px" height="30px" viewBox="0 0 24 30" style="enable-background:new 0 0 50 50;"
