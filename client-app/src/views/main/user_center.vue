@@ -51,6 +51,9 @@
       <el-button type="danger" @click="logout" style="margin-top: 15px">退出登录</el-button>
     </el-col>
   </el-row>
+  <el-row>
+
+  </el-row>
   <el-dialog v-model="password_dialog" style="width:400px" draggable>
     <template #header>
       <div style="display: flex;justify-content: center">
@@ -91,7 +94,7 @@ import {ElMessage} from "element-plus";
 import {fetch_user_info} from "@/views/loginInterface/loginAPI";
 import {UploadFilled} from '@element-plus/icons-vue'
 import router from "@/router";
-import {change_password} from "@/views/main/api";
+import {change_password, fetch_ques_history, fetch_set_history} from "@/views/main/api";
 
 export default {
   name: "user_center",
@@ -103,6 +106,7 @@ export default {
     const old_password = ref('')
     const new_password = ref('')
     const confirm_password = ref('')
+    const records = ref([])
 
     const confirm_change = () => {
       if (new_password.value === confirm_password.value) {
@@ -131,6 +135,23 @@ export default {
       password_dialog.value = true
     }
 
+    const init = () => {
+      fetch_set_history(store.getUserId).then(
+          (res) => {
+            for (let i = 0; i < res.ques_set_name_list.length; i++) {
+              records.value.push({
+                ques_tion_set_name: res.ques_set_name_list[i],
+                time: res.time_list[i],
+                user_score: res.user_score_list[i],
+                total_score: res.total_score_list[i],
+                sh_id: res.shid_list[i]
+              })
+            }
+          }
+      )
+    }
+
+    init()
     //const is_editing_user_name = ref(false)
     //TODO: on server change here
     const action_url = ref("http://127.0.0.1:8000/upload_avatar?user_id=" + store.getUserId)

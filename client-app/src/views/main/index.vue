@@ -78,7 +78,7 @@
     @open="before_open_pm">
     <message_container ref="messageContainer"></message_container>
   </el-dialog>
-  <el-dialog v-model="user_dialog" style="width: 600px">
+  <el-dialog v-model="user_dialog" style="width: 700px">
     <template #header>
       <div class="title">UserInfo</div>
     </template>

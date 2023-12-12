@@ -1017,7 +1017,7 @@ def get_recent_records(request):
                           "user_score": qs[i].score,
                           "total_score": total_scores[i],
                           "time": qs[i].time.strftime("%Y-%m-%d %H:%M"),
-                          "qsid": qs[i].qsid.qsid,
+                          "shid": qs[i].shid,
                           } for i in range(len(qs))], safe=False)
 
 
@@ -1310,3 +1310,47 @@ def change_password(request):
         return JsonResponse({"old_password_fault":"false","is_successful":"true"})
     else:
         return JsonResponse({"old_password_fault":"true","is_successful":"false"})
+
+def get_do_set_history(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    uid=request_dict['uid']
+    ls=list(SetHistory.objects.filter(uid=uid))[:10]
+    ques_set_name_ls=[]
+    shid_list=[]
+    user_score_list=[]
+    total_score_list=[]
+    time_list=[]
+    for _ in ls:
+        ques_set_name_ls.append(_.qsid.set_name)
+        shid_list.append(_.shid)
+        user_score_list.append(_.score)
+        time_list.append(_.time.strftime("%Y-%m-%d %H:%M"))
+        total_score=0
+        tmp=Question.objects.filter(qsid=_.qsid.qsid)
+        for _ in tmp:
+            total_score+=_.score
+        total_score_list.append(total_score)
+    return JsonResponse({"ques_set_name_list":ques_set_name_ls,
+                         "shid_list":shid_list,
+                         "user_score_list":user_score_list,
+                         "total_score_list":total_score_list,
+                         "time_list":time_list
+                         })
+def get_do_ques_history(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    uid=request_dict['uid']
+    shid=request_dict['shid']
+    ques=QuestionHistory.objects.filter(shid=shid)
+    get_score_list=[]
+    question_list=[]
+    ans_list=[]
+    for _ in ques:
+        get_score_list.append(_.score)
+        question_list.append(_.qid.content)
+        ans_list.append(_.answer)
+    return JsonResponse({"get_score_list":get_score_list,
+                         "question_list":question_list,
+                         "ques_set_name":SetHistory.objects.get(shid=shid).qsid.set_name,
+                         "introduction":SetHistory.objects.get(shid=shid).qsid.introduction,
+                         "ans_list":ans_list
+                         })
