@@ -418,7 +418,7 @@ export function hand_in_ans(form) {
 }
 
 export function string2Array(string) {
-    return string.match(/'([^']+)'/g).map(item => item.slice(1, -1))
+    return string.match(/'([^']*)'/g).map(item => item.slice(1, -1))
 }
 
 export function array2String(array) {

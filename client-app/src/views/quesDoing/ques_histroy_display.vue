@@ -93,7 +93,7 @@
        style="display: flex;justify-content: left;width: 100%">
     <div style="width: 100%">
       <sub_history_display v-for="(item, index) in content.sub_problem"
-                         :sub_problem="item" :id="index" :ans="ans[index]"/>
+                         :sub_problem="item" :id="index" :ans="ques_ans[index]"/>
     </div>
   </div>
   <div v-if="content.type === '问答'" style="margin-bottom: 10px">
@@ -167,8 +167,9 @@ export default {
     )
 
     const init = () => {
+      console.log(props.ans)
       ques_ans.value = props.ques.content.type === '选择' ? props.ans.split(',')
-        : (props.ques.content.type === '填空' ? string2Array(props.ans) : props.ans)
+        : string2Array(props.ans)
     }
 
     init()
