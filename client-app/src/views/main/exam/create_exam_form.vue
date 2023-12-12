@@ -19,7 +19,7 @@
         </el-col>
         <el-col :offset="4" :span="8">
           <el-time-picker v-model="time" placeholder="请输入考试时间"
-                          format="hh:mm"
+                          format="HH:mm"
                           value-format='HH:mm'/>
         </el-col>
       </el-row>
@@ -93,19 +93,23 @@ export default {
     }
 
     const transmit = () => {
-      if(!(date.value.getTime() > new Date().getTime())) {
-        ElMessage.error("考试开始时间需要大于当前时间")
-        return ;
-      }
       const year = date.value.getFullYear();
       const month = String(date.value.getMonth() + 1).padStart(2, '0');
       const day = String(date.value.getDate()).padStart(2, '0');
-
+      let array = time.value.split(":")
+      let today = new Date(date.value.getFullYear(), date.value.getMonth(), date.value.getDate(),
+          parseInt(array[0]), parseInt(array[1]))
+      if (!(today.getTime() > new Date().getTime())) {
+        ElMessage.error("考试开始时间需要大于当前时间")
+        return;
+      }
       const start_time = `${year}-${month}-${day} ${time.value}`;
       create_exam(store.getUserId, start_time, duration_min.value * 60
           + duration_hour.value * 3600, ques_set_name.value, exam_name.value).then(
           (res) => {
-            if (res.has_no_perm === 'true') {
+            if(res.none_exist === 'true') {
+              ElMessage.error("问题组不存在，请重新尝试")
+            } else if (res.has_no_perm === 'true') {
               ElMessage.error("您无权使用该问题组创建")
             } else if (res.is_successful === 'false') {
               ElMessage.error("创建失败请稍后再试")

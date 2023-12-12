@@ -50,7 +50,8 @@
         </div>
       </template>
       <team_introduction :tid="tid" :team_name="group_name"
-                         :date="date" :avatar="avatar_url" :creator="creator_name"/>
+                         :date="date" :avatar="avatar_url" :creator="creator_name"
+                         :introduction="introduction"/>
     </el-dialog>
   </el-card>
 </template>
@@ -101,7 +102,7 @@ export default {
     const joinReq = () => {
       apply_for_team(props.creator_name, props.group_name, store.getUserId).then(
           (response) => {
-            if(response.have_applied === 'true') {
+            if (response.have_applied === 'true') {
               ElMessage({
                 message: '您已申请过，请等待创建者批准',
                 showClose: true,

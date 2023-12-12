@@ -1220,7 +1220,10 @@ def create_exam(request):
     ques_set_name = request_dict['ques_set_name']
     exam_name = request_dict['exam_name']
     duration = timedelta(seconds=duration)
-    qs = QuestionSet.objects.get(set_name=ques_set_name)
+    try:
+        qs = QuestionSet.objects.get(set_name=ques_set_name)
+    except:
+        return JsonResponse({"is_successful": "false", "none_exist": "true"})
     if not qs.is_public:
         permits = list(QuestionSetPerm.objects.filter(qsid=qs.qsid))
         # permits = [_.tid.creator.uid for _ in permits]

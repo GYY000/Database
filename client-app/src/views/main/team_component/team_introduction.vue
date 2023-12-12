@@ -49,11 +49,10 @@ import User_show_card from "@/views/main/team_component/user_show_card.vue";
 export default {
   name: "team_introduction",
   components: {User_show_card},
-  props: ['tid', 'date', 'avatar', 'creator', 'team_name'],
+  props: ['tid', 'date', 'avatar', 'creator', 'team_name', 'introduction'],
   setup(props) {
     const user_name_list = ref(null)
     const register_date_list = ref(null)
-    const introduction = ref('here is supposed to be introduction')
 
     const init = () => {
       fetch_all_member(props.tid).then(
@@ -69,7 +68,6 @@ export default {
     return {
       user_name_list,
       register_date_list,
-      introduction
     }
   }
 }

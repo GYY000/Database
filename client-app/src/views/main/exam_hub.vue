@@ -45,7 +45,7 @@
               <template #default="scope">
                 <el-button v-if="scope.row.is_inside === 'false'" type="primary"
                            @click="join_exam(scope.row.eid)">加入考试</el-button>
-                <el-button v-else type="primary"
+                <el-button v-else type="success"
                            @click="into_exam(scope.row.eid)">进入考试</el-button>
               </template>
             </el-table-column>
@@ -70,7 +70,7 @@
               <template #default="scope">
                 <el-button v-if="scope.row.is_inside === 'false'" type="primary" style="width: 70px"
                            @click="join_exam(scope.row.eid)">加入考试</el-button>
-                <el-button v-else type="primary"
+                <el-button v-else type="success"
                            @click="into_exam(scope.row.eid)">进入考试</el-button>
               </template>
             </el-table-column>
