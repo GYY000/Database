@@ -54,7 +54,7 @@
   <el-dialog v-model="password_dialog" style="width:400px" draggable>
     <template #header>
       <div style="display: flex;justify-content: center">
-        <span style="font-size: 35px;color:dodgerblue;font-family: Lobster;font-weight: bold">修改密码</span>
+        <span style="font-size: 20px;color:dodgerblue;font-weight: bold">修改密码</span>
       </div>
     </template>
     <el-form
