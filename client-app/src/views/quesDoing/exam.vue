@@ -163,6 +163,7 @@ import {useRouter} from "vue-router";
 import router from "@/router";
 import Ques_do_display from "@/views/quesDoing/ques_do_display.vue";
 import Judge_ans_view from "@/views/quesDoing/judge_ans_view.vue";
+import {ElMessage} from "element-plus";
 
 export default {
   name: 'exam',
@@ -276,10 +277,12 @@ export default {
       diff_time.value = formattedTime()
       if (seconds.value === 0) {
         if (exam_mode.value === true) {
+          ElMessage.success("自动交卷，请等待批改")
           hand_in()
         } else {
           seconds.value = duration.value
           clearInterval(timerInterval.value)
+          startTimer()
           exam_mode.value = true
         }
       }
@@ -307,17 +310,17 @@ export default {
             qsid.value = res.qsid
             duration.value = res.duration
             start_time.value = res.start_time
-            if (isWithinTimeRange(res.start_time, duration)) {
+            if (isWithinTimeRange(res.start_time, duration.value)) {
               exam_mode.value = true
-              const startTime = new Date(start_time.value);
+              const startTime = new Date(res.start_time);
               const currentTime = new Date();
-              const endTime = new Date(startTime.getTime() + duration * 1000);
-              seconds.value = Math.floor((endTime - currentTime) / 1000);
+              const endTime = new Date(startTime.getTime() + duration.value * 1000);
+              seconds.value = Math.floor((endTime.getTime() - currentTime.getTime()) / 1000);
             } else {
               exam_mode.value = false
               const startTime = new Date(start_time.value);
               const currentTime = new Date();
-              seconds.value = Math.floor((startTime - currentTime) / 1000);
+              seconds.value = Math.floor((startTime.getTime() - currentTime.getTime()) / 1000);
             }
             startTimer()
             fetch_ques_info(res.qsid).then(
@@ -401,7 +404,7 @@ export default {
       const startTime = new Date(start_time);
       const currentTime = new Date();
       const endTime = new Date(startTime.getTime() + duration * 1000);
-      return currentTime >= startTime && currentTime <= endTime;
+      return currentTime.getTime() >= startTime.getTime() && currentTime.getTime() <= endTime.getTime();
     }
 
     const update_ans = (data) => {

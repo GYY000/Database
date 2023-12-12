@@ -1257,7 +1257,7 @@ def fetch_exam_info(request):
     return JsonResponse({
         "qsid": exam.qsid.qsid,
         "start_time": exam.start_time.strftime("%Y-%m-%d %H:%M"),
-        "duration": exam.duration
+        "duration": exam.duration.total_seconds()
     })
 
 
