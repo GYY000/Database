@@ -75,14 +75,13 @@ export default {
   },
   mounted() {
     console.log("mounted钩子启动")
-    this.messageLoaded = false;
     this.getProfilePhoto();
     this.getMessages();
     this.updateData();
   },
   watch: {
     contact: function (oldVal, newVal) {
-      console.log("watch钩子启动")
+      this.messageLoaded = false;
       this.stopTimer();
       this.messages = []
       this.$nextTick(() => {
@@ -110,8 +109,8 @@ export default {
       const store = userStateStore()
       axios.post('/get_history_message', { receiver: this.contact.user_id, sender: store.getUserId })
         .then(response => {
-          this.messageLoaded = true;
           if (response.data.receiver == this.contact.user_id && response.data.message_list.length > this.messages.length) {
+            this.messageLoaded = true;
             const diff = response.data.message_list.length - this.messages.length;
             this.messages.push(...response.data.message_list.slice(-diff));
             this.scrollToBottom();
