@@ -1,6 +1,6 @@
 <template>
   <el-card :body-style="{ padding: '0px' }" shadow="hover"
-           style="width:23%; border-radius: 3%;margin-top: 10px">
+           style="width:23%; border-radius: 3%;margin-top: 10px;">
     <el-skeleton :loading="flag" animated>
       <template #template>
         <el-skeleton-item variant="image" class="image-container"/>
@@ -168,7 +168,7 @@ export default {
   flex-direction: column;
   width: 90%;
   padding-left: 5%;
-  max-width: 300px;
+  /*max-width: 300px;*/
   height: 150px
 }
 
