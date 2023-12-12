@@ -196,8 +196,6 @@ export default {
 
 .set_content {
   padding-top: 10px;
-  padding-left: 5%;
-  padding-right: 5%;
   height: 50%;
   font-size: 10px;
   width: 100%;
