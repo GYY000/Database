@@ -37,6 +37,7 @@
 import {fetch_avatar, respond} from "@/views/main/api";
 import {ref} from "vue";
 import {ElMessage} from "element-plus";
+import router from "@/router";
 
 export default {
   name: 'message',
@@ -66,6 +67,7 @@ export default {
                 showClose: true,
                 type: 'success',
               })
+              router.go(0)
             }
           }
       )

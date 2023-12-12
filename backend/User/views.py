@@ -650,7 +650,7 @@ url:/fetch_all_application
             id_list.append(_.id)
             applier_name_list.append(_.uid.user_name)
             team_name_list.append(_.tid.team_name)
-            time_list.append(_.create_time.strftime("%Y-%m-%d"))
+            time_list.append(_.create_time.strftime("%Y-%m-%d %H:%M"))
     return JsonResponse({"applier_name_list": applier_name_list,
                          "team_name_list": team_name_list,
                          "time_list": time_list,
@@ -718,7 +718,7 @@ url:/fetch_all_users_in_team
     accuracy_list = []
     for _ in ReUserTeam.objects.filter(tid=tid):
         name_list.append(_.uid.user_name)
-        register_date_list.append(_.join_date.strftime("%Y-%m-%d %H:%M"))
+        register_date_list.append(_.join_date.strftime("%Y-%m-%d"))
         uid_list.append(_.uid.uid)
         try:
             qhs = QuestionHistory.objects.filter(uid=_.uid.uid)
