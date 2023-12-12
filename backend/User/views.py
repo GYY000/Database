@@ -1017,7 +1017,7 @@ def get_recent_records(request):
                           "user_score": qs[i].score,
                           "total_score": total_scores[i],
                           "time": qs[i].time.strftime("%Y-%m-%d %H:%M"),
-                          "qsid": qs[i].qsid.qsid,
+                          "shid": qs[i].shid,
                           } for i in range(len(qs))], safe=False)
 
 
