@@ -269,6 +269,20 @@ export function fetch_team_info(tid) {
     })
 }
 
+export function change_password(uid,old_password,new_password) {
+    return axios.request({
+        url: '/change_password',
+        method: "post",
+        data: JSON.stringify({
+            old_password:old_password,
+            new_password:new_password,
+            uid:uid
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
 export function fetch_history_application(tid) {
     return axios.request({
         url: '/fetch_history_applications',

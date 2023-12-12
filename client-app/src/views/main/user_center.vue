@@ -34,7 +34,6 @@
                 <span>注册日期</span>
               </div>
             </el-tag>
-            <el-button type="danger" @click="logout" style="margin-top: 15px">退出登录</el-button>
           </div>
         </div>
         <div class="right-column" style="flex: 3">
@@ -44,9 +43,45 @@
             </div>
           </div>
         </div>
+
       </div>
+      <el-button type="primary" @click="open_change_password"
+                 style="margin-top: 15px">更改密码
+      </el-button>
+      <el-button type="danger" @click="logout" style="margin-top: 15px">退出登录</el-button>
     </el-col>
   </el-row>
+  <el-dialog v-model="password_dialog" style="width:400px" draggable>
+    <template #header>
+      <div style="display: flex;justify-content: center">
+        <span style="font-size: 35px;color:dodgerblue;font-family: Lobster;font-weight: bold">修改密码</span>
+      </div>
+    </template>
+    <el-form
+        label-position="left"
+        label-width="75px"
+        style="max-width: 300px;margin:auto">
+      <el-form-item label="密码">
+        <el-input v-model="old_password" :show-password="true"/>
+      </el-form-item>
+      <el-form-item label="密码">
+        <el-input v-model="new_password" :show-password="true"/>
+      </el-form-item>
+      <el-form-item label="确认密码">
+        <el-input v-model="confirm_password" :show-password="true"/>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button type="primary" @click="confirm_change">
+          确定
+        </el-button>
+        <el-button type="danger" @click="cancel_change">
+          取消
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script>
@@ -56,6 +91,7 @@ import {ElMessage} from "element-plus";
 import {fetch_user_info} from "@/views/loginInterface/loginAPI";
 import {UploadFilled} from '@element-plus/icons-vue'
 import router from "@/router";
+import {change_password} from "@/views/main/api";
 
 export default {
   name: "user_center",
@@ -63,6 +99,37 @@ export default {
   setup() {
     const store = userStateStore()
     const src1 = ref(store.getProfilePhoto)
+    const password_dialog = ref(false)
+    const old_password = ref('')
+    const new_password = ref('')
+    const confirm_password = ref('')
+
+    const confirm_change = () => {
+      if (new_password.value === confirm_password.value) {
+        change_password(store.getUserId, old_password.value, new_password.value).then(
+            (res) => {
+              if (res.old_password_fault === 'true') {
+                ElMessage.error("原有密码输入错误")
+              } else if (res.is_successful === 'true') {
+                ElMessage.success("修改成功")
+              } else {
+                ElMessage.error("修改失败，请稍后再试")
+              }
+            }
+        )
+      } else {
+        ElMessage.error("请确认新密码是否一致")
+      }
+    }
+
+    const cancel_change = () => {
+      password_dialog.value = false
+    }
+
+    const open_change_password = () => {
+      password_dialog.value = true
+    }
+
     //const is_editing_user_name = ref(false)
     //TODO: on server change here
     const action_url = ref("http://127.0.0.1:8000/upload_avatar?user_id=" + store.getUserId)
@@ -95,7 +162,14 @@ export default {
       action_url,
       handleAvatarSuccess,
       store,
-      logout
+      logout,
+      open_change_password,
+      password_dialog,
+      old_password,
+      new_password,
+      confirm_password,
+      confirm_change,
+      cancel_change
     }
   }
 }
@@ -103,7 +177,7 @@ export default {
 
 <style scoped>
 .avatar-uploader .el-upload:hover {
-  border: 1px dashed  #409EFF;
+  border: 1px dashed #409EFF;
 }
 
 .avatar {

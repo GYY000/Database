@@ -546,9 +546,9 @@ export default {
       send_set_admin(uids, team_id.value, store.getUserId).then(
           (res) => {
             if (res.is_successful === 'true') {
-              ElMessage.success("发送成功")
+              ElMessage.success("操作成功")
             } else {
-              ElMessage.error("发送失败")
+              ElMessage.error("操作失败")
             }
           }
       )
