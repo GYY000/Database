@@ -1,7 +1,7 @@
 <template>
   <el-card shadow="hover" style="width:32%; border-radius: 3%;margin-top: 10px">
     <div class="card_layout">
-      <div class="l_column">
+      <el-row :span="11">
         <el-skeleton :loading="flag" animated>
           <template #template>
             <el-skeleton-item variant="image" class="image-container"/>
@@ -12,8 +12,8 @@
             </div>
           </template>
         </el-skeleton>
-      </div>
-      <div class="r_column">
+      </el-row>
+      <el-row :span="11" style="margin-left: 10px">
         <div class="set_title">
           {{ set_name }}
           <div class="seperator"></div>
@@ -29,7 +29,8 @@
           <el-button type="danger" :icon="Edit" class="button"
                      v-if="creator_name === user_name" @click="do_edit"/>
           <div style="flex-grow: 1;"/>
-          <svg width="20" height="20" class="star" viewBox="0 0 20 20" style="margin-top: 8px;" @click="clickCollection">
+          <svg width="20" height="20" class="star" viewBox="0 0 20 20" style="margin-top: 8px;margin-left: 20px"
+               @click="clickCollection">
             <path d="M10 14.2L5 17l1-5.6-4-4 5.5-.7 2.5-5 2.5 5 5.6.8-4 4 .9 5.5z"
                   :stroke="isFavorite ? 'gold' : 'black'"
                   :fill="isFavorite ? 'gold' : 'none'"
@@ -38,7 +39,7 @@
             </path>
           </svg>
         </div>
-      </div>
+      </el-row>
     </div>
   </el-card>
 </template>
@@ -172,6 +173,7 @@ export default {
   font-size: 18px;
   color: #1169ea;
   height: 30%;
+  width: 100%;
 }
 
 .set_content {
@@ -183,6 +185,7 @@ export default {
   font-size: 10px;
   color: rgb(86, 94, 108);
   height: 15%;
+  width: 100%;
 }
 
 .footer {
@@ -193,7 +196,7 @@ export default {
 .button {
   margin-top: 8px;
   height: 70%;
-  width: 30%;
+  width: 40px;
   padding-right: 5px;
 }
 

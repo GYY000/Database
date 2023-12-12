@@ -142,7 +142,7 @@ export default {
                 closure()
               } else {
                 ElMessage({
-                  message: '您不在用户组内，请重新确认',
+                  message: '您不在团队内，请重新确认',
                   showClose: true,
                   type: 'error',
                 })

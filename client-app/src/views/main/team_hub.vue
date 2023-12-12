@@ -3,7 +3,7 @@
   <div class="top_panel">
     <span>
       <el-button type="success" @click="dialog_visible = true">
-        创建用户组
+        创建团队
       </el-button>
     </span>
     <span>
@@ -19,7 +19,7 @@
 
   <el-dialog
       v-model="dialog_visible"
-      title="创建用户组"
+      title="创建团队"
       width="30%"
       draggable
       :before-close="handle_close"
@@ -61,6 +61,7 @@
   <el-row class="groups-container" v-if="begin_flag">
     <team_card v-for="(item,index) in team_sets.creator_list" :creator_name="item"
                :group_name="team_sets.group_name_list[index]"
+               style="margin-right: 15px"
                :date="team_sets.date_list[index]"
                :tid="team_sets.tid_list[index]"
                :introduction="team_sets.introduction_list[index]">
@@ -125,7 +126,7 @@ export default {
     }
 
     const handle_close = (done) => {
-      ElMessageBox.confirm('确定取消创建用户组吗')
+      ElMessageBox.confirm('确定取消创建团队吗')
           .then(() => {
             done();
           })
@@ -158,7 +159,7 @@ export default {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: space-around;
+  justify-content: left;
   width: 95%;
   left: 2.5%;
 }

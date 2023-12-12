@@ -198,6 +198,7 @@ export default {
   padding-right: 5%;
   height: 50%;
   font-size: 10px;
+  width: 100%;
   display: flex;
   justify-content: center;
 }
