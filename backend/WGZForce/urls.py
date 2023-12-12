@@ -90,5 +90,7 @@ urlpatterns = [
     re_path("inside_exam",views.inside_exam),
     re_path("set_admin",views.set_admin),
     re_path("is_team_admin",views.is_team_admin),
-    re_path("change_password",views.change_password)
+    re_path("change_password",views.change_password),
+    re_path("get_do_set_history",views.get_do_set_history),
+    re_path("get_do_ques_history",views.get_do_ques_history)
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
