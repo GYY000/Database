@@ -14,6 +14,7 @@ import panel_del_index from "@/views/main/panel_del_index.vue";
 import manage_team from "@/views/main/team_component/manage_team.vue";
 import exam from "@/views/quesDoing/exam.vue";
 import exam_hub from "@/views/main/exam_hub.vue";
+import history_set from "@/views/quesDoing/history_set.vue";
 
 const routes = [
     {
@@ -80,6 +81,11 @@ const routes = [
                     path: 'do_exam/:eid',
                     name: "do_exam",
                     component: exam
+                },
+                {
+                    path: 'set_history/:shid',
+                    name: "history_set",
+                    component: history_set
                 }
             ]
     }

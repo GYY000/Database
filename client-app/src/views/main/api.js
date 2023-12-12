@@ -581,3 +581,39 @@ export function fetch_exam_info(eid) {
     )
 }
 
+export function fetch_set_history(uid) {
+    return axios.request(
+        {
+            url: '/get_do_set_history',
+            method: "post",
+            data: JSON.stringify(
+                {
+                    uid: uid
+                }
+            )
+        }
+    ).then(
+        (response) => {
+            return response.data
+        }
+    )
+}
+
+export function fetch_ques_history(uid, shid) {
+    return axios.request(
+        {
+            url: '/get_do_ques_history',
+            method: "post",
+            data: JSON.stringify(
+                {
+                    uid: uid,
+                    shid: shid
+                }
+            )
+        }
+    ).then(
+        (response) => {
+            return response.data
+        }
+    )
+}
