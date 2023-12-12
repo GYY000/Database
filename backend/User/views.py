@@ -722,9 +722,11 @@ url:/fetch_all_users_in_team
     uid_list = []
     do_prob_sum_list = []
     accuracy_list = []
+    is_admin_list = []
     for _ in ReUserTeam.objects.filter(tid=tid):
         name_list.append(_.uid.user_name)
         register_date_list.append(_.join_date.strftime("%Y-%m-%d"))
+        is_admin_list.append(_.is_admin)
         uid_list.append(_.uid.uid)
         try:
             qhs = QuestionHistory.objects.filter(uid=_.uid.uid)
@@ -741,6 +743,7 @@ url:/fetch_all_users_in_team
     return JsonResponse({"name_list": name_list,
                          "register_date_list": register_date_list,
                          "uid_list": uid_list,
+                         "is_admin_list": is_admin_list,
                          "do_prob_sum_list": do_prob_sum_list,
                          "accuracy_list": accuracy_list
                          })
@@ -1273,7 +1276,7 @@ def set_admin(request):
     users=ReUserTeam.objects.filter(tid=tid)
     if cur_user==Team.objects.get(tid=tid).creator.uid:
         for _ in users:
-            if uids.__contains__(_.uid):
+            if uids.__contains__(_.uid.uid):
                 _.is_admin=True
                 _.save()
         return JsonResponse({"is_successful":"true"})

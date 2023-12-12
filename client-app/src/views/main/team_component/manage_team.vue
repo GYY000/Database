@@ -155,6 +155,7 @@
                 <el-table-column v-if="is_admin_perm" type="selection"/>
                 <el-table-column property="id" label="id" sortable/>
                 <el-table-column property="name" label="用户名" sortable/>
+                <el-table-column property="is_admin" label="身份" sortable/>
                 <el-table-column property="date" label="加入时间" sortable/>
                 <el-table-column property="do_prob_sum" label="做题数" sortable/>
                 <el-table-column property="accuracy" label="正确率" sortable/>
@@ -547,6 +548,7 @@ export default {
           (res) => {
             if (res.is_successful === 'true') {
               ElMessage.success("操作成功")
+              router.go(0)
             } else {
               ElMessage.error("操作失败")
             }
@@ -644,6 +646,7 @@ export default {
                     name: res.name_list[i],
                     date: res.register_date_list[i],
                     do_prob_sum: res.do_prob_sum_list[i],
+                    is_admin:res.is_admin_list[i] === true? "管理员": "成员",
                     accuracy: (res.accuracy_list[i] * 100).toFixed(1) + '%'
                   }
               )
@@ -749,6 +752,7 @@ export default {
                 showClose: true,
                 type: 'success',
               })
+              router.go(0)
             } else {
               ElMessage({
                 message: '修改失败，请稍后再试',
@@ -781,6 +785,7 @@ export default {
           (res) => {
             if (res.is_successful === 'true') {
               ElMessage.success("发送成功")
+              group_message_dialog.value = false
             } else {
               ElMessage.error("发送失败")
             }
@@ -866,6 +871,7 @@ export default {
               ElMessage.error("删除失败")
             }
             del_member_dialog.value = false
+            router.go(0)
           }
       )
     }

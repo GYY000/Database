@@ -112,6 +112,7 @@ export default {
                 ElMessage.error("原有密码输入错误")
               } else if (res.is_successful === 'true') {
                 ElMessage.success("修改成功")
+                password_dialog.value = false
               } else {
                 ElMessage.error("修改失败，请稍后再试")
               }
