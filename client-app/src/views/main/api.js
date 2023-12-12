@@ -205,6 +205,34 @@ export function del_ques_set(set_name) {
     })
 }
 
+export function send_set_admin(uids, tid, current_user_id) {
+    return axios.request({
+        url: '/set_admin',
+        method: "post",
+        data: JSON.stringify({
+            uids: uids,
+            tid: tid,
+            current_user_id: current_user_id
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
+
+export function check_team_perm(uid, tid) {
+    return axios.request({
+        url: '/is_team_admin',
+        method: "post",
+        data: JSON.stringify({
+            tid:tid,
+            uid:uid,
+        })
+    }).then(response => {
+        return response.data
+    })
+}
+
 export function fetch_all_member(tid) {
     return axios.request({
         url: '/fetch_all_users_in_team',
@@ -490,8 +518,8 @@ export function check_inside_exam(uid, eid) {
             method: "post",
             data: JSON.stringify(
                 {
-                    uid:uid,
-                    eid:eid
+                    uid: uid,
+                    eid: eid
                 }
             )
         }
@@ -509,8 +537,8 @@ export function participate_exam(uid, eid) {
             method: "post",
             data: JSON.stringify(
                 {
-                    uid:uid,
-                    eid:eid
+                    uid: uid,
+                    eid: eid
                 }
             )
         }
@@ -528,7 +556,7 @@ export function fetch_exam_info(eid) {
             method: "post",
             data: JSON.stringify(
                 {
-                    eid:eid
+                    eid: eid
                 }
             )
         }
