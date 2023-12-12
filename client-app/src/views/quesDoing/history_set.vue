@@ -1,18 +1,19 @@
 <template>
+  <img src="@/assets/image/background3.jpg" class="background">
   <div class="lower_panel" id="lower_panel">
-      <el-row style="width: 100%" class="vertical-align-center">
-        <el-col :span="3" style="height: 100%; margin-left: 30px;display: flex;align-items: center"
-                @click="open_exit" class="hover_class">
-          <el-icon style="width: 40px; height: 45px;margin-top: 12px">
-            <ArrowLeft/>
-          </el-icon>
-          <div style="font-size: 16px;margin-top: 12px;display: inline-block">退出答题</div>
-        </el-col>
-        <el-col :span="8" :offset="7" style="height: 100%;font-size: 16px;color: #545455">
-          {{ ques_set_name }}
-        </el-col>
-      </el-row>
-    </div>
+    <el-row style="width: 100%" class="vertical-align-center">
+      <el-col :span="3" style="height: 100%; margin-left: 30px;display: flex;align-items: center"
+              @click="exit" class="hover_class">
+        <el-icon style="width: 40px; height: 45px;margin-top: 12px">
+          <ArrowLeft/>
+        </el-icon>
+        <div style="font-size: 16px;margin-top: 12px;display: inline-block">退出</div>
+      </el-col>
+      <el-col :span="8" :offset="7" style="height: 100%;font-size: 16px;color: #545455">
+        {{ ques_set_name }}
+      </el-col>
+    </el-row>
+  </div>
   <div class="secbackground"></div>
   <div class="center_class">
     <div class="main_container" id="main_container">
@@ -54,7 +55,7 @@
         />
         <div v-for="(ques, index) in display_ques" style="margin-bottom: 25px">
           <div v-if="index !== 0" class="dashed-divider"></div>
-          <ques_judge_display :ques="ques" :id="(currentPage - 1)* page_size + index"
+          <ques_history_display :ques="ques" :id="(currentPage - 1)* page_size + index"
                               :score="scores[(currentPage - 1)* page_size + index]"
                               :ans="ans[(currentPage - 1)* page_size + index]"/>
         </div>
@@ -65,19 +66,41 @@
 
 <script>
 import userStateStore from "@/store";
-import {ref} from "vue";
+import {onBeforeUnmount, ref} from "vue";
 import router from "@/router";
 import Ques_judge_display from "@/views/quesDoing/ques_judge_display.vue";
 import {ElMessage} from "element-plus";
-import {hand_in_score} from "@/views/main/api";
+import {fetch_ques_history, hand_in_score} from "@/views/main/api";
+import {useRouter} from "vue-router";
+import Ques_history_display from "@/views/quesDoing/ques_histroy_display.vue";
 
 export default {
   name: 'history_set',
-  props: ["hit_scores", "questions", "ques_set_name", "introduction", "ans", "qsid", "qids"],
   components: {
+    Ques_history_display,
     Ques_judge_display
   },
-  setup(props) {
+  mounted() {
+    const handleScroll = () => {
+      let lower_panel = document.getElementById('lower_panel');
+      let scrollDistance = window.pageYOffset || document.documentElement.scrollTop;
+      let threshold = 20;
+
+      if (scrollDistance < threshold || scrollDistance === 0) {
+        lower_panel.style.top = '60px';
+      } else {
+        lower_panel.style.top = '0px';
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    // 监听器添加后会在组件销毁时自动取消
+    onBeforeUnmount(() => {
+      window.removeEventListener('scroll', handleScroll);
+    });
+  },
+  setup() {
     const statistic = ref([
       {
         sum: 0,
@@ -101,6 +124,13 @@ export default {
         mix: 0.0,
       }
     ])
+    const hit_scores = ref([])
+    const questions = ref([])
+    const ques_set_name = ref('')
+    const ans = ref([])
+    const shid = ref()
+    const introduction = ref('')
+
     const store = userStateStore()
     const page = ref(1)
     const display_ques = ref([])
@@ -138,42 +168,42 @@ export default {
       let true_sum = 0
       let all_sum = 0
       let delta = 1e-5
-      for (let i = 0; i < props.questions.length; i++) {
-        all_score = all_score + props.questions[i].score
+      for (let i = 0; i < questions.value.length; i++) {
+        all_score = all_score + questions.value[i].score
         all_sum++
-        if (props.questions[i].content.type === '选择') {
-          op_all_score = op_all_score + props.questions[i].score
+        if (questions.value[i].content.type === '选择') {
+          op_all_score = op_all_score + questions.value[i].score
           op_all_sum++
           op_true_score = op_true_score + scores.value[i]
           true_score = true_score + scores.value[i]
-          if (Math.abs(props.questions[i].score - scores.value[i]) < delta) {
+          if (Math.abs(questions.value[i].score - scores.value[i]) < delta) {
             op_true_sum++
             true_sum++
           }
-        } else if (props.questions[i].content.type === '填空') {
-          blank_all_score = blank_all_score + props.questions[i].score
+        } else if (questions.value[i].content.type === '填空') {
+          blank_all_score = blank_all_score + questions.value[i].score
           blank_all_sum++
           blank_true_score = blank_true_score + scores.value[i]
           true_score = true_score + scores.value[i]
-          if (Math.abs(props.questions[i].score - scores.value[i]) < delta) {
+          if (Math.abs(questions.value[i].score - scores.value[i]) < delta) {
             blank_true_sum++
             true_sum++
           }
-        } else if (props.questions[i].content.type === '问答') {
-          qa_all_score = qa_all_score + props.questions[i].score
+        } else if (questions.value[i].content.type === '问答') {
+          qa_all_score = qa_all_score + questions.value[i].score
           qa_all_sum++
           qa_true_score = qa_true_score + scores.value[i]
           true_score = true_score + scores.value[i]
-          if (Math.abs(props.questions[i].score - scores.value[i]) < delta) {
+          if (Math.abs(questions.value[i].score - scores.value[i]) < delta) {
             qa_true_sum++
             true_sum++
           }
         } else {
-          mix_all_score = mix_all_score + props.questions[i].score
+          mix_all_score = mix_all_score + questions.value[i].score
           mix_all_sum++
           mix_true_score = mix_true_score + scores.value[i]
           true_score = true_score + scores.value[i]
-          if (Math.abs(props.questions[i].score - scores.value[i]) < delta) {
+          if (Math.abs(questions.value[i].score - scores.value[i]) < delta) {
             mix_true_sum++
             true_sum++
           }
@@ -197,26 +227,21 @@ export default {
     }
 
     const init = () => {
-      for (let i = 0; i < props.questions.length; i++) {
-        if (props.questions[i].content.type === '问答') {
-          scores.value.push(0.0)
-        } else if (props.questions[i].content.type === '复合') {
-          let temp_array = []
-          for (let j = 0; j < props.questions[i].content.sub_problem.length; j++) {
-            if (props.questions[i].content.sub_problem[j].type !== '问答') {
-              temp_array.push(props.hit_scores[i][j])
-            } else {
-              temp_array.push(0.0)
-            }
+      let router = useRouter()
+      shid.value = router.currentRoute.value.params.shid
+      fetch_ques_history(store.getUserId, shid.value).then(
+          (res) => {
+            hit_scores.value = res.get_score_list
+            questions.value = res.question_list
+            ques_set_name.value = res.ques_set_name
+            introduction.value = res.introduction
+            ans.value = res.ans_list
+            scores.value = hit_scores.value
+            display_ques.value = questions.value.slice((page.value - 1) * page_size.value,
+                (page.value - 1) * page_size.value + page_size.value)
+            gen_statistic()
           }
-          scores.value.push(temp_array)
-        } else {
-          scores.value.push(props.hit_scores[i])
-        }
-      }
-      display_ques.value = props.questions.slice((page.value - 1) * page_size.value,
-          (page.value - 1) * page_size.value + page_size.value)
-      gen_statistic()
+      )
     }
 
     init()
@@ -237,12 +262,38 @@ export default {
       statistic,
       exit,
       scores,
+      hit_scores,
+      ans,
+      questions,
+      ques_set_name,
+      introduction
     }
   }
 }
 </script>
 
 <style scoped>
+.secbackground {
+  top: 0;
+  left: 2%;
+  width: 96%;
+  height: 100vh;
+  position: fixed;
+  z-index: -1;
+  opacity: 100%;
+  background-color: white;
+}
+
+.background {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  z-index: -1;
+  opacity: 30%;
+}
+
 .main_container {
   left: 5%;
   width: 90%;
@@ -289,14 +340,80 @@ export default {
   width: 100%;
 }
 
-.secbackground {
-  top: 0;
-  left: 2%;
-  width: 96%;
-  height: 100vh;
+.lower_panel {
+  background: white;
+  height: 70px;
+  left: 0;
+  top: 60px;
+  width: 100%;
   position: fixed;
-  z-index: -1;
-  opacity: 100%;
-  background-color: white;
+  z-index: 9999;
+}
+
+.vertical-align-center {
+  display: flex;
+  align-items: center;
+}
+
+.hover_class:hover {
+  color: #545455;
+  cursor: pointer;
+}
+
+.hover_class {
+  color: #545455;
+}
+
+.right-panel1 {
+  position: fixed;
+  top: 50%;
+  right: 1%;
+  transform: translateY(-50%);
+  height: 300px;
+  width: 200px;
+  background: white;
+  box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.3);
+  border-radius: 5%;
+  overflow-y: scroll;
+}
+
+.right-panel2 {
+  position: fixed;
+  top: 27.4%;
+  right: 1%;
+}
+
+.circle_show1 {
+  border-radius: 50%;
+  margin: 6px;
+  height: 30px;
+  width: 30px;
+  background: #409EFF;
+  color: white;
+  display: flex;
+  font-size: 12px;
+  font-weight: bold;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
+}
+
+.circle_show2 {
+  border-radius: 50%;
+  margin: 6px;
+  height: 30px;
+  width: 30px;
+  background: white;
+  color: #409EFF;
+  display: flex;
+  font-size: 12px;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+.right-panel1::-webkit-scrollbar {
+  width: 0;
 }
 </style>

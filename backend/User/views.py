@@ -1346,7 +1346,11 @@ def get_do_ques_history(request):
     ans_list=[]
     for _ in ques:
         get_score_list.append(_.score)
-        question_list.append(_.qid.content)
+        question = {}
+        question['serial_num'] = _.qid.serial_num
+        question['content'] = _.qid.content
+        question['score'] = _.qid.score
+        question_list.append(question)
         ans_list.append(_.answer)
     return JsonResponse({"get_score_list":get_score_list,
                          "question_list":question_list,

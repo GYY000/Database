@@ -52,7 +52,22 @@
     </el-col>
   </el-row>
   <el-row>
+    <el-col :span="16" :offset="4">
+      <el-card class="horizontal-card" style="height: auto;">
+        <template #header>
+          <div class="card-header">
+            <h2>我的记录</h2>
+          </div>
+        </template>
 
+        <history_card
+            v-for="record in records"
+            :key="record.question_set_name"
+            :record="record"
+        >
+        </history_card>
+      </el-card>
+    </el-col>
   </el-row>
   <el-dialog v-model="password_dialog" style="width:400px" draggable>
     <template #header>
@@ -95,10 +110,11 @@ import {fetch_user_info} from "@/views/loginInterface/loginAPI";
 import {UploadFilled} from '@element-plus/icons-vue'
 import router from "@/router";
 import {change_password, fetch_ques_history, fetch_set_history} from "@/views/main/api";
+import history_card from "@/views/main/main_page_component/history_card.vue";
 
 export default {
   name: "user_center",
-  components: {UploadFilled},
+  components: {history_card, UploadFilled},
   setup() {
     const store = userStateStore()
     const src1 = ref(store.getProfilePhoto)
@@ -140,11 +156,11 @@ export default {
           (res) => {
             for (let i = 0; i < res.ques_set_name_list.length; i++) {
               records.value.push({
-                ques_tion_set_name: res.ques_set_name_list[i],
+                question_set_name: res.ques_set_name_list[i],
                 time: res.time_list[i],
                 user_score: res.user_score_list[i],
                 total_score: res.total_score_list[i],
-                sh_id: res.shid_list[i]
+                shid: res.shid_list[i]
               })
             }
           }
@@ -191,7 +207,8 @@ export default {
       new_password,
       confirm_password,
       confirm_change,
-      cancel_change
+      cancel_change,
+      records
     }
   }
 }
