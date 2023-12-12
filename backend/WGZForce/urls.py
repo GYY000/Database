@@ -87,5 +87,8 @@ urlpatterns = [
     re_path("create_exam",views.create_exam),
     re_path("participate_exam",views.participate_exam),
     re_path("fetch_exam_info",views.fetch_exam_info),
-    re_path("inside_exam",views.inside_exam)
+    re_path("inside_exam",views.inside_exam),
+    re_path("set_admin",views.set_admin),
+    re_path("is_team_admin",views.is_team_admin),
+    re_path("change_password",views.change_password)
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

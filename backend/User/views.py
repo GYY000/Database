@@ -630,6 +630,7 @@ def answer_to_req(request):
     return JsonResponse({"is_successful": "true"})
 
 
+#TODO
 def fetch_all_application(request):
     '''
     前->后	后->前
@@ -646,7 +647,12 @@ url:/fetch_all_application
     time_list = []
     id_list = []
     for _ in JoinRequest.objects.all():
-        if _.tid.creator.uid == user_id:
+        tmp=ReUserTeam.objects.filter(tid=_.tid.tid)
+        perm_list=[]
+        for user in tmp:
+            if user.is_admin:
+                perm_list.append(user.uid.uid)
+        if perm_list.__contains__(user_id):
             id_list.append(_.id)
             applier_name_list.append(_.uid.user_name)
             team_name_list.append(_.tid.team_name)
@@ -1200,7 +1206,7 @@ def fetch_all_future_intime_tests(request):
 
 from datetime import datetime
 
-
+#TODO
 def create_exam(request):
     request_dict = json.loads(request.body.decode('utf-8'))
     creator_id = request_dict['creator_id']
@@ -1214,8 +1220,11 @@ def create_exam(request):
     qs = QuestionSet.objects.get(set_name=ques_set_name)
     if not qs.is_public:
         permits = list(QuestionSetPerm.objects.filter(qsid=qs.qsid))
-        permits = [_.tid.creator.uid for _ in permits]
-        if not permits.__contains__(creator_id):
+        # permits = [_.tid.creator.uid for _ in permits]
+        perms=[]
+        for _ in permits:
+            perms.extend([ haha.uid.uid for haha in ReUserTeam.objects.filter(tid=_.tid.tid,is_admin=True)])
+        if not perms.__contains__(creator_id):
             return JsonResponse({"is_successful": "false", "has_no_perm": "true"})
         else:
             Exam(creator=User.objects.get(uid=creator_id), qsid=qs, exam_name=exam_name,
@@ -1255,3 +1264,46 @@ def inside_exam(request):
         return JsonResponse({"is_inside": "true"})
     except:
         return JsonResponse({"is_inside": "false"})
+
+def set_admin(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    tid=request_dict['tid']
+    uids=request_dict['uids']
+    cur_user=request_dict['current_user_id']
+    users=ReUserTeam.objects.filter(tid=tid)
+    if cur_user==Team.objects.get(tid=tid).creator.uid:
+        for _ in users:
+            if uids.__contains__(_.uid):
+                _.is_admin=True
+                _.save()
+        return JsonResponse({"is_successful":"true"})
+    else:
+        return JsonResponse({"is_successful":"false"})
+
+def is_team_admin(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    tid=request_dict['tid']
+    uid=request_dict['uid']
+    try:
+        user=ReUserTeam.objects.get(uid=uid,tid=tid)
+        if user.is_admin:
+            return JsonResponse({"is_admin":"true"})
+        else:
+            return JsonResponse({"is_admin":"false"})
+    except:
+        return JsonResponse({"is_admin": "false"})
+
+
+def change_password(request):
+    request_dict=json.loads(request.body.decode('utf-8'))
+    uid=request_dict['uid']
+    old_passswd=request_dict['old_password']
+    new_passwd=request_dict['new_password']
+    user=User.objects.get(uid=uid)
+    correct_passwd=user.password
+    if old_passswd==correct_passwd:
+        user.password=new_passwd
+        user.save()
+        return JsonResponse({"old_password_fault":"false","is_successful":"true"})
+    else:
+        return JsonResponse({"old_password_fault":"true","is_successful":"false"})
